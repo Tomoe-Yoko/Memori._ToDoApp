@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model Users {
+  id             Int      @id @default(autoincrement())
+  userName       String
+  supabaseUserId String
+  themeColorId   Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  calendars      Calendar[]
+  weeklies       Weekly[]
+  todoGroups     TodoGroup[]
+  galleryGroups  GalleryGroup[]
+
+  @@map("Users")
+}
+
+
+model Calendar {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  scheduleDate  DateTime
+  content       String
+  scheduleColor ScheduleColor
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          Users    @relation(fields: [userId], references: [id])
+
+  @@map("Calendar")
+}
+enum ScheduleColor {
+  Pink
+  Blue
+  Green
+  Orange
+  Cyan
+  Yellow
+  Wine
+  Purple
+}
+
+
+
+model TodoGroup {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  toDoGroupTitle  String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            Users    @relation(fields: [userId], references: [id])
+  toDoItems       TodoItems[]
+
+  @@map("TodoGroup")
+}
+
+model TodoItems {
+  id            Int      @id @default(autoincrement())
+  todoGroupId   Int
+  toDoItem      String
+  isChecked     Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  todoGroup     TodoGroup @relation(fields: [todoGroupId], references: [id])
+
+  @@map("TodoItems")
+}
+
+
+model Weekly {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  weekly    WeeklyDay
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user      Users    @relation(fields: [userId], references: [id])
+  routineWorks RoutineWork[]
+
+  @@map("Weekly")
+}
+enum WeeklyDay {
+  mon
+  tue
+  wed
+  thu
+  fri
+  sat
+  sun
+}
+
+model RoutineWork {
+  id              Int      @id @default(autoincrement())
+  weeklyId        Int
+  routineContent  String[]
+  isChecked       Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  weekly          Weekly   @relation(fields: [weeklyId], references: [id])
+
+  @@map("RoutineWork")
+}
+
+
+
+model GalleryGroup {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  galleryGroupTitle String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user              Users    @relation(fields: [userId], references: [id])
+  galleryItems      GalleryItems[]
+
+  @@map("GalleryGroup")
+}
+
+model GalleryItems {
+  id                Int      @id @default(autoincrement())
+  galleryGroupId    Int
+  thumbnailImageKey String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  galleryGroup      GalleryGroup @relation(fields: [galleryGroupId], references: [id])
+
+  @@map("GalleryItems")
+}
+
+model Contact {
+  id         Int      @id @default(autoincrement())
+  userName   String
+  text       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("Contact")
+}
+
