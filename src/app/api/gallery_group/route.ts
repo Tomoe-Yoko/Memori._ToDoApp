@@ -27,19 +27,7 @@ export const POST = async (request: Request) => {
         thumbnailImageKey,
       },
     });
-    //postCategoryにも生成
-    // 本来複数同時生成には、createManyというメソッドがあるが、sqliteではcreateManyが使えないので、for文1つずつ実施
 
-    // for (const category of categories) {
-    //   //postCategory` テーブルに新しいエントリを作成するためのメソッド↓
-    //   await prisma.postCategory.create({
-    //     data: {
-    //       categoryId: category.id,
-    //       postId: data.id,
-    //     },
-    //   });
-    // }
-    //レスポンスを返す
     return NextResponse.json({
       status: "OK",
       message: "送信しました",
