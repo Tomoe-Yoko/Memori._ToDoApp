@@ -8,25 +8,22 @@ const prisma = new PrismaClient();
 export const POST = async (request: Request) => {
   try {
     const body = await request.json();
+
     const {
       userId,
       scheduleDate,
       content,
       scheduleColor,
-      createdAt,
-      updatedAt,
     }: CreatePostRequestBody = body;
-
     const data = await prisma.calendar.create({
       data: {
         userId,
         scheduleDate,
         content,
         scheduleColor,
-        createdAt,
-        updatedAt,
       },
     });
+    // console.log(userId);
 
     // if (!userId || !scheduleDate || !content || !scheduleColor) {
     //   return NextResponse.json(
@@ -52,9 +49,6 @@ export const POST = async (request: Request) => {
     });
   } catch (error) {
     if (error instanceof Error)
-      return NextResponse.json(
-        { error: "Failed to create calendar entry" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
   }
 };
