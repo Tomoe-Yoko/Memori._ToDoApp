@@ -15,14 +15,40 @@ const Page = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) {
       alert("ログインに失敗しました。");
     } else {
-      router.replace("/calendar");
+      // APIにリクエストを送信する処理
+      const token = data.session?.access_token;
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            email,
+            userName: data.,
+            themeColorId: "Theme01",
+            supabaseUserId: data.user.id,
+          }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          router.replace("/calendar");
+        } else {
+          alert("APIリクエストに失敗しました: " + result.message);
+        }
+      } catch (apiError) {
+        console.error("APIリクエストエラー:", apiError);
+        alert("APIリクエスト中にエラーが発生しました。");
+      }
     }
   };
 
