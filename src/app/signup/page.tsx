@@ -15,8 +15,7 @@ export default function Page() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { error } = await supabase.auth.signUp({
-      userName,
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -26,10 +25,24 @@ export default function Page() {
     if (error) {
       alert("登録に失敗しました。");
     } else {
+      // ユーザー名をプロフィール情報として保存
+      const user = data.user;
+      if (user) {
+        const { error: updateError } = await supabase
+          .from("Users") // 'Users'はあなたのプロフィールテーブルの名前です
+          .insert([{ id: user.id, userName }]);
+
+        if (updateError) {
+          console.error("プロフィールの更新に失敗しました:", updateError);
+          alert("プロフィールの更新に失敗しました。");
+        } else {
+          alert("確認メールを送信しました。");
+        }
+      }
       setUserName("");
       setEmail("");
       setPassword("");
-      alert("確認メールを送信しました。");
+      // alert("確認メールを送信しました。");
     }
   };
   return (
