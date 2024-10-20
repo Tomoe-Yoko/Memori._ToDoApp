@@ -6,44 +6,37 @@ import Button from "../components/Button";
 import Footer from "../components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "../../img/memo.png";
+import openPw from "../../img/openPw.png";
+import closePw from "../../img/closePw.png";
 
 export default function Page() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: "http://localhost:3000/login",
+        //optionsでユーザーネームを登録
+        data: { userName },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_URL}/login`,
       },
     });
     if (error) {
       alert("登録に失敗しました。");
     } else {
-      // ユーザー名をプロフィール情報として保存
-      const user = data.user;
-      if (user) {
-        const { error: updateError } = await supabase
-          .from("Users") // 'Users'はあなたのプロフィールテーブルの名前です
-          .insert([{ id: user.id, userName }]);
-
-        if (updateError) {
-          console.error("プロフィールの更新に失敗しました:", updateError);
-          alert("プロフィールの更新に失敗しました。");
-        } else {
-          alert("確認メールを送信しました。");
-        }
-      }
-      setUserName("");
-      setEmail("");
-      setPassword("");
-      // alert("確認メールを送信しました。");
+      alert("確認メールを送信しました。");
     }
+
+    setUserName("");
+    setEmail("");
+    setPassword("");
+    // alert("確認メールを送信しました。");
   };
   return (
     <div className="h-dvh">
@@ -84,9 +77,9 @@ export default function Page() {
               className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
-          <div>
+          <div className="relative w-full">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="パスワード"
               className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
@@ -94,6 +87,28 @@ export default function Page() {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
             />
+            <div
+              className="absolute right-12 top-3 transform-translate-y-1/2 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <Image
+                  src={closePw}
+                  alt="closePw"
+                  width={32}
+                  height={32}
+                  className="w-5 h-5 text-[#cccccc]"
+                />
+              ) : (
+                <Image
+                  src={openPw}
+                  alt="openPw"
+                  width={32}
+                  height={32}
+                  className="w-5 h-5 text-[#cccccc]"
+                />
+              )}
+            </div>
           </div>
           <div>
             <Button text="登録" />

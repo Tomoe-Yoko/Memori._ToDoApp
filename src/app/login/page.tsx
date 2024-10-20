@@ -6,10 +6,13 @@ import Button from "../components/Button";
 import Footer from "../components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "../../img/memo.png";
+import openPw from "../../img/openPw.png";
+import closePw from "../../img/closePw.png";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -19,6 +22,7 @@ const Page = () => {
       email,
       password,
     });
+
     if (error) {
       alert("ログインに失敗しました。");
     } else {
@@ -33,9 +37,9 @@ const Page = () => {
           },
           body: JSON.stringify({
             email,
-            userName: data.,
+            //optionsはuser_metadataの中に入る
+            userName: data.user.user_metadata.userName,
             themeColorId: "Theme01",
-            supabaseUserId: data.user.id,
           }),
         });
 
@@ -78,9 +82,9 @@ const Page = () => {
               className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
-          <div>
+          <div className="relative w-full">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"} // パスワードの表示/非表示を切り替え
               name="password"
               placeholder="パスワード"
               className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
@@ -88,6 +92,28 @@ const Page = () => {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
             />
+            <div
+              className="absolute right-12 top-3 transform-translate-y-1/2 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <Image
+                  src={closePw}
+                  alt="closePw"
+                  width={32}
+                  height={32}
+                  className="w-5 h-5 text-[#cccccc]"
+                />
+              ) : (
+                <Image
+                  src={openPw}
+                  alt="openPw"
+                  width={32}
+                  height={32}
+                  className="w-5 h-5 text-[#cccccc]"
+                />
+              )}
+            </div>
           </div>
           <p className="text-center text-[#729EF0] text-xl">
             <a href="">※パスワードを忘れた方はこちら</a>

@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 export const POST = async (request: NextRequest) => {
   const body: CreateLoginPostRequestBody = await request.json(); // 型適用
   const token = request.headers.get("Authorization") ?? "";
+  console.log(body);
 
   const { data, error } = await supabase.auth.getUser(token);
 
@@ -33,8 +34,7 @@ export const POST = async (request: NextRequest) => {
         userExists: true,
       });
     }
-    // themeColorIdの初期値を1に設定
-    //const themeColorId = body.themeColorId || themeColorId.Theme01;
+
     // 新しいユーザーを作成
     const userPostResponse = await prisma.users.create({
       data: {
