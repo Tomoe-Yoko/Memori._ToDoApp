@@ -39,7 +39,6 @@ body {
 .react-calendar__viewContainer {
   @apply bg-white;
 }
-
 /*曜日下線削除*/
 .react-calendar__month-view__weekdays > div > abbr {
   @apply decoration-transparent;
