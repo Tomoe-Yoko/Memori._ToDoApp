@@ -1,28 +1,28 @@
 "use client";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
-import { useRouter } from "next/navigation";
 import "react-calendar/dist/Calendar.css"; // デフォルトスタイルをインポート
 import "../../app/globals.css";
+import { CalendarProps } from "../_type/Calendar";
 import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import Button from "../components/Button";
 
 //Modal.setAppElement("#root");
 
-const Page = () => {
-  const router = useRouter();
-  // const handleAddEvent = () => {
-  //   router.push("/calendar/new");
-  // };
-  const removeSuffix = (locale: string, date: Date): string => {
-    return date.getDate().toString(); // 日付の数字だけを表示
-  };
-  const removeMonthYearSuffix = (locale: string, date: Date): string => {
-    return `${date.getFullYear()}.${date.getMonth() + 1}`; // 月のみ表示
-  };
+const Page: React.FC = () => {
   const [addScheduleModal, setAddScheduleModal] = useState(false);
+
+  const removeMonthYearSuffix = ({ date }: CalendarProps): string => {
+    return `${date.getFullYear()}.${date.getMonth() + 1}`; // 2024.10と表示
+  };
+
+  const removeSuffix = ({ date }: CalendarProps): string => {
+    return date.getDate().toString(); // 日付の数字だけを表示(文字列化)
+  };
+
   const closeModal = () => setAddScheduleModal(false);
+
   return (
     <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
@@ -30,11 +30,11 @@ const Page = () => {
         locale="ja-JP"
         prev2Label={null}
         next2Label={null}
-        formatDay={removeSuffix} // 「日」を削除したフォーマット
-        formatMonthYear={removeMonthYearSuffix} // 「年」を削除したフォーマット
-        formatShortWeekday={(locale, date) =>
+        formatDay={(_, date) => removeSuffix({ date })}
+        formatMonthYear={(_, date) => removeMonthYearSuffix({ date })}
+        formatShortWeekday={(_, date) =>
           ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]
-        } // 曜日をカスタマイズ
+        }
         className={"react-calendar"}
       />
       <div className="flex justify-end mr-4">
@@ -48,15 +48,12 @@ const Page = () => {
       <Modal
         isOpen={addScheduleModal}
         onRequestClose={closeModal}
-        // ●●モーダルっぽくしたい
-        className=" bg-gray-800"
-        overlayClassName="bg-black"
+        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <div className="absolute top-0 left-2/4 translate-x-[-50%] max-w-md w-1/2 bg-001 p-8">
-          <NewPost />
-          <div onClick={closeModal}>
-            <Button text="キャンセル" />
-          </div>
+        <NewPost />
+        <div onClick={closeModal} className="mt-[-32px]">
+          <Button text="キャンセル" />
         </div>
       </Modal>
     </div>

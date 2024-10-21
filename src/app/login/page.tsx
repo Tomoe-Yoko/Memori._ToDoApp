@@ -8,6 +8,7 @@ import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "../../img/memo.png";
 import openPw from "../../img/openPw.png";
 import closePw from "../../img/closePw.png";
+import toast, { Toaster } from "react-hot-toast";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ const Page = () => {
     });
 
     if (error) {
-      alert("ログインに失敗しました。");
+      toast.error("ログインに失敗しました。");
     } else {
       // APIにリクエストを送信する処理
       const token = data.session?.access_token;
@@ -47,11 +48,13 @@ const Page = () => {
         if (response.ok) {
           router.replace("/calendar");
         } else {
-          alert("APIリクエストに失敗しました: " + result.message);
+          // alert("APIリクエストに失敗しました: " + result.message);
+          toast.error("APIリクエストに失敗しました: " + result.message);
         }
       } catch (apiError) {
         console.error("APIリクエストエラー:", apiError);
-        alert("APIリクエスト中にエラーが発生しました。");
+        // alert("APIリクエスト中にエラーが発生しました。");
+        toast.error("APIリクエスト中にエラーが発生しました。");
       }
     }
   };
@@ -122,6 +125,7 @@ const Page = () => {
             <Button text="送信" />
           </div>
         </form>
+        <Toaster position="bottom-center" />
       </div>
       <Footer />
     </div>

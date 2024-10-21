@@ -8,6 +8,7 @@ import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "../../img/memo.png";
 import openPw from "../../img/openPw.png";
 import closePw from "../../img/closePw.png";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Page() {
   const [userName, setUserName] = useState("");
@@ -28,15 +29,13 @@ export default function Page() {
       },
     });
     if (error) {
-      alert("登録に失敗しました。");
+      toast.error("登録に失敗しました。");
     } else {
-      alert("確認メールを送信しました。");
+      toast.success("確認メールを送信しました。");
     }
-
     setUserName("");
     setEmail("");
     setPassword("");
-    // alert("確認メールを送信しました。");
   };
   return (
     <div className="h-dvh">
@@ -114,6 +113,7 @@ export default function Page() {
             <Button text="登録" />
           </div>
         </form>
+        <Toaster position="bottom-center" />
       </div>
       <Footer />
     </div>

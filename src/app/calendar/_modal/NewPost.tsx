@@ -3,73 +3,76 @@ import React, { useState } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { useRouter } from "next/navigation";
 import Button from "@/app/components/Button";
+import { CalendarPostType } from "@/app/_type/Calendar";
+import { ScheduleColor } from "@prisma/client";
+import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
 
-const NewPost = () => {
+const NewPost: React.FC = () => {
   const { token } = useSupabaseSession();
   const router = useRouter();
-  const [userId, setUserId] = useState(1); // ここで適切なユーザーIDを設定
-  const [scheduleDate, setScheduleDate] = useState("");
-  const [content, setContent] = useState("");
-  const [scheduleColor, setScheduleColor] = useState("#FF0080"); // default
 
-  const colorNameMap = {
+  const newPostData: CalendarPostType = {
+    userId: 1, // ここで適切なユーザーIDを設定
+    scheduleDate: new Date().toISOString(),
+    content: "",
+    scheduleColor: "Pink" as ScheduleColor, // default
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const [postData, setPostData] = useState<CalendarPostType>(newPostData);
+
+  const scheduleColorMap: Record<string, ScheduleColor> = {
     "#FF0080": "Pink",
     "#0062FF": "Blue",
     "#27BA2E": "Green",
     "#FF6F00": "Orange",
     "#00E5FF": "Cyan",
     "#E3C901": "Yellow",
-    "#A92782": "Purple",
-    "#8A30FF": "Violet",
+    "#A92782": "Wine",
+    "#8A30FF": "Purple",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
 
-    // 日付をISO形式に変換
-    const formattedDate = new Date(scheduleDate).toISOString();
-
-    const res = await fetch("/api/calendar", {
+    const response = await fetch("/api/calendar", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: token },
       body: JSON.stringify({
-        userId,
-        scheduleDate: formattedDate,
-        content,
-        scheduleColor: colorNameMap[scheduleColor],
-        createdAt: formattedDate,
-        updatedAt: formattedDate,
+        ...postData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }),
     });
 
-    if (res.ok) {
-      alert("予定が登録されました！");
-      setScheduleDate("");
-      setContent("");
-      setScheduleColor("#FF0080");
-      // setIsModalOpen(false);
-      //modalを消したい
+    if (response.ok) {
+      toast.success("予定が登録されました！");
+      setPostData(newPostData);
+      //closeModalにしたい
       router.push("/calendar");
     } else {
-      alert("登録に失敗しました。");
+      toast.error("登録に失敗しました。");
     }
   };
 
   return (
     <div>
       <h2 className="text-center text-2xl mb-4 text-white">Calendar.</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit}>
         {/* 予定の内容 */}
-        <div>
+        <div className="mb-8">
           <label className="block text-lg mb-2 text-text_button">
             予定の内容 (23文字以内)
           </label>
           <input
             type="text"
             name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={postData.content}
+            onChange={(e) =>
+              setPostData({ ...postData, content: e.target.value })
+            }
             required
             maxLength={23}
             className="w-full p-2 border rounded"
@@ -77,13 +80,18 @@ const NewPost = () => {
         </div>
 
         {/* 日付 */}
-        <div>
+        <div className="mb-8">
           <label className="block text-lg mb-2 text-text_button">日付</label>
           <input
             type="date"
             name="scheduleDate"
-            value={scheduleDate}
-            onChange={(e) => setScheduleDate(e.target.value)}
+            value={postData.scheduleDate.substring(0, 10)}
+            onChange={(e) =>
+              setPostData({
+                ...postData,
+                scheduleDate: new Date(e.target.value).toISOString(),
+              })
+            }
             required
             className="w-full p-2 border rounded"
           />
@@ -94,18 +102,24 @@ const NewPost = () => {
           <label className="block text-lg mb-2 text-text_button">
             予定の文字色
           </label>
-          <div className="w-2/3 mx-auto grid grid-cols-4 gap-4">
-            {Object.keys(colorNameMap).map((color) => (
+          <div className="grid grid-cols-4 gap-4">
+            {Object.keys(scheduleColorMap).map((color) => (
               <button
                 key={color}
                 type="button"
-                onClick={() => setScheduleColor(color)}
-                className={`w-10 aspect-square rounded-full focus:border-4 focus:border-white border-solid ${color.toLowerCase()}`}
+                onClick={() =>
+                  setPostData({
+                    ...postData,
+                    scheduleColor: scheduleColorMap[color],
+                  })
+                }
+                className={`w-10 aspect-square rounded-full focus:border-4 focus:border-white border-solid`}
                 style={{ backgroundColor: color.toLowerCase() }}
               />
             ))}
           </div>
           <Button text="登録" />
+          <Toaster position="bottom-center" />
         </div>
       </form>
     </div>

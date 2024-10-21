@@ -1,8 +1,8 @@
 import { ScheduleColor } from "@prisma/client";
 
-export interface CalendarType {
+export interface CalendarPostType {
   userId: number;
-  scheduleDate: Date;
+  scheduleDate: string;
   content: string;
   scheduleColor: ScheduleColor;
   createdAt: string;
@@ -17,4 +17,22 @@ export interface CreatePostRequestBody {
   scheduleColor: ScheduleColor;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CalendarProps {
+  // locale: string;
+  date: Date;
+  //第一引数：locale（地域）、第二引数；date（日付）
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+  className: string;
+  overlayClassName: string;
+}
+
+export interface ButtonProps {
+  text: string;
+  onClick: () => void;
 }
