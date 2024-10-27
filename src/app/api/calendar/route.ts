@@ -1,47 +1,75 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreatePostRequestBody } from "@/app/_type/Calendar";
-// import { supabase } from "@/utils/supabase";
+import { supabase } from "@/utils/supabase";
 
 const prisma = new PrismaClient();
 
+export const GET = async (request: Request) => {
+  const token = request.headers.get("Authorization") ?? ""; //ログインしているユーザーか判別（tokenを検証）
+
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ status: error.message }, { status: 400 }); //ログインして表示させたいページは書く
+  const supabaseUserId = data.user.id; //supabaseからuseIdを取り出す
+  //supabaseUserIdをもとにuserテーブルを見つける↓
+  const user = await prisma.users.findUnique({
+    where: { supabaseUserId }, //{supabaseUserId:supabaseUserId}同じ名前なら略せる（省略記法keyとvalueが一緒）
+  });
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
+
+  try {
+    //カレンダーの一覧を見つけ出す！
+    const calendars = await prisma.calendar.findMany({
+      //findの内容（オブジェクト）何も書かなければすべて取ってくる
+      //ユーザーIDをwhereで指定
+      where: { userId: user.id }, //calendar`テーブルの`userId`列が現在のユーザーのIDと一致するレコードを取得する
+    });
+    //フロントエンドに返すコード
+    return NextResponse.json({
+      status: "OK",
+      calendars,
+    });
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+};
+
 export const POST = async (request: Request) => {
+  const token = request.headers.get("Authorization") ?? "";
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ status: error.message }, { status: 400 });
+  const supabaseUserId = data.user.id;
+  const user = await prisma.users.findUnique({
+    where: { supabaseUserId },
+  });
+  //userIdが見つからなかったら404ページを作成（ログインしてるページには全部かく）
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
+  // ユーザーidがあったら以下が処理される
   try {
     const body = await request.json();
 
-    const {
-      userId,
-      scheduleDate,
-      content,
-      scheduleColor,
-    }: CreatePostRequestBody = body;
+    const { scheduleDate, content, scheduleColor }: CreatePostRequestBody =
+      body;
     const data = await prisma.calendar.create({
       data: {
-        userId,
+        userId: user.id,
         scheduleDate,
         content,
         scheduleColor,
       },
     });
-    // console.log(userId);
 
-    // if (!userId || !scheduleDate || !content || !scheduleColor) {
-    //   return NextResponse.json(
-    //     { error: "情報を取得できませんでした。" },
-    //     { status: 400 }
-    //   );
-    // }
-    // const { error } = await supabase.from("Calendar").insert([
-    //   {
-    //     userId,
-    //     scheduleDate,
-    //     content,
-    //     scheduleColor,
-    //   },
-    // ]);
-    // if (error) {
-    //   return NextResponse.json({ error: error.message }, { status: 400 });
-    // }
     return NextResponse.json({
       status: "OK",
       message: "Calendar entry created successfully",

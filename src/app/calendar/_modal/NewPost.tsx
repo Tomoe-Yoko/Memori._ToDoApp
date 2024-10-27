@@ -1,18 +1,34 @@
 "use client";
 import React, { useState } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+
 import { useRouter } from "next/navigation";
 import Button from "@/app/components/Button";
 import { CalendarPostType } from "@/app/_type/Calendar";
 import { ScheduleColor } from "@prisma/client";
 import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
 
-const NewPost: React.FC = () => {
+interface ModalProps {
+  closeModal: () => void;
+  // refreshCalendars: () => void; // 予定リストを更新するための関数
+}
+
+export const scheduleColorMap: Record<string, ScheduleColor> = {
+  "#FF0080": "Pink",
+  "#0062FF": "Blue",
+  "#27BA2E": "Green",
+  "#FF6F00": "Orange",
+  "#00E5FF": "Cyan",
+  "#E3C901": "Yellow",
+  "#A92782": "Wine",
+  "#8A30FF": "Purple",
+};
+
+//const NewPost: React.FC<ModalProps> = ({ closeModal, refreshCalendars }) => {
+const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
   const { token } = useSupabaseSession();
   const router = useRouter();
-
   const newPostData: CalendarPostType = {
-    userId: 1, // ここで適切なユーザーIDを設定
     scheduleDate: new Date().toISOString(),
     content: "",
     scheduleColor: "Pink" as ScheduleColor, // default
@@ -21,18 +37,8 @@ const NewPost: React.FC = () => {
   };
 
   const [postData, setPostData] = useState<CalendarPostType>(newPostData);
-
-  const scheduleColorMap: Record<string, ScheduleColor> = {
-    "#FF0080": "Pink",
-    "#0062FF": "Blue",
-    "#27BA2E": "Green",
-    "#FF6F00": "Orange",
-    "#00E5FF": "Cyan",
-    "#E3C901": "Yellow",
-    "#A92782": "Wine",
-    "#8A30FF": "Purple",
-  };
-
+  const [selectedColor, setSelectedColor] = useState<string>("#FF0080");
+  // useEffect(() => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
@@ -48,14 +54,22 @@ const NewPost: React.FC = () => {
     });
 
     if (response.ok) {
-      toast.success("予定が登録されました！");
+      toast.success("予定が登録されました！", {
+        duration: 1500, //ポップアップ表示時間
+
+        // onClose: () => {
+        //   closeModal();
+        //   refreshCalendars(); // 予定リストを更新
+        // },
+      });
+      closeModal();
       setPostData(newPostData);
-      //closeModalにしたい
       router.push("/calendar");
     } else {
       toast.error("登録に失敗しました。");
     }
   };
+  // }, []);
 
   return (
     <div>
@@ -74,7 +88,7 @@ const NewPost: React.FC = () => {
               setPostData({ ...postData, content: e.target.value })
             }
             required
-            maxLength={23}
+            maxLength={15}
             className="w-full p-2 border rounded"
           />
         </div>
@@ -107,20 +121,27 @@ const NewPost: React.FC = () => {
               <button
                 key={color}
                 type="button"
-                onClick={() =>
+                onClick={() => {
                   setPostData({
                     ...postData,
                     scheduleColor: scheduleColorMap[color],
-                  })
-                }
-                className={`w-10 aspect-square rounded-full focus:border-4 focus:border-white border-solid`}
+                  });
+                  setSelectedColor(color); // 選択された色を更新
+                }}
+                className={`w-10 aspect-square rounded-full ${
+                  selectedColor === color
+                    ? "border-white border-solid border-4"
+                    : ""
+                }`}
                 style={{ backgroundColor: color.toLowerCase() }}
               />
             ))}
           </div>
-          <Button text="登録" />
-          <Toaster position="bottom-center" />
+          <div className="mt-8">
+            <Button text="登録" />
+          </div>
         </div>
+        <Toaster position="bottom-center" />
       </form>
     </div>
   );

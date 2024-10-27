@@ -28,9 +28,12 @@ export default function Home() {
             大切な人の予定もまとめて管理
             <br /> 忙しい日常をスムーズにするToDoアプリ
           </p>
-          <Link href="/login">
-            <Button text="ログイン" />
-          </Link>
+          <div className="my-12">
+            <Link href="/login">
+              <Button text="ログイン" />
+            </Link>
+          </div>
+
           <Link href="/signup">
             <Button text="新規登録" />
           </Link>
@@ -78,9 +81,11 @@ export default function Home() {
             忙しいあなたへ <br /> 毎日おつかれさま。 <br />
             効率良くタスクをこなして ゆっくりできる時間を 確保してくださいね。
           </p>
-          <Link href="/signup">
-            <Button text="使ってみる！" />
-          </Link>
+          <div className="mt-12">
+            <Link href="/signup">
+              <Button text="使ってみる！" />
+            </Link>
+          </div>
         </section>
       </main>
       <Footer />

@@ -54,7 +54,10 @@ body div.react-calendar__month-view__days > button {
 
 /*日付を上に、下に余白 */
 .react-calendar__month-view__days > button {
-  @apply flex items-start justify-center p-2 h-20;
+  @apply p-2 h-20;
+}
+.react-calendar__month-view__days__day {
+  @apply flex flex-col justify-start;
 }
 /* 当日の色を変更 */
 .react-calendar__tile--now {
