@@ -31,6 +31,7 @@ export default function Page() {
     if (error) {
       toast.error("登録に失敗しました。");
     } else {
+      //Thank youのページにする
       toast.success("確認メールを送信しました。");
     }
     setUserName("");

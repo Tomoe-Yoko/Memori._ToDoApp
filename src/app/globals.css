@@ -63,3 +63,40 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__tile--now {
   @apply bg-[#ffffe3];
 }
+
+/* つなぎのアニメーション */
+.animation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #e4c8ce;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* トランジションを効かせたい */
+  /* transition: all 0.3s; */
+  animation: tether 1.8s both;
+  color: #fff;
+  background-image: url(../img/tether_line.svg);
+  background-position: right 15% bottom 45%;
+  background-repeat: no-repeat;
+
+  /* @apply absolute inset-0 w-full h-screen bg-[#E4C8CE] flex justify-center items-center transition-all duration-300 animate-tether; */
+}
+@keyframes tether {
+  0%,
+  95% {
+    z-index: 3;
+    opacity: 1;
+  }
+  100% {
+    z-index: -1;
+    opacity: 0;
+  }
+}
+.animation p {
+  margin-top: -10rem;
+  letter-spacing: 2px;
+  font-size: 1.8rem;
+}

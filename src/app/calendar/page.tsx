@@ -24,7 +24,7 @@ const Page: React.FC = () => {
     return date.getDate().toString(); // 日付の数字だけを表示(文字列化)
   };
 
-  const closeModal = () => setAddScheduleModal(false);
+  const closeModal = () => setAddScheduleModal(false); //閉じる関数
 
   useEffect(() => {
     if (!token) return;
