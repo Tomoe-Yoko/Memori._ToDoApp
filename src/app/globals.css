@@ -29,24 +29,21 @@ body {
 /*・・・・・・ react-calendar・・・・・・ */
 /* カレンダー全体 */
 .react-calendar {
-  @apply mx-auto border-none bg-transparent;
+  @apply mx-auto border-none bg-transparent w-[400px];
 }
 /*2024.10のテキスト */
 .react-calendar__navigation {
-  @apply text-white text-2xl;
+  @apply text-white text-2xl mx-auto;
 }
 /* 曜日以下（白背景部分） */
 .react-calendar__viewContainer {
-  @apply bg-white;
+  @apply bg-white  justify-center;
 }
 /*曜日下線削除*/
 .react-calendar__month-view__weekdays > div > abbr {
   @apply decoration-transparent;
 }
 /* カレンダーを格子状に */
-/* .react-calendar__month-view__weekdays > div {
-  @apply text-text_button border-b border-gray-200;
-} */
 .react-calendar__month-view__weekdays > div,
 body div.react-calendar__month-view__days > button {
   @apply outline outline-1 outline-gray-100;
@@ -54,7 +51,7 @@ body div.react-calendar__month-view__days > button {
 
 /*日付を上に、下に余白 */
 .react-calendar__month-view__days > button {
-  @apply p-2 h-20;
+  @apply p-1 h-24;
 }
 .react-calendar__month-view__days__day {
   @apply flex flex-col justify-start;
@@ -63,8 +60,12 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__tile--now {
   @apply bg-[#ffffe3];
 }
+/* 日付内スケジュール */
+.react-calendar__month-view__days > button > div > p {
+  @apply text-[10px] leading-tight p-0;
+}
 
-/* つなぎのアニメーション */
+/* ログイン後などのつなぎアニメーション */
 .animation {
   position: absolute;
   inset: 0;

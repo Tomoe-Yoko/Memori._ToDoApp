@@ -59,8 +59,8 @@ export default function Home() {
           </p>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">03．Gallary.</h2>
-          <Image src={top03} alt="gallary" className="m-auto" />
+          <h2 className="text-white text-5xl text-center py-8">03．Gallery.</h2>
+          <Image src={top03} alt="gallery" className="m-auto" />
           <p className="w-72 mx-auto text-text_button py-4">
             子供が持ち帰るプリントは、画像で残しておけば外出先でも確認できちゃう。
           </p>
