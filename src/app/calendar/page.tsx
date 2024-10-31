@@ -143,6 +143,7 @@ const Page: React.FC = () => {
         <AllSchedule
           selectedDate={selectedDate}
           closeModal={() => setShowAllScheduleModal(false)}
+          calendars={calendars}
         />
       </Modal>
     </div>
