@@ -1,7 +1,6 @@
-import { supabase } from "@/utils/supabase";
-import { PrismaClient } from "@prisma/client";
-
 import { NextResponse, NextRequest } from "next/server";
+import { supabase } from "@/utils/supabase";
+import { PrismaClient, ScheduleColor } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -30,11 +29,36 @@ export const GET = async (
 };
 
 //////POST
-export const POST = async (request: Request) => {
+// export const POST = async (request: Request) => {
+//   const token = request.headers.get("Authorization") ?? "";
+//   const { error, data } = await supabase.auth.getUser(token);
+//   if (error) return Response.json({ status: error.message }, { status: 400 });
+
+//   const supabaseUserId = data.user.id;
+//   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+//   if (!user)
+//     return NextResponse.json(
+//       { message: "ユーザーが見つかりませんでした" },
+//       { status: 404 }
+//     );
+// };
+
+// /////PUT
+interface UpdateCalendarRequestBody {
+  scheduleDate: string;
+  content: string;
+  scheduleColor: ScheduleColor;
+  createdAt: string;
+  updatedAt: string;
+}
+export const PUT = async (
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) => {
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
-  if (error) return Response.json({ status: error.message }, { status: 400 });
-
+  if (error)
+    return NextResponse.json({ message: error.message }, { status: 400 });
   const supabaseUserId = data.user.id;
   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
   if (!user)
@@ -42,34 +66,56 @@ export const POST = async (request: Request) => {
       { message: "ユーザーが見つかりませんでした" },
       { status: 404 }
     );
+
+  const { id } = params;
+  const body: UpdateCalendarRequestBody = await request.json();
+  const { scheduleDate, content, scheduleColor, createdAt, updatedAt } = body;
+  try {
+    const calendar = await prisma.calendar.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        scheduleDate: new Date(scheduleDate), // 文字列をDate型に変換
+        content,
+        scheduleColor,
+        createdAt: new Date(createdAt),
+        updatedAt: new Date(updatedAt),
+      },
+    });
+    return NextResponse.json({ status: "OK", calendar }, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ status: error.message }, { status: 400 });
+    }
+  }
 };
 
-// /////PUT
-// export const PUT = async (request: Request) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error, data } = await supabase.auth.getUser(token);
-//   if (error)
-//     return NextResponse.json({ message: error.message }, { status: 400 });
-//   const supabaseUserId = data.user.id;
-//   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-//   if (!user)
-//     return NextResponse.json(
-//       { message: "ユーザーが見つかりませんでした" },
-//       { status: 404 }
-//     );
-// };
-
 // /////DELETE
-// export const DELETE = async (request: NextRequest) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error, data } = await supabase.auth.getUser(token);
-//   if (error)
-//     return NextResponse.json({ message: error.message }, { status: 400 });
-//   const supabaseUserId = data.user.id;
-//   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-//   if (!user)
-//     return NextResponse.json(
-//       { message: "ユーザーが見つかりませんでした" },
-//       { status: 404 }
-//     );
-// };
+export const DELETE = async (
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) => {
+  const token = request.headers.get("Authorization") ?? "";
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  const supabaseUserId = data.user.id;
+  const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
+
+  const { id } = params;
+  try {
+    await prisma.calendar.delete({
+      where: { id: parseInt(id) },
+    });
+    return NextResponse.json({ status: "OK" }, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ status: error.message }, { status: 400 });
+  }
+};
