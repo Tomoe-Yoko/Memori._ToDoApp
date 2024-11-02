@@ -44,27 +44,38 @@ const Page: React.FC = () => {
   }, [token]);
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
-      // UTCの日付を取得
-      const dateString = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-      )
-        .toISOString()
-        .split("T")[0];
-
+      const dateString = date.toLocaleDateString("ja-JP");
       const calendarEntries = calendars.filter((entry) => {
-        const entryDate = new Date(entry.scheduleDate);
-        const entryDateString = new Date(
-          Date.UTC(
-            entryDate.getFullYear(),
-            entryDate.getMonth(),
-            entryDate.getDate()
-          )
-        )
-          .toISOString()
-          .split("T")[0];
+        const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
+          "ja-JP"
+        );
+
         return entryDateString === dateString;
       });
-      if (calendarEntries.length > 0) {
+
+      if (calendarEntries.length > 2) {
+        return (
+          <div className="flex flex-col items-start">
+            {calendarEntries.slice(0, 2).map((entry) => {
+              const colorCode = Object.keys(scheduleColorMap).find(
+                (key) => scheduleColorMap[key] === entry.scheduleColor
+              );
+              return (
+                <p
+                  key={entry.id}
+                  style={{ color: colorCode }}
+                  className="text-[10px]"
+                >
+                  .{entry.content}
+                </p>
+              );
+            })}
+            <p className="text-[10px] text-gray-500">
+              ほか{calendarEntries.length - 2}件
+            </p>
+          </div>
+        );
+      } else if (calendarEntries.length > 0) {
         return (
           <div className="flex flex-col items-start">
             {calendarEntries.map((entry) => {
@@ -77,15 +88,16 @@ const Page: React.FC = () => {
                   style={{ color: colorCode }}
                   className="text-[10px]"
                 >
-                  {entry.content}
+                  ・{entry.content}
                 </p>
               );
             })}
           </div>
         );
+      } else {
+        return null;
       }
     }
-    return null;
   };
   const onCalendarClick = (value: Date) => {
     setSelectedDate(value);
@@ -137,8 +149,8 @@ const Page: React.FC = () => {
       <Modal
         isOpen={showAllScheduleModal}
         onRequestClose={closeModal}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
-        overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
+        className=" bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        overlayClassName="absolute inset-0 w-full h-max min-h-screen bg-black bg-opacity-50 flex justify-center items-center"
       >
         <AllSchedule
           selectedDate={selectedDate}

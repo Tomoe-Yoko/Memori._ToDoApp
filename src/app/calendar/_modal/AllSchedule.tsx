@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Button from "@/app/components/Button";
 import { CalendarData } from "../../_type/Calendar"; // Scheduleの型を適切にインポート
 import { scheduleColorMap } from "./NewPost";
+import CloseButton from "@/app/components/CloseButton";
 
 interface Props {
   selectedDate: Date | null;
@@ -19,19 +20,23 @@ const AllSchedule: React.FC<Props> = ({
 
   useEffect(() => {
     if (selectedDate) {
-      const dateString = selectedDate.toISOString().split("T")[0];
-      const daySchedules = calendars.filter(
-        (entry) => entry.scheduleDate === dateString
-      );
-      console.log("Filtered schedules:", daySchedules);
+      const dateString = selectedDate.toLocaleDateString("ja-JP");
+      const daySchedules = calendars.filter((entry) => {
+        const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
+          "ja-JP"
+        );
+        return entryDateString === dateString;
+      });
 
       setSchedules(daySchedules);
     }
   }, [selectedDate, calendars]);
-
   return (
-    <div>
-      <h2 className="text-white text-2xl">
+    <div className="relative">
+      <div className="absolute top-[-40px] right-[-30px]">
+        <CloseButton onClick={closeModal} />
+      </div>
+      <h2 className="text-white text-2xl py-4">
         {selectedDate?.toLocaleDateString("ja-JP", {
           year: "numeric",
           month: "2-digit",
@@ -39,7 +44,7 @@ const AllSchedule: React.FC<Props> = ({
           weekday: "short",
         })}
       </h2>
-      <div className="space-y-2">
+      <div className="space-y-2 bg-[#fffa] rounded-xl p-4 leading-normal">
         {schedules.length > 0 ? (
           schedules.map((entry) => {
             const colorCode = Object.keys(scheduleColorMap).find(
@@ -49,14 +54,14 @@ const AllSchedule: React.FC<Props> = ({
               <p
                 key={entry.id}
                 style={{ color: colorCode }}
-                className="text-[10px]"
+                className="text-base"
               >
                 {entry.content}
               </p>
             );
           })
         ) : (
-          <p>予定がありません。</p>
+          <p className="text-text_button">予定がありません。</p>
         )}
       </div>
       <div onClick={closeModal} className="mt-8">

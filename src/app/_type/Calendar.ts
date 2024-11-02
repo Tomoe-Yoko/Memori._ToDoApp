@@ -39,7 +39,7 @@ export interface ButtonProps {
 
 export interface CalendarData {
   id: number;
-  scheduleDate: string;
+  scheduleDate: Date;
   content: string;
   scheduleColor: ScheduleColor;
   createdAt: string;
