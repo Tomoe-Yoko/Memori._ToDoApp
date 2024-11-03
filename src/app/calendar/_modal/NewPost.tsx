@@ -58,7 +58,9 @@ const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
       setPostData(newPostData);
       router.push("/calendar");
     } else {
-      toast.error("登録に失敗しました。");
+      toast.error("登録に失敗しました。", {
+        duration: 1500, //ポップアップ表示時間
+      });
     }
   };
 

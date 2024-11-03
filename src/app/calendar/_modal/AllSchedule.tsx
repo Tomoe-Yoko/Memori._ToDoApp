@@ -9,16 +9,16 @@ interface Props {
   selectedDate: Date | null;
   closeModal: () => void;
   calendars: CalendarData[]; // 親コンポーネントから予定を受け取る
-  onDeleteSchedule: (id: number) => void;
-  onUpdateSchedule: (id: number, newContent: string) => void;
+  handleDeleteSchedule: (id: number) => void;
+  handleUpdateSchedule: (id: number, newContent: string) => void;
 }
 
 const AllSchedule: React.FC<Props> = ({
   selectedDate,
   closeModal,
   calendars,
-  onDeleteSchedule,
-  onUpdateSchedule,
+  handleDeleteSchedule,
+  handleUpdateSchedule,
 }) => {
   const [schedules, setSchedules] = useState<CalendarData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -44,7 +44,7 @@ const AllSchedule: React.FC<Props> = ({
     setEditContent(content);
   };
   const handleSave = (id: number) => {
-    onUpdateSchedule(id, editContent);
+    handleUpdateSchedule(id, editContent);
     setEditingId(null);
   };
   return (
@@ -90,7 +90,7 @@ const AllSchedule: React.FC<Props> = ({
                     </p>
                   )}
                   <button
-                    onClick={() => onDeleteSchedule(entry.id)}
+                    onClick={() => handleDeleteSchedule(entry.id)}
                     className="text-white bg-trash_bg p-2 rounded-full"
                   >
                     <BsTrash3Fill size={14} />

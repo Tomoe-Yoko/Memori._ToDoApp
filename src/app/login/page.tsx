@@ -131,7 +131,7 @@ const Page = () => {
             <Button text="送信" />
           </div>
         </form>
-        <Toaster position="bottom-center" />
+        <Toaster position="top-center" />
       </div>
       <Footer />
     </div>

@@ -114,7 +114,7 @@ export default function Page() {
             <Button text="登録" />
           </div>
         </form>
-        <Toaster position="bottom-center" />
+        <Toaster position="top-center" />
       </div>
       <Footer />
     </div>
