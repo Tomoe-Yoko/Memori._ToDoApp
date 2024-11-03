@@ -1,9 +1,9 @@
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
-type CloseButtonProps = {
+interface CloseButtonProps {
   onClick: () => void;
-};
+}
 
 const CloseButton: React.FC<CloseButtonProps> = ({ onClick }) => {
   return (
