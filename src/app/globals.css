@@ -64,6 +64,13 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__month-view__days > button > div > p {
   @apply text-[10px] leading-tight p-0;
 }
+/* カレンダータイルの背景色をなしに */
+.react-calendar__tile,
+.react-calendar__month-view__days:active,
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  @apply bg-transparent text-inherit;
+}
 
 /* ログイン後などのつなぎアニメーション */
 .animation {
@@ -82,8 +89,6 @@ body div.react-calendar__month-view__days > button {
   background-image: url(../img/tether_line.svg);
   background-position: right 15% bottom 45%;
   background-repeat: no-repeat;
-
-  /* @apply absolute inset-0 w-full h-screen bg-[#E4C8CE] flex justify-center items-center transition-all duration-300 animate-tether; */
 }
 @keyframes tether {
   0%,

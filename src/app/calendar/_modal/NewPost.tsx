@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Button from "@/app/components/Button";
 import { CalendarPostType } from "@/app/_type/Calendar";
 import { ScheduleColor } from "@prisma/client";
@@ -22,9 +22,10 @@ export const scheduleColorMap: Record<string, ScheduleColor> = {
   "#8A30FF": "Purple",
 };
 
-const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
+// const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
+const NewPost: React.FC<ModalProps> = () => {
   const { token } = useSupabaseSession();
-  const router = useRouter();
+  // const router = useRouter();
   const newPostData: CalendarPostType = {
     scheduleDate: new Date().toISOString(),
     content: "",
@@ -52,14 +53,14 @@ const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
 
     if (response.ok) {
       toast.success("予定が登録されました！", {
-        duration: 1500, //ポップアップ表示時間
+        duration: 2100, //ポップアップ表示時間
       });
-      closeModal();
+      // closeModal();
       setPostData(newPostData);
-      router.push("/calendar");
+      // router.push("/calendar");
     } else {
       toast.error("登録に失敗しました。", {
-        duration: 1500, //ポップアップ表示時間
+        duration: 2100, //ポップアップ表示時間
       });
     }
   };
@@ -133,8 +134,8 @@ const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
           <div className="mt-8">
             <Button text="登録" />
           </div>
+          <Toaster position="bottom-center" />
         </div>
-        <Toaster position="bottom-center" />
       </form>
     </div>
   );

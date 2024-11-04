@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "@/app/components/Button";
 import { CalendarData } from "../../_type/Calendar"; // Scheduleの型を適切にインポート
+import { ScheduleColor } from "@prisma/client";
 import { scheduleColorMap } from "./NewPost";
 import CloseButton from "@/app/components/CloseButton";
 import { BsTrash3Fill } from "react-icons/bs"; // アイコンをインポート
@@ -10,7 +11,14 @@ interface Props {
   closeModal: () => void;
   calendars: CalendarData[]; // 親コンポーネントから予定を受け取る
   handleDeleteSchedule: (id: number) => void;
-  handleUpdateSchedule: (id: number, newContent: string) => void;
+  handleUpdateSchedule: (
+    id: number,
+    newContent: string,
+    scheduleDate: string,
+    scheduleColor: ScheduleColor,
+    createdAt: string,
+    updatedAt: string
+  ) => void;
 }
 
 const AllSchedule: React.FC<Props> = ({
@@ -44,7 +52,17 @@ const AllSchedule: React.FC<Props> = ({
     setEditContent(content);
   };
   const handleSave = (id: number) => {
-    handleUpdateSchedule(id, editContent);
+    const schedule = schedules.find((entry) => entry.id === id);
+    if (!schedule) return;
+
+    handleUpdateSchedule(
+      id,
+      editContent,
+      new Date(schedule.scheduleDate).toISOString(), // 更新日時は現在の日時を使用
+      schedule.scheduleColor,
+      new Date(schedule.createdAt).toISOString(), // Date型をstring型に変換
+      new Date().toISOString()
+    );
     setEditingId(null);
   };
   return (

@@ -1,18 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import "../../app/globals.css";
+import { ScheduleColor } from "@prisma/client";
 import { CalendarData } from "../_type/Calendar";
 import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import AllSchedule from "./_modal/AllSchedule";
 import { scheduleColorMap } from "./_modal/NewPost";
 import Button from "../components/Button";
-import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import Navigation from "../components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { ScheduleColor } from "@prisma/client";
+import "react-calendar/dist/Calendar.css";
+import "../../app/globals.css";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -75,16 +75,31 @@ const Page: React.FC = () => {
     updatedAt: string
   ) => {
     if (!token) return;
+
+    // 日付の検証
+    const isValidDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    };
+
+    if (
+      !isValidDate(scheduleDate) ||
+      !isValidDate(createdAt) ||
+      !isValidDate(updatedAt)
+    ) {
+      console.error("Invalid date provided");
+      return;
+    }
     try {
       const response = await fetch(`/api/calendar/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: token },
         body: JSON.stringify({
-          scheduleDate,
+          scheduleDate: new Date(scheduleDate).toISOString(),
           content: newContent,
-          scheduleColor,
-          createdAt,
-          updatedAt,
+          scheduleColor: scheduleColor,
+          createdAt: new Date(createdAt).toISOString(),
+          updatedAt: new Date(updatedAt).toISOString(),
         }),
       });
       if (response.ok) {
