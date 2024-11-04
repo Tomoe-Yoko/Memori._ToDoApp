@@ -16,9 +16,9 @@ import "../../app/globals.css";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
-  const [addScheduleModal, setAddScheduleModal] = useState(false);
   const [calendars, setCalendars] = useState<CalendarData[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [addScheduleModal, setAddScheduleModal] = useState(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
 
   useEffect(() => {
@@ -49,8 +49,9 @@ const Page: React.FC = () => {
         toast.success("予定を削除しました。", {
           duration: 2100, //ポップアップ表示時間
         });
-        setCalendars((prevCalendars) =>
-          prevCalendars.filter((calendar) => calendar.id !== id)
+        setCalendars(
+          (prevCalendars) =>
+            prevCalendars.filter((calendar) => calendar.id !== id) //`calendar.id`が削除したい`id`と一致しない場合に`true`を返す。
         );
       } else {
         toast.error("削除に失敗しました。", {
@@ -58,8 +59,8 @@ const Page: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error("Error deleting schedule:", error);
-      toast.error("削除できませんでした。", {
+      // console.error("Error deleting schedule:", error);
+      toast.error(`${error}:削除できませんでした。`, {
         duration: 2100,
       });
     }
@@ -76,20 +77,6 @@ const Page: React.FC = () => {
   ) => {
     if (!token) return;
 
-    // 日付の検証
-    const isValidDate = (dateString: string) => {
-      const date = new Date(dateString);
-      return !isNaN(date.getTime());
-    };
-
-    if (
-      !isValidDate(scheduleDate) ||
-      !isValidDate(createdAt) ||
-      !isValidDate(updatedAt)
-    ) {
-      console.error("Invalid date provided");
-      return;
-    }
     try {
       const response = await fetch(`/api/calendar/${id}`, {
         method: "PUT",
@@ -124,8 +111,6 @@ const Page: React.FC = () => {
         duration: 2100,
       });
     }
-
-    // 必要に応じて、APIで更新リクエストを送るコードも追加してください
   };
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
@@ -135,7 +120,6 @@ const Page: React.FC = () => {
         const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
           "ja-JP"
         );
-
         return entryDateString === dateString;
       });
 
@@ -241,7 +225,7 @@ const Page: React.FC = () => {
           calendars={calendars}
           handleDeleteSchedule={handleDeleteSchedule}
           handleUpdateSchedule={handleUpdateSchedule}
-        />{" "}
+        />
         <Toaster position="top-center" />
       </Modal>
     </div>
