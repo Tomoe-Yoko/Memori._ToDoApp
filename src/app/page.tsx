@@ -11,8 +11,8 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="">
-      <main className="">
+    <div>
+      <main>
         <section className="py-28">
           <Image
             src={memo}
@@ -28,9 +28,12 @@ export default function Home() {
             大切な人の予定もまとめて管理
             <br /> 忙しい日常をスムーズにするToDoアプリ
           </p>
-          <Link href="/login">
-            <Button text="ログイン" />
-          </Link>
+          <div className="my-12">
+            <Link href="/login">
+              <Button text="ログイン" />
+            </Link>
+          </div>
+
           <Link href="/signup">
             <Button text="新規登録" />
           </Link>
@@ -56,8 +59,8 @@ export default function Home() {
           </p>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">03．Gallary.</h2>
-          <Image src={top03} alt="gallary" className="m-auto" />
+          <h2 className="text-white text-5xl text-center py-8">03．Gallery.</h2>
+          <Image src={top03} alt="gallery" className="m-auto" />
           <p className="w-72 mx-auto text-text_button py-4">
             子供が持ち帰るプリントは、画像で残しておけば外出先でも確認できちゃう。
           </p>
@@ -78,9 +81,11 @@ export default function Home() {
             忙しいあなたへ <br /> 毎日おつかれさま。 <br />
             効率良くタスクをこなして ゆっくりできる時間を 確保してくださいね。
           </p>
-          <Link href="/signup">
-            <Button text="使ってみる！" />
-          </Link>
+          <div className="mt-12">
+            <Link href="/signup">
+              <Button text="使ってみる！" />
+            </Link>
+          </div>
         </section>
       </main>
       <Footer />

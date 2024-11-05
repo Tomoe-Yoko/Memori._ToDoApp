@@ -15,8 +15,8 @@ datasource db {
 model Users {
   id             Int      @id @default(autoincrement())
   userName       String
-  supabaseUserId String
-  themeColorId   Int
+  supabaseUserId String  @unique
+  themeColorId   ThemeColorId 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -26,6 +26,23 @@ model Users {
   galleryGroups  GalleryGroup[]
 
   @@map("Users")
+}
+enum ThemeColorId {
+  Theme01
+  Theme02
+  Theme03
+  Theme04
+  Theme05
+  Theme06
+  Theme07
+  Theme08
+  Theme09
+  Theme10
+  Theme11
+  Theme12
+  Theme13
+  Theme14
+  Theme15
 }
 
 

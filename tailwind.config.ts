@@ -27,6 +27,7 @@ const config: Config = {
         "014": "#C3C3C3",
         "015": "#333333",
         text_button: "#787878",
+        trash_bg: "#C86262",
       },
       fontFamily: {
         Jost: ["var(--JostFont)"],
