@@ -174,6 +174,25 @@ const Page: React.FC = () => {
     setSelectedDate(value);
     setShowAllScheduleModal(true);
   };
+  const handleSuccess = () => {
+    setAddScheduleModal(false);
+    toast.success("予定が登録されました！", {
+      duration: 2100,
+    }); //ポップアップ表示時間
+    //GET(リロード)
+    if (!token) return;
+    const fetcher = async () => {
+      const res = await fetch("/api/calendar", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+      const { calendars } = await res.json();
+      setCalendars(calendars);
+    };
+    fetcher();
+  };
 
   return (
     <div className="relative">
@@ -202,13 +221,17 @@ const Page: React.FC = () => {
         </button>
       </div>
       <Navigation />
+      <Toaster position="top-center" />
       <Modal
         isOpen={addScheduleModal}
         onRequestClose={() => setAddScheduleModal(false)}
         className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <NewPost closeModal={() => setAddScheduleModal(false)} />
+        <NewPost
+          // closeModal={setAddScheduleModal(false)}
+          onSuccess={handleSuccess}
+        />
         <div onClick={() => setAddScheduleModal(false)} className="mt-8">
           <Button text="キャンセル" />
         </div>
