@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreatePostRequestBody } from "@/app/_type/Calendar";
-import { supabase } from "@/utils/supabase";
+import { validateUser } from "../_utils/validateUser";
 
 const prisma = new PrismaClient();
 
 export const GET = async (request: Request) => {
   const token = request.headers.get("Authorization") ?? ""; //ログインしているユーザーか判別（tokenを検証）
 
-  const { error, data } = await supabase.auth.getUser(token);
+  const { user, error } = await validateUser(token);
+
+  // const { error, data } = await supabase.auth.getUser(token);
   if (error)
     return NextResponse.json({ status: error.message }, { status: 400 }); //ログインして表示させたいページは書く
-  const supabaseUserId = data.user.id; //supabaseからuseIdを取り出す
-  //supabaseUserIdをもとにuserテーブルを見つける↓
-  const user = await prisma.users.findUnique({
-    where: { supabaseUserId }, //{supabaseUserId:supabaseUserId}同じ名前なら略せる（省略記法keyとvalueが一緒）
-  });
+  // const supabaseUserId = data.user.id; //supabaseからuseIdを取り出す
+  // //supabaseUserIdをもとにuserテーブルを見つける↓
+  // const user = await prisma.users.findUnique({
+  //   where: { supabaseUserId }, //{supabaseUserId:supabaseUserId}同じ名前なら略せる（省略記法keyとvalueが一緒）
+  // });
   if (!user)
     return NextResponse.json(
       { message: "ユーザーが見つかりませんでした" },
@@ -42,19 +44,15 @@ export const GET = async (request: Request) => {
 
 export const POST = async (request: Request) => {
   const token = request.headers.get("Authorization") ?? "";
-  const { error, data } = await supabase.auth.getUser(token);
+  const { user, error } = await validateUser(token);
   if (error)
     return NextResponse.json({ status: error.message }, { status: 400 });
-  const supabaseUserId = data.user.id;
-  const user = await prisma.users.findUnique({
-    where: { supabaseUserId },
-  });
-  //userIdが見つからなかったら404ページを作成（ログインしてるページには全部かく）
   if (!user)
     return NextResponse.json(
       { message: "ユーザーが見つかりませんでした" },
       { status: 404 }
     );
+
   // ユーザーidがあったら以下が処理される
   try {
     const body = await request.json();
