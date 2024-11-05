@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
 import { ScheduleColor } from "@prisma/client";
@@ -21,20 +21,21 @@ const Page: React.FC = () => {
   const [addScheduleModal, setAddScheduleModal] = useState(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
 
+  const fetcher = useCallback(async () => {
+    const res = await fetch("/api/calendar", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token!,
+      },
+    });
+    const { calendars } = await res.json();
+    setCalendars(calendars);
+  }, [token]);
+
   useEffect(() => {
     if (!token) return;
-    const fetcher = async () => {
-      const res = await fetch("/api/calendar", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      });
-      const { calendars } = await res.json();
-      setCalendars(calendars);
-    };
     fetcher();
-  }, [token]);
+  }, [fetcher, token]);
 
   //DELETE
   const handleDeleteSchedule = async (id: number) => {
@@ -175,6 +176,11 @@ const Page: React.FC = () => {
     setShowAllScheduleModal(true);
   };
 
+  const handleSuccess = async () => {
+    setAddScheduleModal(false);
+    fetcher();
+  };
+
   return (
     <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
@@ -208,7 +214,10 @@ const Page: React.FC = () => {
         className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <NewPost closeModal={() => setAddScheduleModal(false)} />
+        <NewPost
+          closeModal={() => setAddScheduleModal(false)}
+          onSuccess={handleSuccess}
+        />
         <div onClick={() => setAddScheduleModal(false)} className="mt-8">
           <Button text="キャンセル" />
         </div>
