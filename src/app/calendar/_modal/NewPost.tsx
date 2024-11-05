@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
 
 interface ModalProps {
   closeModal: () => void;
+  onSuccess: () => void;
 }
 
 export const scheduleColorMap: Record<string, ScheduleColor> = {
@@ -23,7 +24,7 @@ export const scheduleColorMap: Record<string, ScheduleColor> = {
 };
 
 // const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
-const NewPost: React.FC<ModalProps> = () => {
+const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
   const { token } = useSupabaseSession();
   // const router = useRouter();
   const newPostData: CalendarPostType = {
@@ -52,11 +53,12 @@ const NewPost: React.FC<ModalProps> = () => {
     });
 
     if (response.ok) {
-      toast.success("予定が登録されました！", {
-        duration: 2100, //ポップアップ表示時間
-      });
+      onSuccess();
+      // toast.success("予定が登録されました！", {
+      //   duration: 2100, //ポップアップ表示時間
+      // });
       // closeModal();
-      setPostData(newPostData);
+      // setPostData(newPostData);
       // router.push("/calendar");
     } else {
       toast.error("登録に失敗しました。", {
