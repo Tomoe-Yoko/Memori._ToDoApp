@@ -7,10 +7,6 @@ import { CalendarPostType } from "@/app/_type/Calendar";
 import { ScheduleColor } from "@prisma/client";
 import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
 
-interface ModalProps {
-  closeModal: () => void;
-}
-
 export const scheduleColorMap: Record<string, ScheduleColor> = {
   "#FF0080": "Pink",
   "#0062FF": "Blue",
@@ -22,10 +18,13 @@ export const scheduleColorMap: Record<string, ScheduleColor> = {
   "#8A30FF": "Purple",
 };
 
-// const NewPost: React.FC<ModalProps> = ({ closeModal }) => {
-const NewPost: React.FC<ModalProps> = () => {
+interface ModalProps {
+  // closeModal: () => void;
+  onSuccess: () => void; //callback関数
+}
+const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
   const { token } = useSupabaseSession();
-  // const router = useRouter();
+
   const newPostData: CalendarPostType = {
     scheduleDate: new Date().toISOString(),
     content: "",
@@ -52,11 +51,12 @@ const NewPost: React.FC<ModalProps> = () => {
     });
 
     if (response.ok) {
-      toast.success("予定が登録されました！", {
-        duration: 2100, //ポップアップ表示時間
-      });
+      onSuccess();
+      // toast.success("予定が登録されました！", {
+      //   duration: 2100, //ポップアップ表示時間
+      // });
       // closeModal();
-      setPostData(newPostData);
+      // setPostData(newPostData);
       // router.push("/calendar");
     } else {
       toast.error("登録に失敗しました。", {
@@ -134,7 +134,7 @@ const NewPost: React.FC<ModalProps> = () => {
           <div className="mt-8">
             <Button text="登録" />
           </div>
-          <Toaster position="bottom-center" />
+          <Toaster position="top-center" />
         </div>
       </form>
     </div>

@@ -53,12 +53,10 @@ const Page = () => {
             router.replace("/calendar");
           }, 1800); //アニメーションの時間に合わせる
         } else {
-          // alert("APIリクエストに失敗しました: " + result.message);
           toast.error("APIリクエストに失敗しました: " + result.message);
         }
       } catch (apiError) {
         console.error("APIリクエストエラー:", apiError);
-        // alert("APIリクエスト中にエラーが発生しました。");
         toast.error("APIリクエスト中にエラーが発生しました。");
       }
     }
