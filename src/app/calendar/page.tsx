@@ -18,7 +18,7 @@ const Page: React.FC = () => {
   const { token } = useSupabaseSession();
   const [calendars, setCalendars] = useState<CalendarData[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [addScheduleModal, setAddScheduleModal] = useState(false);
+  const [addScheduleModal, setAddScheduleModal] = useState<boolean>(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
 
   useEffect(() => {
@@ -175,7 +175,7 @@ const Page: React.FC = () => {
     setShowAllScheduleModal(true);
   };
   const handleSuccess = () => {
-    setAddScheduleModal(false);
+    setAddScheduleModal(false); //モーダルクローズ
     toast.success("予定が登録されました！", {
       duration: 2100,
     }); //ポップアップ表示時間
@@ -223,15 +223,12 @@ const Page: React.FC = () => {
       <Navigation />
       <Toaster position="top-center" />
       <Modal
-        isOpen={addScheduleModal}
+        isOpen={addScheduleModal} //closeModal
         onRequestClose={() => setAddScheduleModal(false)}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg" //モーダルの外でクローズ
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <NewPost
-          // closeModal={setAddScheduleModal(false)}
-          onSuccess={handleSuccess}
-        />
+        <NewPost onSuccess={handleSuccess} initialDate={new Date()} />
         <div onClick={() => setAddScheduleModal(false)} className="mt-8">
           <Button text="キャンセル" />
         </div>
