@@ -9,13 +9,12 @@ import memo from "../../img/memo.png";
 import openPw from "../../img/openPw.png";
 import closePw from "../../img/closePw.png";
 import toast, { Toaster } from "react-hot-toast";
-import Animation from "../components/Animation";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false); //Animationの状態
+
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -48,10 +47,7 @@ const Page = () => {
 
         const result = await response.json();
         if (response.ok) {
-          setIsAnimating(true);
-          setTimeout(() => {
-            router.replace("/calendar");
-          }, 1800); //アニメーションの時間に合わせる
+          router.replace("/login/welcome");
         } else {
           toast.error("APIリクエストに失敗しました: " + result.message);
         }
@@ -64,7 +60,6 @@ const Page = () => {
 
   return (
     <div className="h-dvh">
-      {isAnimating && <Animation text="今日もおつかれさま" />}
       <Image
         src={memo}
         alt="topImage"
