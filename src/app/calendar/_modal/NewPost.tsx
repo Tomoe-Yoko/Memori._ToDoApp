@@ -19,14 +19,16 @@ export const scheduleColorMap: Record<string, ScheduleColor> = {
 };
 
 interface ModalProps {
-  // closeModal: () => void;
-  onSuccess: () => void; //callback関数
+  onSuccess: () => void; //登録したらモーダル閉じる＋toastを表示のcallback関数
+  initialDate: Date; //初期日付の設定
 }
-const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
+const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
   const { token } = useSupabaseSession();
 
   const newPostData: CalendarPostType = {
-    scheduleDate: new Date().toISOString(),
+    // scheduleDate: new Date().toISOString(),
+    // initialDate: Date; //初期日付の設定
+    scheduleDate: initialDate.toISOString(), // 初期日付を設定
     content: "",
     scheduleColor: "Pink" as ScheduleColor, // default
     createdAt: new Date().toISOString(),
@@ -51,13 +53,7 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
     });
 
     if (response.ok) {
-      onSuccess();
-      // toast.success("予定が登録されました！", {
-      //   duration: 2100, //ポップアップ表示時間
-      // });
-      // closeModal();
-      // setPostData(newPostData);
-      // router.push("/calendar");
+      onSuccess(); //onSuccess：モーダルを閉じる、toastの表示、スケジュール追加のprops（handleSuccess関数）
     } else {
       toast.error("登録に失敗しました。", {
         duration: 2100, //ポップアップ表示時間
@@ -71,10 +67,14 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
       <form onSubmit={handleSubmit}>
         {/* 予定の内容 */}
         <div className="mb-8">
-          <label className="block text-lg mb-2 text-text_button">
-            予定の内容 (23文字以内)
+          <label
+            htmlFor="content"
+            className="block text-lg mb-2 text-text_button"
+          >
+            予定の内容 (15文字以内)
           </label>
           <input
+            id="content"
             type="text"
             name="content"
             value={postData.content}
@@ -89,8 +89,11 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
 
         {/* 日付 */}
         <div className="mb-8">
-          <label className="block text-lg mb-2 text-text_button">日付</label>
+          <label htmlFor="date" className="block text-lg mb-2 text-text_button">
+            日付
+          </label>
           <input
+            id="date"
             type="date"
             name="scheduleDate"
             value={postData.scheduleDate.substring(0, 10)}
@@ -101,7 +104,7 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess }) => {
               })
             }
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded bg-white"
           />
         </div>
 

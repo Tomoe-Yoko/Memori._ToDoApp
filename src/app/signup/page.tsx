@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import Footer from "../components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
-import memo from "../../img/memo.png";
+import memo from "../../../public/img/memo.png";
 import openPw from "../../img/openPw.png";
 import closePw from "../../img/closePw.png";
 import toast, { Toaster } from "react-hot-toast";

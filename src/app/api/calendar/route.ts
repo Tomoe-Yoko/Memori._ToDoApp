@@ -61,10 +61,13 @@ export const POST = async (request: Request) => {
 
     const { scheduleDate, content, scheduleColor }: CreatePostRequestBody =
       body;
+    // scheduleDateをISO-8601形式に変換
+    const date = new Date(scheduleDate);
+    const isoDateTime = date.toISOString();
     const data = await prisma.calendar.create({
       data: {
         userId: user.id,
-        scheduleDate,
+        scheduleDate: isoDateTime, // ここでISO-8601形式を使用
         content,
         scheduleColor,
       },
