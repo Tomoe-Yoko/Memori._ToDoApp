@@ -19,7 +19,7 @@ export const scheduleColorMap: Record<string, ScheduleColor> = {
 };
 
 interface ModalProps {
-  onSuccess: () => void; //callback関数
+  onSuccess: () => void; //登録したらモーダル閉じる＋toastを表示のcallback関数
   initialDate: Date; //初期日付の設定
 }
 const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {

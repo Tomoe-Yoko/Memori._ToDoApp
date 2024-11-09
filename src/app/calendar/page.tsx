@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
 import { ScheduleColor } from "@prisma/client";
@@ -21,20 +21,21 @@ const Page: React.FC = () => {
   const [addScheduleModal, setAddScheduleModal] = useState<boolean>(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
 
+  const fetcher = useCallback(async () => {
+    const res = await fetch("/api/calendar", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token!,
+      },
+    });
+    const { calendars } = await res.json();
+    setCalendars(calendars);
+  }, [token]);
+
   useEffect(() => {
     if (!token) return;
-    const fetcher = async () => {
-      const res = await fetch("/api/calendar", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      });
-      const { calendars } = await res.json();
-      setCalendars(calendars);
-    };
     fetcher();
-  }, [token]);
+  }, [fetcher, token]);
 
   //DELETE
   const handleDeleteSchedule = async (id: number) => {
@@ -59,7 +60,7 @@ const Page: React.FC = () => {
         });
       }
     } catch (error) {
-      // console.error("Error deleting schedule:", error);
+      console.error("Error deleting schedule:", error);
       toast.error(`${error}:削除できませんでした。`, {
         duration: 2100,
       });
@@ -174,24 +175,14 @@ const Page: React.FC = () => {
     setSelectedDate(value);
     setShowAllScheduleModal(true);
   };
+
   const handleSuccess = () => {
     setAddScheduleModal(false); //モーダルクローズ
     toast.success("予定が登録されました！", {
       duration: 2100,
     }); //ポップアップ表示時間
     //GET(リロード)
-    if (!token) return;
-    const fetcher = async () => {
-      const res = await fetch("/api/calendar", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-      });
-      const { calendars } = await res.json();
-      setCalendars(calendars);
-    };
-    fetcher();
+    fetcher(); //useCallbackで書いた内容（token情報は不要）
   };
 
   return (

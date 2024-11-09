@@ -32,6 +32,19 @@ const config: Config = {
       fontFamily: {
         Jost: ["var(--JostFont)"],
       },
+      keyframes: {
+        fadeout: {
+          "0%": { opacity: " 1" },
+          "95%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
+      },
+      animation: {
+        fadeout: "fadeout 1.8s both",
+      },
+      backgroundImage: {
+        "tether-line": "url('/img/tether_line.svg')",
+      },
     },
   },
   plugins: [],

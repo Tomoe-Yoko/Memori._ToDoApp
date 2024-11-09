@@ -2,30 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-} */
-
 /*・・・・・・ react-calendar・・・・・・ */
 /* カレンダー全体 */
 .react-calendar {
@@ -70,39 +46,4 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
   @apply bg-transparent text-inherit;
-}
-
-/* ログイン後などのつなぎアニメーション */
-.animation {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: #e4c8ce;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* トランジションを効かせたい */
-  /* transition: all 0.3s; */
-  animation: tether 1.8s both;
-  color: #fff;
-  background-image: url(../img/tether_line.svg);
-  background-position: right 15% bottom 45%;
-  background-repeat: no-repeat;
-}
-@keyframes tether {
-  0%,
-  95% {
-    z-index: 3;
-    opacity: 1;
-  }
-  100% {
-    z-index: -1;
-    opacity: 0;
-  }
-}
-.animation p {
-  margin-top: -10rem;
-  letter-spacing: 2px;
-  font-size: 1.8rem;
 }

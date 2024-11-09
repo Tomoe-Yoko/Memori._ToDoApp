@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image"; // Imageコンポーネントをインポート
-import memo from "../img/memo.png";
+import memo from "../../public/img/memo.png";
 import top01 from "../img/top01.png";
 import top02 from "../img/top02.png";
 import top03 from "../img/top03.png";
