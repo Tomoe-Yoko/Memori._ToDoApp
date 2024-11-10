@@ -19,7 +19,6 @@ model Users {
   themeColorId   ThemeColorId 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-
   calendars      Calendar[]
   weeklies       Weekly[]
   todoGroups     TodoGroup[]

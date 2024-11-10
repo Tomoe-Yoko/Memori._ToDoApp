@@ -4,45 +4,6 @@ import { PrismaClient, ScheduleColor } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// export const GET = async (
-//   request: NextRequest,
-//   { params }: { params: { id: string } }
-// ) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error } = await supabase.auth.getUser(token);
-//   if (error) {
-//     return NextResponse.json({ status: error.message }, { status: 400 });
-//   }
-//   const { id } = params;
-//   try {
-//     const calendar = await prisma.calendar.findUnique({
-//       where: {
-//         id: parseInt(id),
-//       },
-//     });
-//     return NextResponse.json({ status: "OK", calendar }, { status: 200 });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       return NextResponse.json({ status: error.message }, { status: 400 });
-//     }
-//   }
-// };
-
-//////POST
-// export const POST = async (request: Request) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error, data } = await supabase.auth.getUser(token);
-//   if (error) return Response.json({ status: error.message }, { status: 400 });
-
-//   const supabaseUserId = data.user.id;
-//   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-//   if (!user)
-//     return NextResponse.json(
-//       { message: "ユーザーが見つかりませんでした" },
-//       { status: 404 }
-//     );
-// };
-
 ///////PUT
 interface UpdateCalendarRequestBody {
   scheduleDate: string;
