@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import { TodoGroupData } from "../_type/Todo";
 import Tabs from "./_components/Tabs";
+import Navigation from "../components/Navigation";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -29,6 +30,7 @@ const Page: React.FC = () => {
       <h2 className="text-white text-2xl text-center">ToDo.</h2>
 
       <Tabs todoGroups={todoGroups} />
+      <Navigation />
     </div>
   );
 };

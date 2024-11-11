@@ -69,7 +69,6 @@ export const PUT = async (
       },
     });
 
-    console.log("Calendar entry updated for ID:", calendarId);
     return NextResponse.json({ status: "OK", calendar }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {

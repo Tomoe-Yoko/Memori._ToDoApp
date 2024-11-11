@@ -45,6 +45,9 @@ const config: Config = {
       backgroundImage: {
         "tether-line": "url('/img/tether_line.svg')",
       },
+      borderRadius: {
+        "custom-rounded": "1rem 1rem 0 0", // 上だけ角丸
+      },
     },
   },
   plugins: [],
