@@ -47,3 +47,14 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__tile:enabled:focus {
   @apply bg-transparent text-inherit;
 }
+
+/* todoスクロールバーを非表示 */
+.scrollbar-hide {
+  overflow-x: scroll; /* 横方向のスクロールを有効*/
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /*Chrome, Safari, and Opera */
+}
