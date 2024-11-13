@@ -2,21 +2,23 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { TodoGroupData } from "@/app/_type/Todo";
+import { CreatePostRequestBody } from "@/app/_type/Todo";
 import Button from "@/app/components/Button";
 import toast, { Toaster } from "react-hot-toast";
+import { supabase } from "@/utils/supabase";
+import Input from "./Input";
 
 interface Props {
-  todoGroups: TodoGroupData[];
+  todoGroups: CreatePostRequestBody[];
 }
 
 const Tabs: React.FC<Props> = () => {
   const { token } = useSupabaseSession();
-  const [tabs, setTabs] = useState<TodoGroupData[]>([]);
+  const [tabs, setTabs] = useState<CreatePostRequestBody[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
-  const [editTab, setEditTab] = useState<TodoGroupData | null>(null); //現在編集対象のタブを管理
+  const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
 
@@ -25,7 +27,7 @@ const Tabs: React.FC<Props> = () => {
   const scrollLeft = useRef(0); //タブドラッグ
 
   const fetcher = useCallback(async () => {
-    const response = await fetch("/api/todoGroup", {
+    const response = await fetch("/api/todo_group", {
       headers: {
         "Content-Type": "application/json",
         Authorization: token!,
@@ -77,7 +79,7 @@ const Tabs: React.FC<Props> = () => {
   const updateTab = async () => {
     if (!editTab || !editTabName) return;
     try {
-      const response = await fetch(`/api/todoGroup/${editTab.id}`, {
+      const response = await fetch(`/api/todo_group/${editTab.id}`, {
         method: "PUT",
         headers: { ContentType: "application/json", Authorization: token! },
         body: JSON.stringify({ toDoGroupTitle: editTabName }),
@@ -105,7 +107,7 @@ const Tabs: React.FC<Props> = () => {
     if (!confirm("予定を削除しますか？")) return;
 
     try {
-      const response = await fetch(`/api/todoGroup/${editTab.id}`, {
+      const response = await fetch(`/api/todo_group/${editTab.id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json", Authorization: token! },
       });
@@ -164,19 +166,30 @@ const Tabs: React.FC<Props> = () => {
   // 新しいタブを追加
   const addTab = async () => {
     if (!token || !newTabName.trim()) return; //newTabNameが空だとreturn
+
+    //SupabaseセッションからuserIdを取得
+    const { data: userData, error } = await supabase.auth.getUser(token);
+    if (error || !userData) {
+      console.error("Failed to get user data");
+      return;
+    }
+
     //型合わせる
-    const newTab: TodoGroupData = {
+    const newTab: CreatePostRequestBody = {
       id: tabs.length + 1,
+      userId: userData.user.id,
       toDoGroupTitle: newTabName,
       createdAt: new Date().toISOString(), // 現在の日時を設定
       updatedAt: new Date().toISOString(),
     };
+
     try {
-      const response = await fetch("/api/todoGroup", {
+      const response = await fetch("/api/todo_group", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token },
         body: JSON.stringify({ toDoGroupTitle: newTabName }),
       });
+
       if (response.ok) {
         setTabs([...tabs, newTab]);
         closeModal();
@@ -231,12 +244,11 @@ const Tabs: React.FC<Props> = () => {
         <h2 className="text-lg font-semibold mb-4 text-text_button">
           タブ編集
         </h2>
-        <input
-          type="text"
+        <Input
           value={editTabName}
           onChange={(e) => setEditTabName(e.target.value)}
           placeholder="タブ名を編集"
-          className="border p-2 w-full mb-4"
+          // className="border p-2 w-full mb-4"
         />
         {/* <div className="flex space-x-4"> ボタンの仕様を変えたい*/}
         <div className="mt-4">
@@ -260,12 +272,11 @@ const Tabs: React.FC<Props> = () => {
         <h2 className="text-lg font-semibold mb-4 text-text_button">
           ToDoタブ追加
         </h2>
-        <input
-          type="text"
+        <Input
           value={newTabName}
           onChange={(e) => setNewTabName(e.target.value)}
           placeholder="タブ名を入力"
-          className="border p-2 w-full mb-4"
+          // className="border p-2 w-full mb-4"
         />
 
         <div onClick={addTab}>

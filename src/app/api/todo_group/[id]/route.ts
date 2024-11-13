@@ -7,8 +7,6 @@ const prisma = new PrismaClient();
 ///////PUT
 interface UpdatedTodoGroupRequestBody {
   toDoGroupTitle: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export const PUT = async (
@@ -32,26 +30,29 @@ export const PUT = async (
   if (isNaN(todoGroupId))
     return NextResponse.json({ message: "無効なIDです" }, { status: 400 });
   const body: UpdatedTodoGroupRequestBody = await request.json();
-  const { toDoGroupTitle, createdAt, updatedAt } = body;
+  const { toDoGroupTitle } = body;
 
   try {
-    const TodoTitleId = await prisma.todoGroup.findUnique({
-      where: { id: todoGroupId },
-    });
+    // const TodoTitleId = await prisma.todoGroup.findUnique({
+    //   where: { id: todoGroupId },
+    // });
 
-    if (!TodoTitleId)
-      return NextResponse.json(
-        { message: "更新するレコードがありません" },
-        { status: 404 }
-      );
+    // if (!TodoTitleId)
+    //   return NextResponse.json(
+    //     { message: "更新するレコードがありません" },
+    //     { status: 404 }
+    //   );
+    //findUnique設定しなくてよし。下記update時に、該当のtogoGroupがなければエラーで止まってくれる。
     const editingTodoTitle = await prisma.todoGroup.update({
-      where: { id: todoGroupId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: todoGroupId,
+      },
       data: {
         toDoGroupTitle,
-        createdAt,
-        updatedAt,
       },
     });
+
     return NextResponse.json(
       { status: "OK", editingTodoTitle },
       { status: 200 }

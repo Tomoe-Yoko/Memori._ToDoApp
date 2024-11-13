@@ -9,8 +9,6 @@ interface UpdateCalendarRequestBody {
   scheduleDate: string;
   content: string;
   scheduleColor: ScheduleColor;
-  createdAt: string;
-  updatedAt: string;
 }
 export const PUT = async (
   request: NextRequest,
@@ -41,31 +39,30 @@ export const PUT = async (
   }
 
   const body: UpdateCalendarRequestBody = await request.json();
-  const { scheduleDate, content, scheduleColor, createdAt, updatedAt } = body;
+  const { scheduleDate, content, scheduleColor } = body;
 
   try {
-    const existingCalendar = await prisma.calendar.findUnique({
-      where: { id: calendarId },
-    });
+    // const existingCalendar = await prisma.calendar.findUnique({
+    //   where: { id: calendarId },
+    // });
 
-    if (!existingCalendar) {
-      console.error("Calendar entry not found for ID:", calendarId);
-      return NextResponse.json(
-        { message: "更新するレコードが見つかりません" },
-        { status: 404 }
-      );
-    }
+    // if (!existingCalendar) {
+    //   console.error("Calendar entry not found for ID:", calendarId);
+    //   return NextResponse.json(
+    //     { message: "更新するレコードが見つかりません" },
+    //     { status: 404 }
+    //   );
+    // }
 
     const calendar = await prisma.calendar.update({
       where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
         id: calendarId,
       },
       data: {
         scheduleDate: new Date(scheduleDate),
         content,
         scheduleColor,
-        createdAt: new Date(createdAt),
-        updatedAt: new Date(updatedAt),
       },
     });
 

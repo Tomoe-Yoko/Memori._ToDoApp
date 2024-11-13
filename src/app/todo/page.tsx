@@ -10,7 +10,7 @@ const Page: React.FC = () => {
   const { token } = useSupabaseSession();
   const [todoGroups, setTodoGroups] = useState<TodoGroupData[]>([]);
   const fetcher = useCallback(async () => {
-    const res = await fetch("api/todoGroup", {
+    const res = await fetch("api/todo_group", {
       headers: {
         ContentType: "application/json",
         Authorization: token!,

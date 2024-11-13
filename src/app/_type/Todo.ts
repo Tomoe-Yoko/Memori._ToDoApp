@@ -10,13 +10,7 @@
 // }
 
 export interface CreatePostRequestBody {
-  userId: number;
-  toDoGroupTitle: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TodoGroupData {
+  userId: string;
   id: number;
   toDoGroupTitle: string;
   createdAt: string;
