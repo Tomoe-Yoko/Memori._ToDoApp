@@ -89,7 +89,10 @@ export const DELETE = async (
   }
   try {
     const todoGroups = await prisma.todoGroup.findUnique({
-      where: { id: todoGroupId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: todoGroupId,
+      },
     });
 
     if (!todoGroups) {
@@ -101,7 +104,10 @@ export const DELETE = async (
     }
 
     await prisma.todoGroup.delete({
-      where: { id: todoGroupId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: todoGroupId,
+      },
     });
 
     return NextResponse.json({ status: "OK" }, { status: 200 });

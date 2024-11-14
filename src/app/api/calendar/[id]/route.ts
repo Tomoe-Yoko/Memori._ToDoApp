@@ -101,7 +101,10 @@ export const DELETE = async (
 
   try {
     const calendar = await prisma.calendar.findUnique({
-      where: { id: calendarId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: calendarId,
+      },
     });
 
     if (!calendar) {
@@ -113,7 +116,10 @@ export const DELETE = async (
     }
 
     await prisma.calendar.delete({
-      where: { id: calendarId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: calendarId,
+      },
     });
     console.log("Calendar entry deleted for ID:", calendarId);
     return NextResponse.json({ status: "OK" }, { status: 200 });
