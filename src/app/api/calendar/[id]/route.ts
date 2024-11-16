@@ -4,52 +4,11 @@ import { PrismaClient, ScheduleColor } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// export const GET = async (
-//   request: NextRequest,
-//   { params }: { params: { id: string } }
-// ) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error } = await supabase.auth.getUser(token);
-//   if (error) {
-//     return NextResponse.json({ status: error.message }, { status: 400 });
-//   }
-//   const { id } = params;
-//   try {
-//     const calendar = await prisma.calendar.findUnique({
-//       where: {
-//         id: parseInt(id),
-//       },
-//     });
-//     return NextResponse.json({ status: "OK", calendar }, { status: 200 });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       return NextResponse.json({ status: error.message }, { status: 400 });
-//     }
-//   }
-// };
-
-//////POST
-// export const POST = async (request: Request) => {
-//   const token = request.headers.get("Authorization") ?? "";
-//   const { error, data } = await supabase.auth.getUser(token);
-//   if (error) return Response.json({ status: error.message }, { status: 400 });
-
-//   const supabaseUserId = data.user.id;
-//   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-//   if (!user)
-//     return NextResponse.json(
-//       { message: "ユーザーが見つかりませんでした" },
-//       { status: 404 }
-//     );
-// };
-
 ///////PUT
 interface UpdateCalendarRequestBody {
   scheduleDate: string;
   content: string;
   scheduleColor: ScheduleColor;
-  createdAt: string;
-  updatedAt: string;
 }
 export const PUT = async (
   request: NextRequest,
@@ -80,35 +39,33 @@ export const PUT = async (
   }
 
   const body: UpdateCalendarRequestBody = await request.json();
-  const { scheduleDate, content, scheduleColor, createdAt, updatedAt } = body;
+  const { scheduleDate, content, scheduleColor } = body;
 
   try {
-    const existingCalendar = await prisma.calendar.findUnique({
-      where: { id: calendarId },
-    });
+    // const existingCalendar = await prisma.calendar.findUnique({
+    //   where: { id: calendarId },
+    // });
 
-    if (!existingCalendar) {
-      console.error("Calendar entry not found for ID:", calendarId);
-      return NextResponse.json(
-        { message: "更新するレコードが見つかりません" },
-        { status: 404 }
-      );
-    }
+    // if (!existingCalendar) {
+    //   console.error("Calendar entry not found for ID:", calendarId);
+    //   return NextResponse.json(
+    //     { message: "更新するレコードが見つかりません" },
+    //     { status: 404 }
+    //   );
+    // }
 
     const calendar = await prisma.calendar.update({
       where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
         id: calendarId,
       },
       data: {
         scheduleDate: new Date(scheduleDate),
         content,
         scheduleColor,
-        createdAt: new Date(createdAt),
-        updatedAt: new Date(updatedAt),
       },
     });
 
-    console.log("Calendar entry updated for ID:", calendarId);
     return NextResponse.json({ status: "OK", calendar }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {
@@ -144,7 +101,10 @@ export const DELETE = async (
 
   try {
     const calendar = await prisma.calendar.findUnique({
-      where: { id: calendarId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: calendarId,
+      },
     });
 
     if (!calendar) {
@@ -156,7 +116,10 @@ export const DELETE = async (
     }
 
     await prisma.calendar.delete({
-      where: { id: calendarId },
+      where: {
+        userId: user.id, //userIdがuser.idであることを条件追加
+        id: calendarId,
+      },
     });
     console.log("Calendar entry deleted for ID:", calendarId);
     return NextResponse.json({ status: "OK" }, { status: 200 });
