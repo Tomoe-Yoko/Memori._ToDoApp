@@ -16,3 +16,12 @@ export interface CreatePostRequestBody {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateTodoItemRequestBody {
+  todoGroupId: number;
+  id: number;
+  toDoItem: string;
+  isChecked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
