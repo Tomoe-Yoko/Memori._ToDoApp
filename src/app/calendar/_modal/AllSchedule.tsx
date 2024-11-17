@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Button from "@/app/components/Button";
+import Button from "@/app/_components/Button";
 import { CalendarData } from "../../_type/Calendar"; // Scheduleの型を適切にインポート
 import { ScheduleColor } from "@prisma/client";
 import { scheduleColorMap } from "./NewPost";
-import CloseButton from "@/app/components/CloseButton";
+import CloseButton from "@/app/_components/CloseButton";
 import { BsTrash3Fill } from "react-icons/bs"; // アイコンをインポート
 import Modal from "react-modal"; // モーダルをインポート
 import NewPost from "./NewPost"; // NewPostコンポーネントをインポート

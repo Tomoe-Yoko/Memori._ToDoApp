@@ -3,13 +3,15 @@ import Modal from "react-modal";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { CreatePostRequestBody } from "@/app/_type/Todo";
-import Button from "@/app/components/Button";
+import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
 import Input from "./Input";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];
+  activeTabId: number | null;
+  setActiveTabId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 const Tabs: React.FC<Props> = () => {

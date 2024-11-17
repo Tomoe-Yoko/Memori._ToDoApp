@@ -8,11 +8,12 @@ import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import AllSchedule from "./_modal/AllSchedule";
 import { scheduleColorMap } from "./_modal/NewPost";
-import Button from "../components/Button";
-import Navigation from "../components/Navigation";
+import Button from "../_components/Button";
+import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
 import "../../app/globals.css";
+import PlusButton from "../_components/PlusButton";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -203,14 +204,9 @@ const Page: React.FC = () => {
         onClickDay={onCalendarClick}
         className={"react-calendar"}
       />
-      <div className="flex justify-end mr-4 pb-20">
-        <button
-          onClick={() => setAddScheduleModal(true)}
-          className="block w-[55px] aspect-square rounded-full bg-text_button text-white text-xl mt-2"
-        >
-          ＋
-        </button>
-      </div>
+
+      <PlusButton handleAddEvent={() => setAddScheduleModal(true)} />
+
       <Navigation />
       <Toaster position="top-center" />
       <Modal
