@@ -39,25 +39,25 @@
 // //             key={item.id}
 // //             className="flex items-center space-x-4 p-2 border-b last:border-none"
 // //           >
-// //             <button
-// //               onClick={() => toggleCompletion(item.id)}
-// //               className={`w-6 h-6 rounded-full border-2 flex justify-center items-center ${
-// //                 item.completed
-// //                   ? "bg-gray-600 border-gray-600"
-// //                   : "border-gray-300"
-// //               }`}
-// //             >
-// //               {item.completed && (
-// //                 <span className="text-white font-bold">✔</span>
-// //               )}
-// //             </button>
-// //             <p
-// //               className={`text-lg ${
-// //                 item.completed ? "line-through text-gray-400" : "text-black"
-// //               }`}
-// //             >
-// //               {item.name}
-// //             </p>
+// <button
+//   onClick={() => toggleCompletion(item.id)}
+//   className={`w-6 h-6 rounded-full border-2 flex justify-center items-center ${
+//     item.isChecked
+//       ? "bg-gray-600 border-gray-600"
+//       : "border-gray-300"
+//   }`}
+// >
+//   {item.isChecked && (
+//     <span className="text-white font-bold">✔</span>
+//   )}
+// </button>
+// <p
+//   className={`text-lg ${
+//     item.isChecked ? "line-through text-gray-400" : "text-black"
+//   }`}
+// >
+//   {item.name}
+// </p>
 // //           </div>
 // //         ))}
 // //       </div>
