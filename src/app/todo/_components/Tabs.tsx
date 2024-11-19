@@ -19,7 +19,6 @@ const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
   const [tabs, setTabs] = useState<CreatePostRequestBody[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
-  // const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
@@ -83,7 +82,7 @@ const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
     try {
       const response = await fetch(`/api/todo_group/${editTab.id}`, {
         method: "PUT",
-        headers: { ContentType: "application/json", Authorization: token! },
+        headers: { "Content-Type": "application/json", Authorization: token! },
         body: JSON.stringify({ toDoGroupTitle: editTabName }),
       });
       if (response.ok) {

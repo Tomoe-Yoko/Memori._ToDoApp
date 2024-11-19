@@ -14,6 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
 import "../../app/globals.css";
 import PlusButton from "../_components/PlusButton";
+import Loading from "@/app/loading";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -21,7 +22,7 @@ const Page: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [addScheduleModal, setAddScheduleModal] = useState<boolean>(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
-
+  const [loading, setLoading] = useState<boolean>(true);
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -35,6 +36,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     if (!token) return;
+    setLoading(false);
     fetcher();
   }, [fetcher, token]);
 
@@ -185,7 +187,9 @@ const Page: React.FC = () => {
     //GET(リロード)
     fetcher(); //useCallbackで書いた内容（token情報は不要）
   };
-
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
