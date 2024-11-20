@@ -1,7 +1,6 @@
 import React from "react";
 
 interface Props {
-  // CreateTodoItemRequestBody: () => void;
   id: number;
   toDoItem: string;
   isChecked: boolean;

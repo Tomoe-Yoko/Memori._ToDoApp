@@ -9,6 +9,7 @@ import Tabs from "./_components/Tabs";
 import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
 import Loading from "@/app/loading";
+import PlusButton from "../_components/PlusButton";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -16,6 +17,8 @@ const Page: React.FC = () => {
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [todoItems, setTodoItems] = useState<CreateTodoItemRequestBody[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [newTask, setNewTask] = useState<string>(""); // 新しいタスクの入力値を管理
+  const [newItemGroupId, setNewItemGroupId] = useState<number | null>(null); // 新しいアイテムのグループIDを管理
 
   const fetcher = useCallback(async () => {
     try {
@@ -28,13 +31,17 @@ const Page: React.FC = () => {
 
       const { todoGroups } = await response.json();
       setTodoGroups(todoGroups);
-      if (todoGroups.length > 0) {
+      if (newItemGroupId !== null) {
+        setActiveTabId(newItemGroupId);
+        setNewItemGroupId(null); // リセット
+        // setNewItemGroupId(activeTabId);
+      } else if (todoGroups.length > 0) {
         setActiveTabId(todoGroups[0].id);
       }
     } catch (error) {
       console.error("Failed to fetch todo groups:", error);
     }
-  }, [token]);
+  }, [token, newItemGroupId]);
 
   useEffect(() => {
     if (!token) return;
@@ -69,11 +76,10 @@ const Page: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchTodoItems();
-  }, [token, activeTabId]);
+  }, [token, fetcher]);
 
-  //タスクの完了状態を切り替える関数;
+  //タスクの完了状態を切り替える
   const toggleCompletion = (id: number) => {
     setTodoItems((prevItems) =>
       prevItems.map((item) =>
@@ -106,6 +112,40 @@ const Page: React.FC = () => {
   //   }
   // };
 
+  //タスクを追加する
+
+  const addItem = async () => {
+    if (!token || activeTabId === null || newTask.trim() === "") return;
+    const newPostItem: CreateTodoItemRequestBody = {
+      todoGroupId: activeTabId,
+      id: todoItems.length + 1,
+      toDoItem: newTask, // 入力されたタスク名を使用
+      isChecked: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    try {
+      const response = await fetch(`api/todo_group/${activeTabId}/todo_items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: token },
+        body: JSON.stringify(newPostItem),
+      });
+      if (response.ok) {
+        const savedItem = await response.json();
+        setTodoItems((prevItems) => [...prevItems, savedItem]);
+        //fetcher();
+        // setNewTask("");
+        setTodoItems((prevItems) => [...prevItems, savedItem]);
+        setNewTask(""); // 入力フィールドをクリア
+        //setNewItemGroupId(activeTabId); // 新しいアイテムのグループIDを保存
+      } else {
+        console.error("登録に失敗しました。");
+      }
+    } catch (error) {
+      console.error("Error adding new item:", error);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -130,7 +170,14 @@ const Page: React.FC = () => {
             />
           ))}
       </ul>
-
+      <input
+        type="text"
+        value={newTask}
+        onChange={(e) => setNewTask(e.target.value)}
+        placeholder="新しいタスクを入力"
+        className="text-input-class"
+      />
+      <PlusButton handleAddEvent={addItem} />
       <Navigation />
     </div>
   );
@@ -139,3 +186,4 @@ const Page: React.FC = () => {
 export default Page;
 
 //チェックの真偽値をデータベースに反映させる
+//11/20今日の夜一旦コードレビュー依頼するぞ！

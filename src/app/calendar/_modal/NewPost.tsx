@@ -56,7 +56,6 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
       toast.error("登録に失敗しました。", {
         duration: 2100, //ポップアップ表示時間
       });
-      console.log("test");
     }
   };
 
