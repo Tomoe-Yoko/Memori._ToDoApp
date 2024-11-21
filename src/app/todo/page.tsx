@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   CreatePostRequestBody,
   CreateTodoItemRequestBody,
@@ -17,8 +17,7 @@ const Page: React.FC = () => {
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [todoItems, setTodoItems] = useState<CreateTodoItemRequestBody[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [newTask, setNewTask] = useState<string>(""); // 新しいタスクの入力値を管理
-  const [newItemGroupId, setNewItemGroupId] = useState<number | null>(null); // 新しいアイテムのグループIDを管理
+  const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
 
   const fetcher = useCallback(async () => {
     try {
@@ -31,17 +30,14 @@ const Page: React.FC = () => {
 
       const { todoGroups } = await response.json();
       setTodoGroups(todoGroups);
-      if (newItemGroupId !== null) {
-        setActiveTabId(newItemGroupId);
-        setNewItemGroupId(null); // リセット
-        // setNewItemGroupId(activeTabId);
-      } else if (todoGroups.length > 0) {
+
+      if (todoGroups.length > 0) {
         setActiveTabId(todoGroups[0].id);
       }
     } catch (error) {
       console.error("Failed to fetch todo groups:", error);
     }
-  }, [token, newItemGroupId]);
+  }, [token]);
 
   useEffect(() => {
     if (!token) return;
@@ -77,7 +73,7 @@ const Page: React.FC = () => {
       }
     };
     fetchTodoItems();
-  }, [token, fetcher]);
+  }, [token, activeTabId]);
 
   //タスクの完了状態を切り替える
   const toggleCompletion = (id: number) => {
@@ -87,62 +83,52 @@ const Page: React.FC = () => {
       )
     );
   };
-  // const toggleCompletion = async (id: number) => {
-  //   try {
-  //     const response = await fetch(
-  //       `/api/todo_group/${activeTabId}/todo_items/${itemId}`,
-  //       {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: token!,
-  //         },
-  //         body: JSON.stringify({ isChecked: boolean }),
-  //       }
-  //     );
-  //     if (response.ok) {
-  //       setTodoItems((prevItems) =>
-  //         prevItems.map((item) =>
-  //           item.id === id ? { ...item, isChecked: !item.isChecked } : item
-  //         )
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating tab:", error);
-  //   }
-  // };
 
-  //タスクを追加する
+  const addEmptyItem = () => {
+    if (!activeTabId) return;
 
-  const addItem = async () => {
-    if (!token || activeTabId === null || newTask.trim() === "") return;
-    const newPostItem: CreateTodoItemRequestBody = {
+    const newItem: CreateTodoItemRequestBody = {
+      // id: todoItems.length + 1,
+      id: Date.now(), // 一意のIDを生成
       todoGroupId: activeTabId,
-      id: todoItems.length + 1,
-      toDoItem: newTask, // 入力されたタスク名を使用
+      toDoItem: "",
       isChecked: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+
+    setTodoItems((prevItems) => [...prevItems, newItem]);
+
+    // 次の描画サイクルで入力欄にフォーカスを当てる
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+
+  const updateItem = (id: number, value: string) => {
+    setTodoItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, toDoItem: value } : item
+      )
+    );
+  };
+
+  const saveItem = async (id: number) => {
+    const targetItem = todoItems.find((item) => item.id === id);
+
+    if (!targetItem || targetItem.toDoItem.trim() === "") return;
+
     try {
       const response = await fetch(`api/todo_group/${activeTabId}/todo_items`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify(newPostItem),
+        body: JSON.stringify(targetItem),
       });
-      if (response.ok) {
-        const savedItem = await response.json();
-        setTodoItems((prevItems) => [...prevItems, savedItem]);
-        //fetcher();
-        // setNewTask("");
-        setTodoItems((prevItems) => [...prevItems, savedItem]);
-        setNewTask(""); // 入力フィールドをクリア
-        //setNewItemGroupId(activeTabId); // 新しいアイテムのグループIDを保存
-      } else {
-        console.error("登録に失敗しました。");
+      if (!response.ok) {
+        console.error("Failed to save item.");
       }
     } catch (error) {
-      console.error("Error adding new item:", error);
+      console.error("Error saving item:", error);
     }
   };
 
@@ -157,7 +143,7 @@ const Page: React.FC = () => {
         activeTabId={activeTabId}
         setActiveTabId={setActiveTabId}
       />
-      <ul>
+      <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
         {todoItems
           .filter((item) => item.todoGroupId === activeTabId)
           .map((item) => (
@@ -167,17 +153,14 @@ const Page: React.FC = () => {
               toDoItem={item.toDoItem}
               isChecked={item.isChecked}
               toggleCompletion={toggleCompletion}
+              inputRef={inputRef}
+              updateItem={updateItem}
+              saveItem={saveItem}
             />
           ))}
       </ul>
-      <input
-        type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
-        placeholder="新しいタスクを入力"
-        className="text-input-class"
-      />
-      <PlusButton handleAddEvent={addItem} />
+
+      <PlusButton handleAddEvent={addEmptyItem} />
       <Navigation />
     </div>
   );
@@ -186,4 +169,3 @@ const Page: React.FC = () => {
 export default Page;
 
 //チェックの真偽値をデータベースに反映させる
-//11/20今日の夜一旦コードレビュー依頼するぞ！

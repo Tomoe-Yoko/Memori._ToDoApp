@@ -204,7 +204,7 @@ const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
     setActiveTabId(newTab.id);
   };
   return (
-    <div className="p-4 max-w-md m-auto   rounded text-text_button">
+    <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
       <div
         className="flex overflow-x-auto scrollbar-hide"
         ref={tabContainerRef}
