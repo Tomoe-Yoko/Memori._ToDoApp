@@ -114,8 +114,8 @@ const Page: React.FC = () => {
   };
 
   const saveItem = async (id: number) => {
+    if (!token) return;
     const targetItem = todoItems.find((item) => item.id === id);
-
     if (!targetItem || targetItem.toDoItem.trim() === "") return;
 
     try {
