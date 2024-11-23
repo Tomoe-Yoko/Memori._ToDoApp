@@ -250,9 +250,8 @@ const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
             value={editTabName}
             onChange={(e) => setEditTabName(e.target.value)}
             placeholder="タブ名を編集"
-            // className="border p-2 w-full mb-4"
           />
-          {/* <div className="flex space-x-4"> ボタンの仕様を変えたい*/}
+
           <div className="mt-4">
             <div onClick={updateTab}>
               <Button text="更新" />
@@ -278,7 +277,6 @@ const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
             value={newTabName}
             onChange={(e) => setNewTabName(e.target.value)}
             placeholder="タブ名を入力"
-            // className="border p-2 w-full mb-4"
           />
 
           <div onClick={addTab}>

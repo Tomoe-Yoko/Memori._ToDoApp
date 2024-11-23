@@ -29,9 +29,11 @@ const Page: React.FC = () => {
       });
 
       const { todoGroups } = await response.json();
-      setTodoGroups(todoGroups);
-
-      if (todoGroups.length > 0) {
+      if (todoGroups.length === 0) {
+        const defaultGroup = await createDefaultGroupAndItem();
+        setTodoGroups([defaultGroup]);
+        setActiveTabId(defaultGroup.id);
+      } else if (todoGroups.length > 0) {
         setActiveTabId(todoGroups[0].id);
       }
     } catch (error) {
@@ -43,6 +45,19 @@ const Page: React.FC = () => {
     if (!token) return;
     fetcher();
   }, [fetcher, token]);
+
+  //signUp後、初めてtodoページを開くときの表示
+  const createDefaultGroupAndItem = async () => {
+    const response = await fetch("/api/todo_group", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token!,
+      },
+    });
+    const defaultGroup: CreatePostRequestBody = await response.json();
+    return defaultGroup;
+  };
 
   //アクティブなタブの情報を取得
   useEffect(() => {
@@ -157,6 +172,7 @@ const Page: React.FC = () => {
               inputRef={inputRef}
               updateItem={updateItem}
               saveItem={saveItem}
+              todoItems={todoItems}
             />
           ))}
       </ul>
