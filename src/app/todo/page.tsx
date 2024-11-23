@@ -21,7 +21,7 @@ const Page: React.FC = () => {
 
   const fetcher = useCallback(async () => {
     try {
-      const response = await fetch("api/todo_group", {
+      const response = await fetch("/api/todo_group", {
         headers: {
           "Content-Type": "application/json",
           Authorization: token!,
@@ -50,7 +50,7 @@ const Page: React.FC = () => {
     const fetchTodoItems = async () => {
       try {
         const response = await fetch(
-          `api/todo_group/${activeTabId}/todo_items`,
+          `/api/todo_group/${activeTabId}/todo_items`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -58,6 +58,7 @@ const Page: React.FC = () => {
             },
           }
         );
+
         const data = await response.json();
         if (response.ok) {
           setTodoItems(data.todoItems);
