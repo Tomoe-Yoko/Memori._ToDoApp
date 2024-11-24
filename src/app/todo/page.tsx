@@ -10,6 +10,7 @@ import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
 import Loading from "@/app/loading";
 import PlusButton from "../_components/PlusButton";
+import toast from "react-hot-toast";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -148,6 +149,36 @@ const Page: React.FC = () => {
     }
   };
 
+  ////////////////////////////////DELETE
+  //route.tsをPOSTMANする
+  const deleteItem = async () => {
+    if (!token) return;
+
+    if (!confirm("一つのリストを削除しますか？")) return;
+
+    try {
+      const response = await fetch(
+        `/api/todo_group/${activeTabId}/todo_items/${itemId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+        }
+      );
+      if (response.ok) {
+        toast.success("リストを一つを削除しました。", {
+          duration: 2100, //ポップアップ表示時間
+        });
+      } else {
+        console.error("Failed to delete item");
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -173,6 +204,7 @@ const Page: React.FC = () => {
               updateItem={updateItem}
               saveItem={saveItem}
               todoItems={todoItems}
+              deleteItem={deleteItem}
             />
           ))}
       </ul>
