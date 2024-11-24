@@ -33,15 +33,6 @@ export const PUT = async (
   const { toDoGroupTitle } = body;
 
   try {
-    // const TodoTitleId = await prisma.todoGroup.findUnique({
-    //   where: { id: todoGroupId },
-    // });
-
-    // if (!TodoTitleId)
-    //   return NextResponse.json(
-    //     { message: "更新するレコードがありません" },
-    //     { status: 404 }
-    //   );
     //findUnique設定しなくてよし。下記update時に、該当のtogoGroupがなければエラーで止まってくれる。
     const editingTodoTitle = await prisma.todoGroup.update({
       where: {

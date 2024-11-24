@@ -2,8 +2,8 @@
 "use client";
 import { supabase } from "@/utils/supabase";
 import React, { useState } from "react";
-import Button from "../components/Button";
-import Footer from "../components/Footer";
+import Button from "../_components/Button";
+import Footer from "../_components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "../../../public/img/memo.png";
 import openPw from "../../img/openPw.png";

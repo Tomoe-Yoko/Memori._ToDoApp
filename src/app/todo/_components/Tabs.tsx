@@ -3,21 +3,22 @@ import Modal from "react-modal";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { CreatePostRequestBody } from "@/app/_type/Todo";
-import Button from "@/app/components/Button";
+import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
 import Input from "./Input";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];
+  activeTabId: number | null;
+  setActiveTabId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const Tabs: React.FC<Props> = () => {
+const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
   const { token } = useSupabaseSession();
   const [tabs, setTabs] = useState<CreatePostRequestBody[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
-  const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
@@ -81,7 +82,7 @@ const Tabs: React.FC<Props> = () => {
     try {
       const response = await fetch(`/api/todo_group/${editTab.id}`, {
         method: "PUT",
-        headers: { ContentType: "application/json", Authorization: token! },
+        headers: { "Content-Type": "application/json", Authorization: token! },
         body: JSON.stringify({ toDoGroupTitle: editTabName }),
       });
       if (response.ok) {
@@ -202,9 +203,8 @@ const Tabs: React.FC<Props> = () => {
     fetcher();
     setActiveTabId(newTab.id);
   };
-
   return (
-    <div className="p-4 max-w-md m-auto   rounded text-text_button">
+    <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
       <div
         className="flex overflow-x-auto scrollbar-hide"
         ref={tabContainerRef}
@@ -227,68 +227,65 @@ const Tabs: React.FC<Props> = () => {
             {tab.toDoGroupTitle}
           </button>
         ))}
+
+        {/* タブのプラスボタン */}
         <button
           onClick={openModal}
           className="px-4 py-2 text-text_button rounded-custom-rounded bg-gray-200"
         >
           <AiOutlinePlus size={20} />
         </button>
+
+        {/* 編集モーダル表示 */}
+        <Modal
+          isOpen={!!editTab}
+          onRequestClose={() => setEditTab(null)}
+          className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+        >
+          <h2 className="text-lg font-semibold mb-4 text-text_button">
+            タブ編集
+          </h2>
+          <Input
+            value={editTabName}
+            onChange={(e) => setEditTabName(e.target.value)}
+            placeholder="タブ名を編集"
+          />
+
+          <div className="mt-4">
+            <div onClick={updateTab}>
+              <Button text="更新" />
+            </div>
+            <div onClick={deleteTab}>
+              <Button text="削除" />
+            </div>
+          </div>
+          <Toaster position="top-center" />
+        </Modal>
+
+        {/* 新規追加モーダル表示 */}
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+        >
+          <h2 className="text-lg font-semibold mb-4 text-text_button">
+            ToDoタブ追加
+          </h2>
+          <Input
+            value={newTabName}
+            onChange={(e) => setNewTabName(e.target.value)}
+            placeholder="タブ名を入力"
+          />
+
+          <div onClick={addTab}>
+            <Button text="追加" />
+          </div>
+        </Modal>
       </div>
-      {/* 編集モーダル表示 */}
-      <Modal
-        isOpen={!!editTab}
-        onRequestClose={() => setEditTab(null)}
-        className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      >
-        <h2 className="text-lg font-semibold mb-4 text-text_button">
-          タブ編集
-        </h2>
-        <Input
-          value={editTabName}
-          onChange={(e) => setEditTabName(e.target.value)}
-          placeholder="タブ名を編集"
-          // className="border p-2 w-full mb-4"
-        />
-        {/* <div className="flex space-x-4"> ボタンの仕様を変えたい*/}
-        <div className="mt-4">
-          <div onClick={updateTab}>
-            <Button text="更新" />
-          </div>
-          <div onClick={deleteTab}>
-            <Button text="削除" />
-          </div>
-        </div>
-        <Toaster position="top-center" />
-      </Modal>
-
-      {/* 新規追加モーダル表示 */}
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      >
-        <h2 className="text-lg font-semibold mb-4 text-text_button">
-          ToDoタブ追加
-        </h2>
-        <Input
-          value={newTabName}
-          onChange={(e) => setNewTabName(e.target.value)}
-          placeholder="タブ名を入力"
-          // className="border p-2 w-full mb-4"
-        />
-
-        <div onClick={addTab}>
-          <Button text="追加" />
-        </div>
-      </Modal>
     </div>
   );
 };
 
 export default Tabs;
-
-{
-  /* <BsTrash3Fill size={14} /> */
-}

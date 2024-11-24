@@ -8,11 +8,13 @@ import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import AllSchedule from "./_modal/AllSchedule";
 import { scheduleColorMap } from "./_modal/NewPost";
-import Button from "../components/Button";
-import Navigation from "../components/Navigation";
+import Button from "../_components/Button";
+import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
 import "../../app/globals.css";
+import PlusButton from "../_components/PlusButton";
+import Loading from "@/app/loading";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -20,7 +22,7 @@ const Page: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [addScheduleModal, setAddScheduleModal] = useState<boolean>(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
-
+  const [loading, setLoading] = useState<boolean>(true);
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -34,6 +36,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     if (!token) return;
+    setLoading(false);
     fetcher();
   }, [fetcher, token]);
 
@@ -184,9 +187,11 @@ const Page: React.FC = () => {
     //GET(リロード)
     fetcher(); //useCallbackで書いた内容（token情報は不要）
   };
-
+  if (loading) {
+    return <Loading />;
+  }
   return (
-    <div className="relative">
+    <div className="relative h-svh">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
       <Calendar
         locale="ja-JP"
@@ -203,14 +208,9 @@ const Page: React.FC = () => {
         onClickDay={onCalendarClick}
         className={"react-calendar"}
       />
-      <div className="flex justify-end mr-4 pb-20">
-        <button
-          onClick={() => setAddScheduleModal(true)}
-          className="block w-[55px] aspect-square rounded-full bg-text_button text-white text-xl mt-2"
-        >
-          ＋
-        </button>
-      </div>
+
+      <PlusButton handleAddEvent={() => setAddScheduleModal(true)} />
+
       <Navigation />
       <Toaster position="top-center" />
       <Modal

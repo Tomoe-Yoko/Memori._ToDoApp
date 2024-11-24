@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 // import { useRouter } from "next/navigation";
-import Button from "@/app/components/Button";
+import Button from "@/app/_components/Button";
 import { CalendarPostType } from "@/app/_type/Calendar";
 import { ScheduleColor } from "@prisma/client";
 import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
@@ -47,8 +47,6 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
       headers: { "Content-Type": "application/json", Authorization: token },
       body: JSON.stringify({
         ...postData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       }),
     });
 

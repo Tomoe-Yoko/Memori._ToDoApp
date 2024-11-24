@@ -5,8 +5,8 @@ import top01 from "../img/top01.png";
 import top02 from "../img/top02.png";
 import top03 from "../img/top03.png";
 import top04 from "../img/top04.png";
-import Button from "./components/Button";
-import Footer from "./components/Footer";
+import Button from "./_components/Button";
+import Footer from "./_components/Footer";
 import Link from "next/link";
 
 export default function Home() {
