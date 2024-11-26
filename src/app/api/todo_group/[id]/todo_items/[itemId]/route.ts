@@ -35,33 +35,13 @@ export const DELETE = async (
     );
 
   try {
-    // 削除対象のtodoItemを取得
-    const todoItem = await prisma.todoItems.findUnique({
-      where: { id: todoItemId },
-    });
-
-    if (!todoItem || todoItem.todoGroupId !== todoGroupId) {
-      return NextResponse.json(
-        { message: "削除対象のTodoアイテムが見つかりません。" },
-        { status: 404 }
-      );
-    }
-
-    // 関連するtodoGroupを取得
-    const todoGroup = await prisma.todoGroup.findUnique({
-      where: { id: todoGroupId },
-    });
-
-    if (!todoGroup || todoGroup.userId !== user.id) {
-      return NextResponse.json(
-        { message: "このTodoリストを削除する権限がありません。" },
-        { status: 403 }
-      );
-    }
-
-    // todoItemを削除
     await prisma.todoItems.delete({
-      where: { id: todoItemId },
+      where: {
+        id: todoItemId,
+        todoGroup: {
+          user: { supabaseUserId },
+        },
+      },
     });
 
     return NextResponse.json({ status: "OK", todoItemId });
@@ -103,31 +83,8 @@ export const PUT = async (
   const { todoGroupId, toDoItem, isChecked } = body;
 
   try {
-    // 削除対象のtodoItemを取得
-    const todoItem = await prisma.todoItems.findUnique({
-      where: { id: putTodoItemId },
-    });
-
-    if (!todoItem || todoItem.todoGroupId !== putTodoGroupId) {
-      return NextResponse.json(
-        { message: "削除対象のTodoアイテムが見つかりません。" },
-        { status: 404 }
-      );
-    }
-
-    // 関連するtodoGroupを取得
-    const todoGroup = await prisma.todoGroup.findUnique({
-      where: { id: putTodoGroupId },
-    });
-
-    if (!todoGroup || todoGroup.userId !== user.id) {
-      return NextResponse.json(
-        { message: "このTodoリストを削除する権限がありません。" },
-        { status: 403 }
-      );
-    }
     const editingTodoItem = await prisma.todoItems.update({
-      where: { id: putTodoItemId },
+      where: { id: putTodoItemId, todoGroup: { user: { supabaseUserId } } },
       data: { todoGroupId, toDoItem, isChecked },
     });
     return NextResponse.json(
