@@ -17,6 +17,7 @@ const Page: React.FC = () => {
   const [todoGroups, setTodoGroups] = useState<CreatePostRequestBody[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [todoItems, setTodoItems] = useState<CreateTodoItemRequestBody[]>([]);
+
   const [loading, setLoading] = useState<boolean>(true);
   const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
 
@@ -92,17 +93,35 @@ const Page: React.FC = () => {
     fetchTodoItems();
   }, [token, activeTabId]);
 
-  //タスクの完了状態を切り替える
-  const toggleCompletion = (id: number) => {
-    setTodoItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, isChecked: !item.isChecked } : item
-      )
+  //タスクの完了状態を切り替え
+  const toggleCompletion = async (id: number) => {
+    if (!token) return;
+    // 状態を更新し、更新されたアイテムを取得
+    const isCheckedItems = todoItems.map((item) =>
+      item.id === id ? { ...item, isChecked: !item.isChecked } : item
     );
+    setTodoItems(isCheckedItems); // 更新されたアイテムを状態にセット
+    //サーバーに送信
+    const updatedItem = isCheckedItems.find((item) => item.id === id);
+    try {
+      const response = await fetch(
+        `api/todo_group/${activeTabId}/todo_items/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: token },
+          body: JSON.stringify(updatedItem),
+        }
+      );
+      if (!response.ok) {
+        console.error("Failed to save item.");
+      }
+    } catch (error) {
+      console.error("Error saving item:", error);
+    }
   };
 
-  const addEmptyItem = () => {
-    if (!activeTabId) return;
+  const addEmptyItem = async () => {
+    if (!activeTabId || !token) return;
 
     const newItem: CreateTodoItemRequestBody = {
       // id: todoItems.length + 1,
@@ -115,7 +134,38 @@ const Page: React.FC = () => {
     };
 
     setTodoItems((prevItems) => [...prevItems, newItem]);
+    try {
+      // サーバーに新しいアイテムを送信
+      const response = await fetch(
+        `/api/todo_group/${activeTabId}/todo_items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            toDoItem: newItem.toDoItem,
+            isChecked: newItem.isChecked,
+          }),
+        }
+      );
 
+      if (response.ok) {
+        const data = await response.json();
+        // サーバーから返された新しいIDでローカルのアイテムを更新
+        setTodoItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === newItem.id ? { ...item, id: data.id } : item
+          )
+        );
+        toast.success("新しいタスクが作成されました。");
+      } else {
+        console.error("Failed to create new todo item.");
+      }
+    } catch (error) {
+      console.error("Error creating new todo item:", error);
+    }
     // 次の描画サイクルで入力欄にフォーカスを当てる
     setTimeout(() => {
       inputRef.current?.focus();
@@ -136,11 +186,14 @@ const Page: React.FC = () => {
     if (!targetItem || targetItem.toDoItem.trim() === "") return;
 
     try {
-      const response = await fetch(`api/todo_group/${activeTabId}/todo_items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify(targetItem),
-      });
+      const response = await fetch(
+        `api/todo_group/${activeTabId}/todo_items/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: token },
+          body: JSON.stringify(targetItem),
+        }
+      );
       if (!response.ok) {
         console.error("Failed to save item.");
       }
@@ -149,16 +202,16 @@ const Page: React.FC = () => {
     }
   };
 
-  ////////////////////////////////DELETE
-  //route.tsをPOSTMANする
-  const deleteItem = async () => {
+  /////DELETE
+
+  const deleteItem = async (id: number) => {
     if (!token) return;
 
     if (!confirm("一つのリストを削除しますか？")) return;
 
     try {
       const response = await fetch(
-        `/api/todo_group/${activeTabId}/todo_items/${itemId}`,
+        `/api/todo_group/${activeTabId}/todo_items/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -168,6 +221,8 @@ const Page: React.FC = () => {
         }
       );
       if (response.ok) {
+        //削除したアイテム以外を表示
+        setTodoItems((prevItems) => prevItems.filter((item) => item.id !== id));
         toast.success("リストを一つを削除しました。", {
           duration: 2100, //ポップアップ表示時間
         });
@@ -216,5 +271,3 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-//チェックの真偽値をデータベースに反映させる
