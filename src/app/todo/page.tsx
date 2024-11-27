@@ -10,14 +10,13 @@ import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
 import Loading from "@/app/loading";
 import PlusButton from "../_components/PlusButton";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
   const [todoGroups, setTodoGroups] = useState<CreatePostRequestBody[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [todoItems, setTodoItems] = useState<CreateTodoItemRequestBody[]>([]);
-
   const [loading, setLoading] = useState<boolean>(true);
   const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
 
@@ -93,6 +92,7 @@ const Page: React.FC = () => {
     fetchTodoItems();
   }, [token, activeTabId]);
 
+  ///////item
   //タスクの完了状態を切り替え
   const toggleCompletion = async (id: number) => {
     if (!token) return;
@@ -159,7 +159,6 @@ const Page: React.FC = () => {
             item.id === newItem.id ? { ...item, id: data.id } : item
           )
         );
-        toast.success("新しいタスクが作成されました。");
       } else {
         console.error("Failed to create new todo item.");
       }
@@ -184,7 +183,6 @@ const Page: React.FC = () => {
     if (!token) return;
     const targetItem = todoItems.find((item) => item.id === id);
     if (!targetItem || targetItem.toDoItem.trim() === "") return;
-
     try {
       const response = await fetch(
         `api/todo_group/${activeTabId}/todo_items/${id}`,
@@ -194,7 +192,9 @@ const Page: React.FC = () => {
           body: JSON.stringify(targetItem),
         }
       );
-      if (!response.ok) {
+      if (response.ok) {
+        toast.success("タスクが追加（更新）されました。");
+      } else {
         console.error("Failed to save item.");
       }
     } catch (error) {
@@ -203,10 +203,8 @@ const Page: React.FC = () => {
   };
 
   /////DELETE
-
   const deleteItem = async (id: number) => {
     if (!token) return;
-
     if (!confirm("一つのリストを削除しますか？")) return;
 
     try {
@@ -221,16 +219,22 @@ const Page: React.FC = () => {
         }
       );
       if (response.ok) {
-        //削除したアイテム以外を表示
-        setTodoItems((prevItems) => prevItems.filter((item) => item.id !== id));
         toast.success("リストを一つを削除しました。", {
           duration: 2100, //ポップアップ表示時間
         });
+        //削除したアイテム以外を表示
+        setTodoItems((prevItems) => prevItems.filter((item) => item.id !== id));
       } else {
         console.error("Failed to delete item");
+        toast.error("削除に失敗しました。", {
+          duration: 2100,
+        });
       }
     } catch (error) {
       console.error("Error deleting item:", error);
+      toast.error(`${error}:削除できませんでした。`, {
+        duration: 2100,
+      });
     }
   };
 
@@ -266,6 +270,7 @@ const Page: React.FC = () => {
 
       <PlusButton handleAddEvent={addEmptyItem} />
       <Navigation />
+      <Toaster position="top-center" />
     </div>
   );
 };

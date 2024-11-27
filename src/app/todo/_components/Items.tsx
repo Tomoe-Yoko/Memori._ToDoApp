@@ -25,17 +25,14 @@ const Items: React.FC<Props> = ({
   todoItems,
   deleteItem,
 }) => {
-  const handleDelete = () => {
-    deleteItem(id);
-  };
   return (
     <>
       {todoItems.length > 0 ? (
         <li
           key={id}
-          className="flex space-x-2 w-[95%] m-auto py-1 text-lg text-text_button"
+          className="flex w-[95%] m-auto py-1 text-lg text-text_button"
         >
-          <div className="flex items-center justify-left w-[15rem]  ml-8">
+          <div className="flex items-center justify-center w-[20rem]  ml-4">
             <button
               onClick={() => toggleCompletion(id)}
               className={`w-7 h-7 rounded-full border-2 flex justify-center items-center  ${
@@ -56,13 +53,13 @@ const Items: React.FC<Props> = ({
                 // フォーカスが外れたら保存
               }}
               placeholder="新しいタスクを入力"
-              className="px-2 py-1 border-b-2 w-[80%] focus:outline-none"
+              className="px-2 py-1 border-b-2 w-[85%] focus:outline-none "
             />
           </div>
 
           {isChecked && (
             <button
-              onClick={handleDelete}
+              onClick={() => deleteItem(id)}
               className="w-8 h-8 text-white bg-trash_bg p-2 rounded-full"
             >
               <BsTrash3Fill size={14} />

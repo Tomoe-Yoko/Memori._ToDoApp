@@ -28,6 +28,7 @@ export const GET = async (request: Request) => {
       //findの内容（オブジェクト）何も書かなければすべて取ってくる
       //ユーザーIDをwhereで指定
       where: { userId: user.id }, //calendar`テーブルの`userId`列が現在のユーザーのIDと一致するレコードを取得する
+      orderBy: { createdAt: "asc" }, // 昇順
     });
     //フロントエンドに返すコード
     return NextResponse.json({

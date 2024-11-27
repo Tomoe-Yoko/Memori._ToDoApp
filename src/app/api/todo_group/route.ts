@@ -20,6 +20,7 @@ export const GET = async (request: Request) => {
   try {
     const todoGroups = await prisma.todoGroup.findMany({
       where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
     });
     return NextResponse.json({ status: "OK", todoGroups });
   } catch (error) {
