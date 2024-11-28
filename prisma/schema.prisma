@@ -103,7 +103,7 @@ model RoutineWork {
   id        Int      @id @default(autoincrement())
   userId    Int
   weekly    Weekly
-  routineContent  String[]
+  routineContent  String
   isChecked       Boolean
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
