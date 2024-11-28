@@ -43,6 +43,7 @@ export const GET = async (
 
     const todoItems = await prisma.todoItems.findMany({
       where: { todoGroupId },
+      orderBy: { createdAt: "asc" }, // 昇順
     }); // 特定のtodoGroupIdに一致するものを取得
     return NextResponse.json({ status: "OK", todoItems });
   } catch (error) {
