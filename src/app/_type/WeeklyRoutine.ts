@@ -1,14 +1,9 @@
 import { WeeklyDay } from "@prisma/client";
-export interface RoutineWeeklyRequestBody {
-  userId: string;
-  id: number;
-  weeklyDay: WeeklyDay;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface RoutineWorkRequestBody {
-  weeklyId: number;
+  id: number;
+  userId: string;
+  weeklyDay: WeeklyDay;
   routineContent: string;
   isChecked: boolean;
   createdAt: string;
