@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Tabs from "./_components/Tabs";
 import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
@@ -27,12 +27,12 @@ const Page: React.FC = () => {
     setPostTodoTitle,
     addPostNewItem,
   } = useTodo();
-  //新しいアイテムが追加されたときにフォーカスを当てる
-  useEffect(() => {
-    if (newItem) {
-      inputRef.current?.focus();
-    }
-  }, [newItem]);
+  // //新しいアイテムが追加されたときにフォーカスを当てる
+  // useEffect(() => {
+  //   if (newItem) {
+  //     inputRef.current?.focus();
+  //   }
+  // }, [newItem]);
 
   // if (loading) {
   //   return <Loading />;

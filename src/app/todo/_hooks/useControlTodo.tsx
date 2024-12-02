@@ -23,6 +23,9 @@ export const useTodo = () => {
   const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
   const [newItem, setNewItem] = useState(false);
   const [postTodoTitle, setPostTodoTitle] = useState("");
+
+  //signUp後、初めてtodoページを開くときの表示
+
   const fetcher = useCallback(async () => {
     try {
       const response = await fetch("/api/todo_group", {
@@ -32,49 +35,24 @@ export const useTodo = () => {
         },
       });
 
-      const { todoGroups } = await response.json();
-      if (todoGroups.length === 0) {
-        const defaultGroup = await createDefaultGroupAndItem();
-        setTodoGroups([defaultGroup]);
-        setActiveTabId(defaultGroup.id);
-      } else {
-        setTodoGroups(todoGroups);
-        setActiveTabId(activeTabId);
-        // switch (operationType) {
-        //   case "POST":
-        //     setActiveTabId(activeTabId);
-        //     break;
-        //   case "PUT":
-        //     setActiveTabId(activeTabId);
-        //     break;
-        //   case "MOUNT":
-        //     setActiveTabId(todoGroups[0].id);
-        //     break;
-        //   default:
-        console.error("Unknown operation type");
-      }
+      const { todoGroups }: { todoGroups: CreatePostRequestBody[] } =
+        await response.json();
+      setTodoGroups(todoGroups);
     } catch (error) {
       console.error("Failed to fetch todo groups:", error);
     }
   }, [token]);
 
   useEffect(() => {
+    if (todoGroups.length !== 0) {
+      setActiveTabId(todoGroups[0].id);
+    }
+  }, [todoGroups]);
+
+  useEffect(() => {
     if (!token) return;
     fetcher();
   }, [fetcher, token]);
-
-  //signUp後、初めてtodoページを開くときの表示
-  const createDefaultGroupAndItem = async () => {
-    const response = await fetch("/api/todo_group", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token!,
-      },
-    });
-    const defaultGroup: CreatePostRequestBody = await response.json();
-    return defaultGroup;
-  };
 
   //アクティブなタブの切り替え、情報を取得
   useEffect(() => {
@@ -108,6 +86,12 @@ export const useTodo = () => {
     fetchTodoItems();
   }, [token, activeTabId]); // activeTabIdが変更されたときに実行
 
+  //新しいアイテムが追加されたときにフォーカスを当てる
+  useEffect(() => {
+    if (newItem) {
+      inputRef.current?.focus();
+    }
+  }, [newItem]);
   //新しいアイテムをPOST
   const addPostNewItem = async () => {
     if (!token) return;

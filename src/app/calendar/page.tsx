@@ -30,17 +30,13 @@ const Page: React.FC = () => {
         Authorization: token!,
       },
     });
-    ///////////
-    const responseBody = await res.text();
-    if (responseBody) {
-      const { calendars } = JSON.parse(responseBody);
+
+    if (res.ok) {
+      const { calendars } = await res.json();
       setCalendars(calendars);
     } else {
       console.error("Empty response body");
     }
-    //////////////
-    const { calendars } = await res.json();
-    setCalendars(calendars);
   }, [token]);
 
   useEffect(() => {
