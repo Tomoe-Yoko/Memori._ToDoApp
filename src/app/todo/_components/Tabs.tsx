@@ -11,7 +11,7 @@ import Input from "./Input";
 interface Props {
   todoGroups: CreatePostRequestBody[];
   activeTabId: number | null;
-  setActiveTabId: React.Dispatch<React.SetStateAction<number | null>>;
+  setActiveTabId: (activeTabId: number) => void; //更新関数のときの型
 }
 
 const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {

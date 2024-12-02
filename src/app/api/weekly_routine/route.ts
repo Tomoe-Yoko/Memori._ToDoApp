@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { RoutineWorkRequestBody } from "@/app/_type/WeeklyRoutine";
 import { supabase } from "@/utils/supabase";
 
 const prisma = new PrismaClient();
 
-export const POST = async (request: Request) => {
+export const POST = async (request: NextRequest) => {
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
   if (error)
@@ -18,8 +18,8 @@ export const POST = async (request: Request) => {
       { status: 404 }
     );
   try {
-    const body = await request.json();
-    const { weekly, routineContent, isChecked }: RoutineWorkRequestBody = body;
+    const body: RoutineWorkRequestBody = await request.json();
+    const { weekly, routineContent, isChecked } = body;
     const data = await prisma.routineWork.create({
       data: {
         userId: user.id,
@@ -39,7 +39,7 @@ export const POST = async (request: Request) => {
   }
 };
 
-export const GET = async (request: Request) => {
+export const GET = async (request: NextRequest) => {
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
   if (error)

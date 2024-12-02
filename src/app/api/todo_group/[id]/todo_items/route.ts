@@ -107,7 +107,7 @@ export const POST = async (
     return NextResponse.json({
       status: "OK",
       message: "todoItem entry created successfully",
-      id: newTodoItem.id,
+      item: newTodoItem,
     });
   } catch (error) {
     if (error instanceof Error)

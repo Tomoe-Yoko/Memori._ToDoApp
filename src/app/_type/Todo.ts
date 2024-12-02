@@ -1,13 +1,9 @@
-// export interface Todo {
-//   id: number;
-//   userId: number;
-//   toDoGroupTitle: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   toDoItemsId: number;
-//   toDoItem: string;
-//   isChecked: boolean;
-// }
+export interface TodoItem {
+  todoGroupId: number;
+  id: number;
+  toDoItem: string;
+  isChecked: boolean;
+}
 
 export interface CreatePostRequestBody {
   userId: string;
@@ -18,10 +14,14 @@ export interface CreatePostRequestBody {
 }
 
 export interface CreateTodoItemRequestBody {
-  todoGroupId: number;
-  id: number;
+  todoGroupId: number | null;
   toDoItem: string;
   isChecked: boolean;
-  createdAt: string;
-  updatedAt: string;
+}
+
+export type UpdateTodoItemRequestBody = TodoItem;
+
+export interface CreateResponse extends TodoItem {
+  createdAt: Date;
+  updatedAt: Date;
 }

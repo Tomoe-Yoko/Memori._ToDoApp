@@ -1,246 +1,42 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  CreatePostRequestBody,
-  CreateTodoItemRequestBody,
-} from "../_type/Todo";
-import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import React, { useEffect } from "react";
 import Tabs from "./_components/Tabs";
 import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
-import Loading from "@/app/loading";
+// import Loading from "@/app/loading";
 import PlusButton from "../_components/PlusButton";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import { useTodo } from "./_hooks/useControlTodo";
 
 const Page: React.FC = () => {
-  const { token } = useSupabaseSession();
-  const [todoGroups, setTodoGroups] = useState<CreatePostRequestBody[]>([]);
-  const [activeTabId, setActiveTabId] = useState<number | null>(null);
-  const [todoItems, setTodoItems] = useState<CreateTodoItemRequestBody[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
-
-  const fetcher = useCallback(async () => {
-    try {
-      const response = await fetch("/api/todo_group", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token!,
-        },
-      });
-
-      const { todoGroups } = await response.json();
-      if (todoGroups.length === 0) {
-        const defaultGroup = await createDefaultGroupAndItem();
-        setTodoGroups([defaultGroup]);
-        setActiveTabId(defaultGroup.id);
-      } else if (todoGroups.length > 0) {
-        setActiveTabId(todoGroups[0].id);
-      }
-    } catch (error) {
-      console.error("Failed to fetch todo groups:", error);
-    }
-  }, [token]);
-
+  const {
+    deleteItem,
+    saveItem,
+    updateItem,
+    addEmptyItem,
+    toggleCompletion,
+    // loading,
+    todoGroups,
+    inputRef,
+    activeTabId,
+    setActiveTabId,
+    todoItems,
+    postItem,
+    newItem,
+    postTodoTitle,
+    setPostTodoTitle,
+    addPostNewItem,
+  } = useTodo();
+  //新しいアイテムが追加されたときにフォーカスを当てる
   useEffect(() => {
-    if (!token) return;
-    fetcher();
-  }, [fetcher, token]);
-
-  //signUp後、初めてtodoページを開くときの表示
-  const createDefaultGroupAndItem = async () => {
-    const response = await fetch("/api/todo_group", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token!,
-      },
-    });
-    const defaultGroup: CreatePostRequestBody = await response.json();
-    return defaultGroup;
-  };
-
-  //アクティブなタブの情報を取得
-  useEffect(() => {
-    if (!token || activeTabId === null) return;
-    const fetchTodoItems = async () => {
-      try {
-        const response = await fetch(
-          `/api/todo_group/${activeTabId}/todo_items`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token!,
-            },
-          }
-        );
-
-        const data = await response.json();
-        if (response.ok) {
-          setTodoItems(data.todoItems);
-        } else {
-          console.error("Failed to fetch todo items:", data);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTodoItems();
-  }, [token, activeTabId]);
-
-  ///////item
-  //タスクの完了状態を切り替え
-  const toggleCompletion = async (id: number) => {
-    if (!token) return;
-    // 状態を更新し、更新されたアイテムを取得
-    const isCheckedItems = todoItems.map((item) =>
-      item.id === id ? { ...item, isChecked: !item.isChecked } : item
-    );
-    setTodoItems(isCheckedItems); // 更新されたアイテムを状態にセット
-    //サーバーに送信
-    const updatedItem = isCheckedItems.find((item) => item.id === id);
-    try {
-      const response = await fetch(
-        `api/todo_group/${activeTabId}/todo_items/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: token },
-          body: JSON.stringify(updatedItem),
-        }
-      );
-      if (!response.ok) {
-        console.error("Failed to save item.");
-      }
-    } catch (error) {
-      console.error("Error saving item:", error);
-    }
-  };
-
-  const addEmptyItem = async () => {
-    if (!activeTabId || !token) return;
-
-    const newItem: CreateTodoItemRequestBody = {
-      // id: todoItems.length + 1,
-      id: Date.now(), // 一意のIDを生成
-      todoGroupId: activeTabId,
-      toDoItem: "",
-      isChecked: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    setTodoItems((prevItems) => [...prevItems, newItem]);
-    try {
-      // サーバーに新しいアイテムを送信
-      const response = await fetch(
-        `/api/todo_group/${activeTabId}/todo_items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-          body: JSON.stringify({
-            toDoItem: newItem.toDoItem,
-            isChecked: newItem.isChecked,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        // サーバーから返された新しいIDでローカルのアイテムを更新
-        setTodoItems((prevItems) =>
-          prevItems.map((item) =>
-            item.id === newItem.id ? { ...item, id: data.id } : item
-          )
-        );
-      } else {
-        console.error("Failed to create new todo item.");
-      }
-    } catch (error) {
-      console.error("Error creating new todo item:", error);
-    }
-    // 次の描画サイクルで入力欄にフォーカスを当てる
-    setTimeout(() => {
+    if (newItem) {
       inputRef.current?.focus();
-    }, 0);
-  };
-
-  const updateItem = (id: number, value: string) => {
-    setTodoItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, toDoItem: value } : item
-      )
-    );
-  };
-
-  const saveItem = async (id: number) => {
-    if (!token) return;
-    const targetItem = todoItems.find((item) => item.id === id);
-    if (!targetItem || targetItem.toDoItem.trim() === "") return;
-    try {
-      const response = await fetch(
-        `api/todo_group/${activeTabId}/todo_items/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: token },
-          body: JSON.stringify(targetItem),
-        }
-      );
-      if (response.ok) {
-        toast.success("タスクが追加（更新）されました。");
-      } else {
-        console.error("Failed to save item.");
-      }
-    } catch (error) {
-      console.error("Error saving item:", error);
     }
-  };
+  }, [newItem]);
 
-  /////DELETE
-  const deleteItem = async (id: number) => {
-    if (!token) return;
-    if (!confirm("一つのリストを削除しますか？")) return;
-
-    try {
-      const response = await fetch(
-        `/api/todo_group/${activeTabId}/todo_items/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token!,
-          },
-        }
-      );
-      if (response.ok) {
-        toast.success("リストを一つを削除しました。", {
-          duration: 2100, //ポップアップ表示時間
-        });
-        //削除したアイテム以外を表示
-        setTodoItems((prevItems) => prevItems.filter((item) => item.id !== id));
-      } else {
-        console.error("Failed to delete item");
-        toast.error("削除に失敗しました。", {
-          duration: 2100,
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      toast.error(`${error}:削除できませんでした。`, {
-        duration: 2100,
-      });
-    }
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
   return (
     <div>
       <h2 className="text-white text-2xl text-center">ToDo.</h2>
@@ -264,8 +60,29 @@ const Page: React.FC = () => {
               saveItem={saveItem}
               todoItems={todoItems}
               deleteItem={deleteItem}
+              postItem={postItem}
             />
           ))}
+        {newItem && (
+          <li className="flex w-[95%] m-auto py-1 text-lg text-text_button">
+            <div className="flex items-center justify-center w-[20rem]  ml-4">
+              <button
+                className={`w-7 h-7 rounded-full border-2 flex justify-center items-center "border-text_button`}
+              >
+                <span className="text-white ">✓</span>
+              </button>
+              <input
+                placeholder="新しいタスクを入力"
+                ref={inputRef} // useRefで作成したrefをここに設定
+                type="text"
+                value={postTodoTitle}
+                onChange={(e) => setPostTodoTitle(e.target.value)}
+                onBlur={addPostNewItem}
+                className="px-2 py-1 border-b-2 w-[85%] focus:outline-none "
+              />
+            </div>
+          </li>
+        )}
       </ul>
 
       <PlusButton handleAddEvent={addEmptyItem} />
