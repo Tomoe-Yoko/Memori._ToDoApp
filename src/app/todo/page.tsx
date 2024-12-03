@@ -3,7 +3,6 @@ import React from "react";
 import Tabs from "./_components/Tabs";
 import Navigation from "../_components/Navigation";
 import Items from "./_components/Items";
-// import Loading from "@/app/loading";
 import PlusButton from "../_components/PlusButton";
 import { Toaster } from "react-hot-toast";
 import { useTodo } from "./_hooks/useControlTodo";
@@ -27,16 +26,7 @@ const Page: React.FC = () => {
     setPostTodoTitle,
     addPostNewItem,
   } = useTodo();
-  // //新しいアイテムが追加されたときにフォーカスを当てる
-  // useEffect(() => {
-  //   if (newItem) {
-  //     inputRef.current?.focus();
-  //   }
-  // }, [newItem]);
 
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <div>
       <h2 className="text-white text-2xl text-center">ToDo.</h2>
