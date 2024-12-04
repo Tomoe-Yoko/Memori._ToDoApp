@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { RoutineWorkRequestBody } from "@/app/_type/WeeklyRoutine";
 import { supabase } from "@/utils/supabase";
-
+import { Weekly } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const POST = async (request: NextRequest) => {
@@ -39,7 +39,20 @@ export const POST = async (request: NextRequest) => {
   }
 };
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (
+  request: NextRequest,
+  context: { params?: { day?: string } }
+) => {
+  const { params } = context;
+  console.log("Params:", params); // デバッグ用に出力
+
+  if (!params || !params.day) {
+    return NextResponse.json(
+      { message: "曜日が指定されていません" },
+      { status: 400 }
+    );
+  }
+
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
   if (error)
@@ -52,10 +65,24 @@ export const GET = async (request: NextRequest) => {
       { status: 404 }
     );
   try {
+    const dayString = params.day;
+
+    // 型ガードを使用して文字列を列挙型に変換
+    const weekday = Object.values(Weekly).includes(dayString as Weekly)
+      ? (dayString as Weekly)
+      : undefined;
+
+    if (!weekday) {
+      return NextResponse.json(
+        { message: "無効な曜日が指定されました" },
+        { status: 400 }
+      );
+    }
+
     const routineWork = await prisma.routineWork.findMany({
       where: {
         userId: user.id,
-        // weekly: weekday, // 曜日を指定フロントで書く？
+        weekly: weekday, // 曜日でフィルタリング
       },
       orderBy: { createdAt: "asc" },
     });

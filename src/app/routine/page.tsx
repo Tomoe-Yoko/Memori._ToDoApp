@@ -2,62 +2,49 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Routine } from "../_type/WeeklyRoutine";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
-//import { Weekly } from "@prisma/client";
+import { Weekly } from "@prisma/client";
 import { BsTrash3Fill } from "react-icons/bs"; // アイコンをインポート
 import PlusButton from "../_components/PlusButton";
-
-// Weekly enumを定義
-enum Weekly {
-  Mon = "mon",
-  Tue = "tue",
-  Wed = "wed",
-  Thu = "thu",
-  Fri = "fri",
-  Sat = "sat",
-  Sun = "sun",
-}
+import Navigation from "../_components/Navigation";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
-  const [currentDay, setCurrentDay] = useState<Weekly>(Weekly.Mon); //選択中の曜日
+  const [currentDay, setCurrentDay] = useState<Weekly>(Weekly.mon); //選択中の曜日
   const [routineList, setRoutineList] = useState<Routine[]>([]); // 現在表示中の曜日のルーティン
   const [newRoutine, setNewRoutine] = useState<string>("");
 
   const days = [
-    { key: Weekly.Mon, label: "月" },
-    { key: Weekly.Tue, label: "火" },
-    { key: Weekly.Wed, label: "水" },
-    { key: Weekly.Thu, label: "木" },
-    { key: Weekly.Fri, label: "金" },
-    { key: Weekly.Sat, label: "土" },
-    { key: Weekly.Sun, label: "日" },
+    { key: Weekly.mon, label: "Monday.（月よう日）" },
+    { key: Weekly.tue, label: "Tuesday.（火よう日）" },
+    { key: Weekly.wed, label: "Wednesday.（水よう日）" },
+    { key: Weekly.thu, label: "Thursday.（木よう日）" },
+    { key: Weekly.fri, label: "Friday.（金よう日）" },
+    { key: Weekly.sat, label: "Saturday.（土よう日）" },
+    { key: Weekly.sun, label: "Sunday.（日よう日）" },
   ];
   // サーバーから特定の曜日のデータを取得
-  const fetcher = useCallback(
-    async (day: Weekly) => {
-      try {
-        const response = await fetch(`/api/weekly_routine?day=${day}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token!,
-          },
-        });
+  const fetcher = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/weekly_routine`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token!,
+        },
+      });
 
-        // 情報が取得できてないのを解消するところから！
-        const data: Routine[] = await response.json();
-        if (Array.isArray(data)) {
-          setRoutineList(data);
-        } else {
-          console.error("Fetched data is not an array:", data);
-          setRoutineList([]); // デフォルトで空の配列を設定
-        }
-      } catch (error) {
-        console.error("Error fetching routines:", error);
+      // 情報が取得できてないのを解消するところから！火曜日には入ってるはず！あと、下にナビゲーションつける
+      const data: Routine[] = await response.json();
+      if (Array.isArray(data)) {
+        setRoutineList(data);
+      } else {
+        console.error("Fetched data is not an array:", data);
         setRoutineList([]); // デフォルトで空の配列を設定
       }
-    },
-    [token]
-  );
+    } catch (error) {
+      console.error("Error fetching routines:", error);
+      setRoutineList([]); // デフォルトで空の配列を設定
+    }
+  }, [token]);
   // 初回レンダリングおよび曜日が変更された際にデータを取得
   useEffect(() => {
     if (!token) return;
@@ -118,12 +105,13 @@ const Page: React.FC = () => {
                 : "bg-white text-text_button"
             }`}
           >
-            {day.label}
+            {day.label.split("（")[1].replace("よう日）", "")}{" "}
+            {/* "月" の部分 */}
           </button>
         ))}
       </div>
       <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg font-bold mb-2">
+        <h2 className="text-lg mb-2 text-text_button">
           {days.find((day) => day.key === currentDay)?.label}
         </h2>
 
@@ -160,7 +148,8 @@ const Page: React.FC = () => {
           </button> */}
           <PlusButton handleAddEvent={addRoutine} />
         </div>
-      </div>{" "}
+      </div>
+      <Navigation />
     </div>
   );
 };
