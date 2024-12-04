@@ -22,29 +22,34 @@ const Page: React.FC = () => {
     { key: Weekly.sat, label: "Saturday.（土よう日）" },
     { key: Weekly.sun, label: "Sunday.（日よう日）" },
   ];
-  // サーバーから特定の曜日のデータを取得
-  const fetcher = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/weekly_routine`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token!,
-        },
-      });
 
-      // 情報が取得できてないのを解消するところから！火曜日には入ってるはず！あと、下にナビゲーションつける
-      const data: Routine[] = await response.json();
-      if (Array.isArray(data)) {
-        setRoutineList(data);
-      } else {
-        console.error("Fetched data is not an array:", data);
+  // サーバーから特定の曜日のデータを取得
+  const fetcher = useCallback(
+    async (day: Weekly) => {
+      try {
+        const response = await fetch(`/api/weekly_routine/${day}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+        });
+        const result = await response.json();
+
+        // APIがオブジェクトでデータを返している
+        const data = Array.isArray(result) ? result : result.routineWork;
+        if (Array.isArray(data)) {
+          setRoutineList(data);
+        } else {
+          console.error("Fetched data is not an array:", data);
+          setRoutineList([]); // デフォルトで空の配列を設定
+        }
+      } catch (error) {
+        console.error("Error fetching routines:", error);
         setRoutineList([]); // デフォルトで空の配列を設定
       }
-    } catch (error) {
-      console.error("Error fetching routines:", error);
-      setRoutineList([]); // デフォルトで空の配列を設定
-    }
-  }, [token]);
+    },
+    [token]
+  );
   // 初回レンダリングおよび曜日が変更された際にデータを取得
   useEffect(() => {
     if (!token) return;
@@ -53,16 +58,17 @@ const Page: React.FC = () => {
 
   //新しいルーティンを追加
   const addRoutine = async () => {
-    if (!newRoutine.trim()) return;
+    if (!token || !newRoutine.trim()) return;
 
     try {
       const response = await fetch("/api/weekly_routine", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token!,
         },
         body: JSON.stringify({
-          Weekly: currentDay,
+          weekly: currentDay,
           routineContent: newRoutine,
           isChecked: false,
         }),
@@ -140,12 +146,7 @@ const Page: React.FC = () => {
             placeholder="新しいルーティンを追加"
             className="flex-1 px-2 py-1 border rounded"
           />
-          {/* <button
-            onClick={addRoutine}
-            className="ml-2 px-3 py-2 bg-gray-800 text-white rounded"
-          >
-            <AiOutlinePlus />
-          </button> */}
+
           <PlusButton handleAddEvent={addRoutine} />
         </div>
       </div>
