@@ -11,13 +11,11 @@ import { supabase } from "@/utils/supabase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-// type OperationType = "MOUNT" | "POST" | "PUT";
-
 export const useTodo = () => {
   const { token } = useSupabaseSession();
   const [todoGroups, setTodoGroups] = useState<CreatePostRequestBody[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
-  //////・・・・・・・・・・初期値を考える。親コンポーネントでタブ一覧取得、フックで引数で渡すその配列の先頭のIDをセット
+  //////親コンポーネントでタブ一覧取得、フックで引数で渡すその配列の先頭のIDをセット
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
