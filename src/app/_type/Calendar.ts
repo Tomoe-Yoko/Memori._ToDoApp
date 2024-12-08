@@ -45,10 +45,3 @@ export interface CalendarData {
   createdAt: string;
   updatedAt: string;
 }
-// export interface UpdateCalendarRequestBody {
-//   scheduleDate: string;
-//   content: string;
-//   scheduleColor: ScheduleColor;
-//   createdAt: string;
-//   updatedAt: string;
-// }

@@ -12,6 +12,7 @@ interface Props {
   saveItem: (id: number) => void; // 保存処理
   todoItems: CreateTodoItemRequestBody[];
   deleteItem: (id: number) => void; // アイテム削除用の関数
+  postItem: () => void;
 }
 
 const Items: React.FC<Props> = ({

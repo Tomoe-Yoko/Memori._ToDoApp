@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${JostFont.variable} bg-001`}>
-        <div className="max-w-md bg-001 m-auto border-r border-l border-white">
+        <div className="max-w-sm bg-001 m-auto border-r border-l border-white">
           <Header />
           {children}
         </div>

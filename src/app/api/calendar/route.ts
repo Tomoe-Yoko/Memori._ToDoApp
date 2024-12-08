@@ -31,10 +31,13 @@ export const GET = async (request: Request) => {
       orderBy: { createdAt: "asc" }, // 昇順
     });
     //フロントエンドに返すコード
-    return NextResponse.json({
-      status: "OK",
-      calendars,
-    });
+    return NextResponse.json(
+      {
+        status: "OK",
+        calendars,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ error: error.message }, { status: 400 });
