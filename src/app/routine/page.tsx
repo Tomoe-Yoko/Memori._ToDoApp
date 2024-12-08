@@ -95,6 +95,7 @@ const Page: React.FC = () => {
       console.error("An error occurred:", error);
     }
   };
+
   /////DELETE
   const deleteRoutine = async (id: number) => {
     if (!token) return;
@@ -126,7 +127,23 @@ const Page: React.FC = () => {
       });
     }
   };
-  // ・・・・・・・・・・・・・・・・・・・・・routineContentの更新(PUT)の関数をつくる！
+
+  //ルーティン内容更新
+  const updateRoutine = async (id: number, value: string) => {
+    if (!token) return;
+    try {
+      const response = await fetch(`/api/weekly_routine/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: token },
+        body: JSON.stringify({ routineContent: value, weekly: currentDay }),
+      });
+      if (!response.ok) {
+        console.error("Failed to update routine.");
+      }
+    } catch (error) {
+      console.error("Error updating routine:", error);
+    }
+  };
 
   //チェック機能
   const toggleCompletion = async (id: number) => {
@@ -135,9 +152,7 @@ const Page: React.FC = () => {
       item.id === id ? { ...item, isChecked: !item.isChecked } : item
     );
     setRoutineList(isCheckedRoutines); //チェック項目が更新された配列を表示
-
     const updatedRoutine = isCheckedRoutines.find((item) => item.id === id);
-
     try {
       const response = await fetch(`/api/weekly_routine/${id}`, {
         method: "PUT",
@@ -152,19 +167,21 @@ const Page: React.FC = () => {
     }
   };
 
-  //  すべてのチェックを外す関数
-  const clearAllChecks = async () => {
-    if (!token) return;
-    // 現在の曜日のルーティンがすべてチェックされているか確認
-    const allChecked = routineList
+  // すべてのチェックを外す関数
+  // 現在の曜日のルーティンがすべてチェックされているか確認
+  const allChecked =
+    routineList.length > 0 && //routineListが空でないことを確認
+    routineList
       .filter((item) => item.weekly === currentDay)
       .every((item) => item.isChecked);
+
+  const clearAllChecks = async () => {
+    if (!token) return;
 
     // 一つでもチェックが外れている場合は、何もせずにリターン
     if (!allChecked) {
       return;
     }
-
     // 現在の曜日のルーティンを取得し、isCheckedをfalseに設定
     const allUnCheckedRoutines = routineList
       .filter((item) => item.weekly === currentDay)
@@ -178,9 +195,7 @@ const Page: React.FC = () => {
         item.weekly === currentDay ? { ...item, isChecked: false } : item
       )
     );
-
-    reward(); // コンフェティアニメーションを実行
-
+    reward(); // アニメーションを実行
     try {
       const response = await fetch(`/api/weekly_routine`, {
         method: "PUT",
@@ -191,14 +206,22 @@ const Page: React.FC = () => {
         }),
       });
       if (response.ok) {
-        toast.success("今日もおつかれさまでした！", {
-          duration: 2100, //ポップアップ表示時間
-        });
+        toast.success(
+          <span>
+            今日もルーティン完了！
+            <br />
+            おつかれさまでした。
+          </span>,
+          {
+            duration: 2100, //ポップアップ表示時間
+          }
+        );
       }
     } catch (error) {
       console.error("Error check routines:", error);
     }
   };
+
   return (
     <div>
       <h2 className="text-white text-2xl text-center">Routine work.</h2>
@@ -238,9 +261,20 @@ const Page: React.FC = () => {
                 >
                   {item.isChecked && <span className="text-white ">✓</span>}
                 </button>
-                <span className="flex px-2 w-[85%]  border-b-2">
-                  {item.routineContent}
-                </span>
+                <input
+                  value={item.routineContent}
+                  onChange={(e) =>
+                    setRoutineList((prev) =>
+                      prev.map((routine) =>
+                        routine.id === item.id
+                          ? { ...routine, routineContent: e.target.value }
+                          : routine
+                      )
+                    )
+                  }
+                  onBlur={() => updateRoutine(item.id, item.routineContent)}
+                  className="flex px-2 w-[85%]  border-b-2 focus:outline-none"
+                />
                 {item.isChecked && (
                   <button
                     onClick={() => deleteRoutine(item.id)}
@@ -253,7 +287,6 @@ const Page: React.FC = () => {
               <Toaster position="top-center" />
             </li>
           ))}
-          {/* <div className="ml-4 flex items-center"> */}
           {isSetNewRoutine && (
             <li className="flex w-[95%] m-auto py-1 text-lg text-text_button">
               <div className="flex items-center w-[20rem]  ml-4">
@@ -261,7 +294,7 @@ const Page: React.FC = () => {
                   className={`w-7 h-7 rounded-full border-2 flex justify-center items-center border-text_button`}
                 ></button>
                 <input
-                  placeholder="新しいタスクを入力"
+                  placeholder="新しいルーティンを入力"
                   ref={inputRef}
                   type="text"
                   value={newRoutine}
@@ -272,16 +305,15 @@ const Page: React.FC = () => {
               </div>
             </li>
           )}
-          {/* </div> */}
         </ul>
         <div className="py-11 relative">
           <AllClearButton
             clearAllChecks={clearAllChecks}
             isAnimating={isAnimating}
-          />{" "}
+            allChecked={allChecked}
+          />
           <span id="rewardId" className="px-52" />
         </div>
-
         <PlusButton handleAddEvent={addEmptyRoutine} />
       </div>
       <Navigation />

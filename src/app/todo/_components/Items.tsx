@@ -54,7 +54,7 @@ const Items: React.FC<Props> = ({
                 // フォーカスが外れたら保存
               }}
               placeholder="新しいタスクを入力"
-              className="px-2 py-1 border-b-2 w-[85%] focus:outline-none "
+              className="px-2 py-1 border-b-2 w-[85%] focus:outline-none"
             />
           </div>
 

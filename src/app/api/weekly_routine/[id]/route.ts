@@ -59,8 +59,7 @@ export const DELETE = async (
 ) => {
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
-  // if (error)
-  //   return NextResponse.json({ message: error.message }, { status: 400 });
+
   // トークンが無効または期限切れの場合の処理
   if (error) {
     return NextResponse.json(
@@ -146,7 +145,6 @@ export const PUT = async (
       { status: 400 }
     );
   }
-
   try {
     const editingRoutineItem = await prisma.routineWork.update({
       where: {

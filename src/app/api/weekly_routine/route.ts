@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { RoutineWorkRequestBody } from "@/app/_type/WeeklyRoutine";
 import { supabase } from "@/utils/supabase";
-// import { Weekly } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const POST = async (request: NextRequest) => {
@@ -40,10 +39,7 @@ export const POST = async (request: NextRequest) => {
 };
 
 /////PUT(一括チェック更新)
-export const PUT = async (
-  request: NextRequest
-  //  { params }: { params: { id?: string } } idはオプショナルに
-) => {
+export const PUT = async (request: NextRequest) => {
   const token = request.headers.get("Authorization") ?? "";
   const { error, data } = await supabase.auth.getUser(token);
   if (error)
