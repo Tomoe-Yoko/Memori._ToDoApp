@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-// import { useRouter } from "next/navigation";
 import Button from "@/app/_components/Button";
 import { CalendarPostType } from "@/app/_type/Calendar";
 import { ScheduleColor } from "@prisma/client";
 import toast, { Toaster } from "react-hot-toast"; //https://react-hot-toast.com/
+import dayjs from "dayjs";
 
 export const scheduleColorMap: Record<string, ScheduleColor> = {
   "#FF0080": "Pink",
@@ -28,7 +28,7 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
   const newPostData: CalendarPostType = {
     // scheduleDate: new Date().toISOString(),
     // initialDate: Date; //初期日付の設定
-    scheduleDate: initialDate.toISOString(), // 初期日付を設定
+    scheduleDate: dayjs(initialDate).format("YYYY-MM-DD"), // 初期日付を設定
     content: "",
     scheduleColor: "Pink" as ScheduleColor, // default
     createdAt: new Date().toISOString(),
@@ -37,7 +37,6 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
 
   const [postData, setPostData] = useState<CalendarPostType>(newPostData);
   const [selectedColor, setSelectedColor] = useState<string>("#FF0080");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
@@ -94,11 +93,11 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
             id="date"
             type="date"
             name="scheduleDate"
-            value={postData.scheduleDate.substring(0, 10)}
+            value={postData.scheduleDate}
             onChange={(e) =>
               setPostData({
                 ...postData,
-                scheduleDate: new Date(e.target.value).toISOString(),
+                scheduleDate: e.target.value,
               })
             }
             required
