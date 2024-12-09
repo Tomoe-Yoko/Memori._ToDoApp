@@ -54,23 +54,22 @@ export const PUT = async (request: NextRequest) => {
     );
 
   const body = await request.json();
-  const routines = body.routines;
+  const routineIds = body.routineIds;
   const day = body.day;
 
-  if (!Array.isArray(routines) || !day) {
+  if (!Array.isArray(routineIds) || !day) {
     return NextResponse.json({ message: "無効なデータです" }, { status: 400 });
   }
 
   try {
-    // トランザクションを使用して特定の曜日のルーティンを一括更新
-    await prisma.$transaction(
-      routines.map((routine) =>
-        prisma.routineWork.update({
-          where: { userId: user.id, id: routine.id },
-          data: { isChecked: false },
-        })
-      )
-    );
+    // updateManyを使用して特定の曜日のルーティンを一括更新
+    await prisma.routineWork.updateMany({
+      where: {
+        userId: user.id,
+        id: { in: routineIds },
+      },
+      data: { isChecked: false },
+    });
 
     return NextResponse.json({ status: "OK" }, { status: 200 });
   } catch (error) {
