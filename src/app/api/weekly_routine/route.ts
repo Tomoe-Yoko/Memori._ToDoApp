@@ -52,9 +52,9 @@ export const PUT = async (request: NextRequest) => {
       { message: "ユーザーが見つかりませんでした" },
       { status: 404 }
     );
-
+  //サーバー側で必要な情報はidだけ
   const body = await request.json();
-  const routineIds = body.routineIds;
+  const routineIds: number[] = body.routineIds;
   const day = body.day;
 
   if (!Array.isArray(routineIds) || !day) {

@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Routine } from "../_type/WeeklyRoutine";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import { Weekly } from "@prisma/client";
-import { BsTrash3Fill } from "react-icons/bs";
 import PlusButton from "../_components/PlusButton";
 import Navigation from "../_components/Navigation";
 import AllClearButton from "./_components/AllClearButton";
 import { useReward } from "react-rewards";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Loading from "../loading";
+import WeekdaySelect from "./_components/WeekdaySelect";
+import RoutineList from "./_components/RoutineList";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -114,11 +115,8 @@ const Page: React.FC = () => {
         },
       });
       if (response.ok) {
-        toast.success("リストを一つを削除しました。", {
-          duration: 2100, //ポップアップ表示時間
-        });
-        //削除したアイテム以外を表示(GET)
         fetcher(currentDay);
+        //削除したアイテム以外を表示(GET)
       } else {
         console.error("Failed to delete item");
         toast.error("削除に失敗しました。", {
@@ -187,14 +185,6 @@ const Page: React.FC = () => {
     if (!allChecked) {
       return;
     }
-    // 現在の曜日のルーティンを取得し、isCheckedをfalseに設定
-    // const allUnCheckedRoutines = routineList
-    //   .filter((item) => item.weekly === currentDay)
-    //   .map((item) => ({
-    //     ...item,
-    //     isChecked: false,
-    //   }));
-
     setRoutineList((prev) =>
       prev.map((item) =>
         item.weekly === currentDay ? { ...item, isChecked: false } : item
@@ -206,7 +196,7 @@ const Page: React.FC = () => {
       const response = await fetch(`/api/weekly_routine`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ routineIds, day: currentDay }), // 修正: routineIdsを送信
+        body: JSON.stringify({ routineIds, day: currentDay }), //routineIdsを送信
       });
       if (response.ok) {
         toast.success(
@@ -233,87 +223,26 @@ const Page: React.FC = () => {
       ) : (
         <div>
           <h2 className="text-white text-2xl text-center">Routine work.</h2>
-          <div className="w-11/12 mx-auto my-4 flex justify-between mb-4">
-            {days.map((day) => (
-              <button
-                key={day.key}
-                onClick={() => setCurrentDay(day.key)}
-                className={`w-11 h-11 rounded-full ${
-                  currentDay === day.key
-                    ? "bg-text_button text-white"
-                    : "bg-white text-text_button"
-                }`}
-              >
-                {day.label.split("（")[1].replace("よう日）", "")}
-              </button>
-            ))}
-          </div>
+          <WeekdaySelect
+            currentDay={currentDay}
+            setCurrentDay={setCurrentDay}
+          />
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg mb-2 text-text_button">
               {days.find((day) => day.key === currentDay)?.label}
             </h2>
-            <ul className="space-y-2">
-              {routineList.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex w-[95%] m-auto py-1 text-lg text-text_button"
-                >
-                  <div className="flex items-center w-[20rem]  ml-4">
-                    <button
-                      onClick={() => toggleCompletion(item.id)}
-                      className={`w-7 h-7 rounded-full border-2 flex justify-center items-center  ${
-                        item.isChecked
-                          ? "bg-text_button border-text_button "
-                          : "border-text_button"
-                      }`}
-                    >
-                      {item.isChecked && <span className="text-white ">✓</span>}
-                    </button>
-                    <input
-                      value={item.routineContent}
-                      onChange={(e) =>
-                        setRoutineList((prev) =>
-                          prev.map((routine) =>
-                            routine.id === item.id
-                              ? { ...routine, routineContent: e.target.value }
-                              : routine
-                          )
-                        )
-                      }
-                      onBlur={() => updateRoutine(item.id, item.routineContent)}
-                      className="flex px-2 w-[85%]  border-b-2 focus:outline-none"
-                    />
-                    {item.isChecked && (
-                      <button
-                        onClick={() => deleteRoutine(item.id)}
-                        className="text-white bg-trash_bg p-2 rounded-full"
-                      >
-                        <BsTrash3Fill size={14} />
-                      </button>
-                    )}
-                  </div>
-                  <Toaster position="top-center" />
-                </li>
-              ))}
-              {isSetNewRoutine && (
-                <li className="flex w-[95%] m-auto py-1 text-lg text-text_button">
-                  <div className="flex items-center w-[20rem]  ml-4">
-                    <button
-                      className={`w-7 h-7 rounded-full border-2 flex justify-center items-center border-text_button`}
-                    ></button>
-                    <input
-                      placeholder="新しいルーティンを入力"
-                      ref={inputRef}
-                      type="text"
-                      value={newRoutine}
-                      onChange={(e) => setNewRoutine(e.target.value)}
-                      onBlur={addRoutine}
-                      className="px-2 py-1 border-b-2 w-[85%] focus:outline-none "
-                    />
-                  </div>
-                </li>
-              )}
-            </ul>
+            <RoutineList
+              toggleCompletion={toggleCompletion}
+              isSetNewRoutine={isSetNewRoutine}
+              routineList={routineList}
+              setRoutineList={setRoutineList}
+              updateRoutine={updateRoutine}
+              deleteRoutine={deleteRoutine}
+              inputRef={inputRef}
+              newRoutine={newRoutine}
+              setNewRoutine={setNewRoutine}
+              addRoutine={addRoutine}
+            />
             <div className="py-11 relative">
               <AllClearButton
                 clearAllChecks={clearAllChecks}
