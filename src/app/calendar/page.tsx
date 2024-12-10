@@ -30,8 +30,13 @@ const Page: React.FC = () => {
         Authorization: token!,
       },
     });
-    const { calendars } = await res.json();
-    setCalendars(calendars);
+
+    if (res.ok) {
+      const { calendars } = await res.json();
+      setCalendars(calendars);
+    } else {
+      console.error("Empty response body");
+    }
   }, [token]);
 
   useEffect(() => {
@@ -216,11 +221,12 @@ const Page: React.FC = () => {
       <Modal
         isOpen={addScheduleModal} //closeModal
         onRequestClose={() => setAddScheduleModal(false)}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg" //モーダルの外でクローズ
+        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        //モーダルの外でクローズ
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
         <NewPost onSuccess={handleSuccess} initialDate={new Date()} />
-        <div onClick={() => setAddScheduleModal(false)} className="mt-8">
+        <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
           <Button text="キャンセル" />
         </div>
       </Modal>
@@ -236,6 +242,7 @@ const Page: React.FC = () => {
           calendars={calendars}
           handleDeleteSchedule={handleDeleteSchedule}
           handleUpdateSchedule={handleUpdateSchedule}
+          handleSuccess={handleSuccess}
         />
         <Toaster position="top-center" />
       </Modal>

@@ -14,6 +14,7 @@ interface Props {
   closeModal: () => void;
   calendars: CalendarData[]; // 親コンポーネントから予定を受け取る
   handleDeleteSchedule: (id: number) => void;
+  handleSuccess: () => void;
   handleUpdateSchedule: (
     id: number,
     newContent: string,
@@ -30,6 +31,7 @@ const AllSchedule: React.FC<Props> = ({
   calendars,
   handleDeleteSchedule,
   handleUpdateSchedule,
+  handleSuccess,
 }) => {
   const [schedules, setSchedules] = useState<CalendarData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -127,7 +129,14 @@ const AllSchedule: React.FC<Props> = ({
           <p className="text-text_button">予定がありません。</p>
         )}
       </div>
-      <div onClick={() => setAddModalOpen(true)} className="mt-8">
+      <div
+        onClick={() => {
+          console.log(selectedDate);
+
+          setAddModalOpen(true);
+        }}
+        className="mt-8"
+      >
         <Button text="追加" />
       </div>
       <div onClick={closeModal} className="mt-8">
@@ -142,7 +151,11 @@ const AllSchedule: React.FC<Props> = ({
         {/* <NewPost onSuccess={() => setAddModalOpen(false)} /> */}
         {selectedDate && (
           <NewPost
-            onSuccess={() => setAddModalOpen(false)}
+            onSuccess={() => {
+              handleSuccess(); // 予定が登録された後の処理
+              setAddModalOpen(false);
+              setAddModalOpen(false); // モーダルを閉じる
+            }}
             initialDate={selectedDate} // 選択された日付を渡す
           />
         )}

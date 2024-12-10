@@ -11,12 +11,12 @@ import Input from "./Input";
 interface Props {
   todoGroups: CreatePostRequestBody[];
   activeTabId: number | null;
-  setActiveTabId: React.Dispatch<React.SetStateAction<number | null>>;
+  setActiveTabId: (activeTabId: number) => void; //更新関数のときの型
 }
 
-const Tabs: React.FC<Props> = ({ activeTabId, setActiveTabId }) => {
+const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const { token } = useSupabaseSession();
-  const [tabs, setTabs] = useState<CreatePostRequestBody[]>([]);
+  const [tabs, setTabs] = useState(todoGroups);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理

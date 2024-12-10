@@ -82,6 +82,14 @@ export const PUT = async (
   const body: CreateTodoItemRequestBody = await request.json();
   const { todoGroupId, toDoItem, isChecked } = body;
 
+  // todoGroupIdがnullまたはundefinedでないことを確認
+  if (todoGroupId == null) {
+    return NextResponse.json(
+      { message: "todoGroupIdが指定されていません。" },
+      { status: 400 }
+    );
+  }
+
   try {
     const editingTodoItem = await prisma.todoItems.update({
       where: { id: putTodoItemId, todoGroup: { user: { supabaseUserId } } },

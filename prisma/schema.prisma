@@ -20,7 +20,7 @@ model Users {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   calendars      Calendar[]
-  weeklies       Weekly[]
+  routineWorks    RoutineWork[]
   todoGroups     TodoGroup[]
   galleryGroups  GalleryGroup[]
 
@@ -98,20 +98,19 @@ model TodoItems {
 }
 
 
-model Weekly {
+
+model RoutineWork {
   id        Int      @id @default(autoincrement())
   userId    Int
-  weekly    WeeklyDay
-
+  weekly    Weekly
+  routineContent  String
+  isChecked       Boolean
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
   user      Users    @relation(fields: [userId], references: [id])
-  routineWorks RoutineWork[]
 
-  @@map("Weekly")
 }
-enum WeeklyDay {
+enum Weekly {
   mon
   tue
   wed
@@ -120,20 +119,6 @@ enum WeeklyDay {
   sat
   sun
 }
-
-model RoutineWork {
-  id              Int      @id @default(autoincrement())
-  weeklyId        Int
-  routineContent  String[]
-  isChecked       Boolean
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  weekly          Weekly   @relation(fields: [weeklyId], references: [id])
-
-  @@map("RoutineWork")
-}
-
 
 
 model GalleryGroup {
