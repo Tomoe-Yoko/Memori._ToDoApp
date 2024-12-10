@@ -215,47 +215,40 @@ const Page: React.FC = () => {
       console.error("Error check routines:", error);
     }
   };
-
+  if (loading) return <Loading />;
   return (
     <div>
-      {loading ? (
-        <Loading />
-      ) : (
-        <div>
-          <h2 className="text-white text-2xl text-center">Routine work.</h2>
-          <WeekdaySelect
-            currentDay={currentDay}
-            setCurrentDay={setCurrentDay}
+      <div>
+        <h2 className="text-white text-2xl text-center">Routine work.</h2>
+        <WeekdaySelect currentDay={currentDay} setCurrentDay={setCurrentDay} />
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg mb-2 text-text_button">
+            {days.find((day) => day.key === currentDay)?.label}
+          </h2>
+          <RoutineList
+            toggleCompletion={toggleCompletion}
+            isSetNewRoutine={isSetNewRoutine}
+            routineList={routineList}
+            setRoutineList={setRoutineList}
+            updateRoutine={updateRoutine}
+            deleteRoutine={deleteRoutine}
+            inputRef={inputRef}
+            newRoutine={newRoutine}
+            setNewRoutine={setNewRoutine}
+            addRoutine={addRoutine}
           />
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-lg mb-2 text-text_button">
-              {days.find((day) => day.key === currentDay)?.label}
-            </h2>
-            <RoutineList
-              toggleCompletion={toggleCompletion}
-              isSetNewRoutine={isSetNewRoutine}
-              routineList={routineList}
-              setRoutineList={setRoutineList}
-              updateRoutine={updateRoutine}
-              deleteRoutine={deleteRoutine}
-              inputRef={inputRef}
-              newRoutine={newRoutine}
-              setNewRoutine={setNewRoutine}
-              addRoutine={addRoutine}
+          <div className="py-11 relative">
+            <AllClearButton
+              clearAllChecks={clearAllChecks}
+              isAnimating={isAnimating}
+              allChecked={allChecked}
             />
-            <div className="py-11 relative">
-              <AllClearButton
-                clearAllChecks={clearAllChecks}
-                isAnimating={isAnimating}
-                allChecked={allChecked}
-              />
-              <span id="rewardId" className="px-52" />
-            </div>
-            <PlusButton handleAddEvent={addEmptyRoutine} />
+            <span id="rewardId" className="px-52" />
           </div>
-          <Navigation />
+          <PlusButton handleAddEvent={addEmptyRoutine} />
         </div>
-      )}
+        <Navigation />
+      </div>
     </div>
   );
 };
