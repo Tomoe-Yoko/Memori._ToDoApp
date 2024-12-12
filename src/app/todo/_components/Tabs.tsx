@@ -6,7 +6,7 @@ import { CreatePostRequestBody } from "@/app/_type/Todo";
 import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
-import Input from "./Input";
+import Input from "@/app/_components/Input";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];

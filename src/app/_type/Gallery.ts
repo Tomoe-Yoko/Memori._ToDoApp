@@ -1,14 +1,15 @@
 export interface GalleryGroup {
   id: number;
+  userId: number;
   galleryGroupTitle: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateGalleryGroupRequestBody {
   userId: number;
   id: number;
   galleryGroupTitle: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // export interface UpdatedGalleryGroupRequestBody {

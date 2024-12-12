@@ -1,121 +1,83 @@
-import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { CreateGalleryGroupRequestBody } from "@/app/_type/Gallery";
-import Loading from "@/app/loading";
-import { supabase } from "@/utils/supabase";
-import { GalleryGroup } from "@prisma/client";
-import React, { useCallback, useEffect, useState } from "react";
+import Modal from "react-modal";
+import Button from "@/app/_components/Button";
+// import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+// import { CreateGalleryGroupRequestBody } from "@/app/_type/Gallery";
+// import Loading from "@/app/loading";
+// import { supabase } from "@/utils/supabase";
+import { GalleryGroup } from "@/app/_type/Gallery";
+import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
+import Input from "@/app/_components/Input";
 
 interface Props {
   galleryGroups: GalleryGroup[];
+  addTab: () => Promise<void>;
+  openModal: () => void;
+  closeModal: () => void;
+  selectedTabId: number;
+  isModalOpen: boolean;
+  selectTab: (tabId: number) => void;
+  newTabName: string;
+  setNewTabName: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Tab: React.FC<Props> = ({ galleryGroups }) => {
-  const { token } = useSupabaseSession();
-  const [tabs, setTabs] = useState(galleryGroups); //tabList
-  const [selectedTabId, setSelectedTabId] = useState<number>(1); // 現在選択中のタブID
-  const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
-  const [loading, setLoading] = useState(false);
-
-  // サーバーから特定の曜日のデータを取得
-  const fetcher = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/gallery_group`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token!,
-        },
-      });
-      const result = await response.json();
-      // APIがオブジェクトでデータを返している
-      const data = Array.isArray(result) ? result : result.ga;
-      if (Array.isArray(data)) {
-        setTabs(data);
-      } else {
-        console.error("Fetched data is not an array:", data);
-        setTabs([]); // デフォルトで空の配列を設定
-      }
-    } catch (error) {
-      console.error("Error fetching routines:", error);
-      setTabs([]); // デフォルトで空の配列を設定
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  // 初回レンダリングおよび曜日が変更された際にデータを取得
-  useEffect(() => {
-    if (!token) return;
-    fetcher();
-  }, [token, fetcher]);
-
-  const addTab = async () => {
-    if (!token || !newTabName.trim()) return; //newTabNameが空だとreturn
-    //SupabaseセッションからuserIdを取得
-    const { data: userData, error } = await supabase.auth.getUser(token);
-    if (error || !userData) {
-      console.error("Failed to get user data");
-      return;
-    }
-    //型合わせる
-    const newTab: CreateGalleryGroupRequestBody = {
-      id: tabs.length + 1,
-      userId: parseInt(userData.user.id),
-      galleryGroupTitle: newTabName,
-    };
-
-    try {
-      const response = await fetch("/api/gallery_group", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ galleryGroups: newTabName }),
-      });
-
-      if (response.ok) {
-        setTabs([...tabs, newTab]);
-        // closeModal();
-      } else {
-        console.error("Failed to add tab");
-      }
-    } catch (error) {
-      console.error("Error adding tab:", error);
-    }
-    fetcher();
-    setSelectedTabId(newTab.id);
-  };
-
-  // タブを切り替える処理
-  const selectTab = (tabId: number) => {
-    setSelectedTabId(tabId);
-  };
-  if (loading) return <Loading />;
+const Tab: React.FC<Props> = ({
+  galleryGroups,
+  addTab,
+  openModal,
+  closeModal,
+  selectTab,
+  selectedTabId,
+  isModalOpen,
+  newTabName,
+  setNewTabName,
+}) => {
   return (
     <div>
-      <div>
-        {tabs.map((tab) => (
+      <div className="flex overflow-x-auto scrollbar-hide">
+        {galleryGroups.map((galleryGroup) => (
           <button
-            key={tab.id}
+            key={galleryGroup.id}
             className={`min-w-fit px-4 py-2 rounded-custom-rounded ${
-              selectedTabId === tab.id
+              selectedTabId === galleryGroup.id
                 ? "bg-white border-t border-l border-r"
                 : "bg-gray-200"
             }`}
-            onClick={() => selectTab(tab.id)} // タブを切り替える処理
+            onClick={() => selectTab(galleryGroup.id)} // タブを切り替える処理
             // onDoubleClick={() => handleTabDoubleClick(tab.id)}
           >
-            {tab.galleryGroupTitle}
+            {galleryGroup.galleryGroupTitle}
           </button>
         ))}
 
         {/* タブのプラスボタン */}
         <button
-          // onClick={openModal}
-          className="px-4 py-2 text-text_button rounded-custom-rounded bg-gray-200"
+          onClick={openModal}
+          className="px-4 py-2 text-text_button rounded-custom-rounded border-t border-l border-r bg-gray-200"
         >
           <AiOutlinePlus size={20} />
         </button>
       </div>
+      {/* 新規追加モーダル表示 */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <h2 className="text-lg font-semibold mb-4 text-text_button">
+          ToDoタブ追加
+        </h2>
+        <Input
+          value={newTabName}
+          onChange={(e) => setNewTabName(e.target.value)}
+          placeholder="タブ名を入力"
+        />
+
+        <div onClick={() => addTab()}>
+          <Button text="追加" />
+        </div>
+      </Modal>
     </div>
   );
 };
