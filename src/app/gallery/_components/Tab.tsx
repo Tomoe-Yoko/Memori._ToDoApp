@@ -1,9 +1,5 @@
 import Modal from "react-modal";
 import Button from "@/app/_components/Button";
-// import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-// import { CreateGalleryGroupRequestBody } from "@/app/_type/Gallery";
-// import Loading from "@/app/loading";
-// import { supabase } from "@/utils/supabase";
 import { GalleryGroup } from "@/app/_type/Gallery";
 import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
