@@ -2,19 +2,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 // import PlusButton from "../_components/PlusButton";
 import Navigation from "../_components/Navigation";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { GalleryGroup } from "@/app/_type/Gallery";
-
 import Loading from "@/app/loading";
-// import { supabase } from "@/utils/supabase";
 
 const Page = () => {
   const { token } = useSupabaseSession();
   const [loading, setLoading] = useState(false);
   const [galleryGroups, setGalleryGroups] = useState<GalleryGroup[]>([]); //tabList
-  const [selectedTabId, setSelectedTabId] = useState<number>(1); // 現在選択中のタブID
+  const [selectedTabId, setSelectedTabId] = useState<number>(0); // 現在選択中のタブID
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editGalleryGroup, setEditGalleryGroup] = useState<GalleryGroup | null>(
@@ -53,10 +51,11 @@ const Page = () => {
     fetcher();
   }, [token, fetcher]);
   useEffect(() => {
-    if (galleryGroups.length !== 0) {
+    if (galleryGroups.length !== 0 && selectedTabId === 0) {
+      // 初回ロード時にだけ最初のタブを選択
       setSelectedTabId(galleryGroups[0].id);
     }
-  }, [galleryGroups]);
+  }, [galleryGroups, selectedTabId]);
 
   const addTab = async () => {
     if (!token || !newTabName.trim()) return; //newTabNameが空だとreturn
@@ -113,10 +112,11 @@ const Page = () => {
         setGalleryGroups(
           galleryGroups.map((g) =>
             g.id === editGalleryGroup.id
-              ? { ...g, galleryGroupTItle: editGalleryGroupName }
+              ? { ...g, galleryGroupTitle: editGalleryGroupName }
               : g
           )
         );
+        setSelectedTabId(editGalleryGroup.id);
         setEditGalleryGroup(null);
         fetcher();
       } else {
@@ -127,30 +127,37 @@ const Page = () => {
     }
   };
 
-  //タブDELETE
-  // const deleteTab = async () => {
-  //   if (!token) return;
-  // if (!editTab) return;
-  //   if (!confirm("予定を削除しますか？")) return;
-
-  //   try {
-  //     const response = await fetch(`/api/todo_group/${editTab.id}`, {
-  //       method: "DELETE",
-  //       headers: { "Content-Type": "application/json", Authorization: token! },
-  //     });
-  //     if (response.ok) {
-  //       toast.success("予定を削除しました。", {
-  //         duration: 2100, //ポップアップ表示時間
-  //       });
-  //       setTabs(tabs.filter((t) => t.id !== editTab.id));
-  //       setEditTab(null);
-  //     } else {
-  //       console.error("Failed to delete tab");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error deleting tab:", error);
-  //   }
-  // };
+  // タブDELETE
+  const deleteTab = async () => {
+    if (!token) return;
+    if (!editGalleryGroup) return;
+    if (!confirm("予定を削除しますか？")) return;
+    try {
+      const response = await fetch(
+        `/api/gallery_group/${editGalleryGroup.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+        }
+      );
+      if (response.ok) {
+        toast.success("タブを一つ削除しました。", {
+          duration: 2100, //ポップアップ表示時間
+        });
+        setGalleryGroups(
+          galleryGroups.filter((g) => g.id !== editGalleryGroup.id)
+        );
+        setEditGalleryGroup(null);
+      } else {
+        console.error("Failed to delete tab");
+      }
+    } catch (error) {
+      console.error("Error deleting tab:", error);
+    }
+  };
   // モーダルを開く
   const openModal = () => {
     setIsModalOpen(true);
@@ -165,21 +172,33 @@ const Page = () => {
   if (loading) return <Loading />;
   return (
     <div>
-      <Tab
-        galleryGroups={galleryGroups}
-        addTab={addTab}
-        openModal={openModal}
-        closeModal={closeModal}
-        isModalOpen={isModalOpen}
-        selectTab={selectTab}
-        selectedTabId={selectedTabId}
-        newTabName={newTabName}
-        setNewTabName={setNewTabName}
-      />
-
-      {/* <PlusButton handleAddEvent={addImg} /> */}
-      <Navigation />
-      <Toaster position="top-center" />
+      <h2 className="text-white text-2xl text-center">Gallery.</h2>
+      <div>
+        <Tab
+          galleryGroups={galleryGroups}
+          addTab={addTab}
+          openModal={openModal}
+          closeModal={closeModal}
+          isModalOpen={isModalOpen}
+          selectTab={selectTab}
+          selectedTabId={selectedTabId}
+          newTabName={newTabName}
+          setNewTabName={setNewTabName}
+          handleTabDoubleClick={handleTabDoubleClick}
+          updateTab={updateTab}
+          editGalleryGroup={editGalleryGroup}
+          setEditGalleryGroup={setEditGalleryGroup}
+          editGalleryGroupName={editGalleryGroupName}
+          setEditGalleryGroupName={setEditGalleryGroupName}
+          deleteTab={deleteTab}
+        />
+        <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
+          <li>画像を入れていくところ</li>
+        </ul>
+        {/* <PlusButton handleAddEvent={addImg} /> */}
+        <Navigation />
+        <Toaster position="top-center" />
+      </div>
     </div>
   );
 };

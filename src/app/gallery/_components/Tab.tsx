@@ -1,9 +1,16 @@
 import Modal from "react-modal";
 import Button from "@/app/_components/Button";
 import { GalleryGroup } from "@/app/_type/Gallery";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import Input from "@/app/_components/Input";
+import { Toaster } from "react-hot-toast";
+import {
+  handleMouseDown,
+  handleMouseLeaveOrUp,
+  handleMouseMove,
+  handleWheel,
+} from "@/app/_utils/MouseDragAction";
 
 interface Props {
   galleryGroups: GalleryGroup[];
@@ -15,6 +22,15 @@ interface Props {
   selectTab: (tabId: number) => void;
   newTabName: string;
   setNewTabName: React.Dispatch<React.SetStateAction<string>>;
+  handleTabDoubleClick: (id: number) => void;
+  updateTab: () => Promise<void>;
+  editGalleryGroup: GalleryGroup | null;
+  setEditGalleryGroup: React.Dispatch<
+    React.SetStateAction<GalleryGroup | null>
+  >;
+  editGalleryGroupName: string;
+  setEditGalleryGroupName: React.Dispatch<React.SetStateAction<string>>;
+  deleteTab: () => Promise<void>;
 }
 
 const Tab: React.FC<Props> = ({
@@ -26,11 +42,47 @@ const Tab: React.FC<Props> = ({
   selectedTabId,
   isModalOpen,
   newTabName,
+  handleTabDoubleClick,
   setNewTabName,
+  editGalleryGroup,
+  setEditGalleryGroup,
+  editGalleryGroupName,
+  setEditGalleryGroupName,
+  updateTab,
+  deleteTab,
 }) => {
+  const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0); //タブドラッグ
+
+  //タブドラッグはMouseDragAction.tsから
+  //タブscroll
+  useEffect(() => {
+    const container = tabContainerRef.current;
+    if (container) {
+      const wheelHandler = (event: WheelEvent) =>
+        handleWheel(event, tabContainerRef);
+      container.addEventListener("wheel", wheelHandler);
+      return () => {
+        container.removeEventListener("wheel", wheelHandler);
+      };
+    }
+  }, []);
   return (
-    <div>
-      <div className="flex overflow-x-auto scrollbar-hide">
+    <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        ref={tabContainerRef}
+        onMouseDown={(e) =>
+          handleMouseDown(e, isDragging, startX, scrollLeft, tabContainerRef)
+        }
+        onMouseLeave={() => handleMouseLeaveOrUp(isDragging)}
+        onMouseUp={() => handleMouseLeaveOrUp(isDragging)}
+        onMouseMove={(e) =>
+          handleMouseMove(e, isDragging, startX, scrollLeft, tabContainerRef)
+        }
+      >
         {galleryGroups.map((galleryGroup) => (
           <button
             key={galleryGroup.id}
@@ -40,7 +92,7 @@ const Tab: React.FC<Props> = ({
                 : "bg-gray-200"
             }`}
             onClick={() => selectTab(galleryGroup.id)} // タブを切り替える処理
-            // onDoubleClick={() => handleTabDoubleClick(tab.id)}
+            onDoubleClick={() => handleTabDoubleClick(galleryGroup.id)}
           >
             {galleryGroup.galleryGroupTitle}
           </button>
@@ -73,6 +125,32 @@ const Tab: React.FC<Props> = ({
         <div onClick={() => addTab()}>
           <Button text="追加" />
         </div>
+      </Modal>
+      {/* 編集モーダル表示 */}
+      <Modal
+        isOpen={!!editGalleryGroup} // 編集対象がある場合にモーダルを表示
+        onRequestClose={() => setEditGalleryGroup(null)}
+        className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <h2 className="text-lg font-semibold mb-4 text-text_button">
+          タブ編集
+        </h2>
+        <Input
+          value={editGalleryGroupName}
+          onChange={(e) => setEditGalleryGroupName(e.target.value)}
+          placeholder="タブ名を編集"
+        />
+
+        <div className="mt-4 flex gap-4">
+          <div onClick={updateTab}>
+            <Button text="更新" size="small" />
+          </div>
+          <div onClick={deleteTab}>
+            <Button text="削除" size="small" bgColor="delete" />
+          </div>
+        </div>
+        <Toaster position="top-center" />
       </Modal>
     </div>
   );

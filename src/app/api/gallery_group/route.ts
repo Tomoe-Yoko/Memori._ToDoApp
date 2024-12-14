@@ -17,7 +17,6 @@ export const GET = async (request: Request) => {
       { message: "ユーザーが見つかりませんでした" },
       { status: 404 }
     );
-
   try {
     const galleryGroups = await prisma.galleryGroup.findMany({
       where: { userId: user.id },
@@ -37,9 +36,8 @@ export const POST = async (request: NextRequest) => {
   if (error)
     return NextResponse.json({ status: error.message }, { status: 400 });
   const supabaseUserId = data.user.id;
-
   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-  console.log(user);
+
   if (!user)
     return NextResponse.json(
       { message: "ユーザーが見つかりませんでした" },
@@ -48,9 +46,7 @@ export const POST = async (request: NextRequest) => {
   try {
     //リクエストのbodyを取得
     const body: CreateGalleryGroupRequestBody = await request.json();
-    console.log("Request Body:", body); // デバッグ用ログ
     //bodyの中から以下を取り出す
-    // const { galleryGroups } = body;
     const { galleryGroupTitle } = body;
     const data = await prisma.galleryGroup.create({
       data: { userId: user.id, galleryGroupTitle },

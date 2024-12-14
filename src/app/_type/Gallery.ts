@@ -1,3 +1,4 @@
+// GalleryGroup
 export interface GalleryGroup {
   id: number;
   userId: number;
@@ -5,7 +6,6 @@ export interface GalleryGroup {
   createdAt: Date;
   updatedAt: Date;
 }
-
 export interface CreateGalleryGroupRequestBody {
   userId: number;
 
@@ -13,18 +13,7 @@ export interface CreateGalleryGroupRequestBody {
   createdAt: string;
   updatedAt: string;
 }
-
-// export interface UpdatedGalleryGroupRequestBody {
-//   galleryGroupTitle: string;
-// }
-
 export interface UpdatedGalleryGroupResponse extends GalleryGroup {
   createdAt: Date;
   updatedAt: Date;
 }
-
-//  content: string;
-//   createdAt: string;
-//   galleryGroupTitle: string;
-//   galleryGroupId: number;
-//   thumbnailImageKey: string;
