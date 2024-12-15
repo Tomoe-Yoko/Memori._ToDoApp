@@ -1,4 +1,4 @@
-// GalleryGroup
+///// GalleryGroup
 export interface GalleryGroup {
   id: number;
   userId: number;
@@ -14,6 +14,15 @@ export interface CreateGalleryGroupRequestBody {
   updatedAt: string;
 }
 export interface UpdatedGalleryGroupResponse extends GalleryGroup {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/////GalleryItems
+export interface GalleryItem {
+  id: number;
+  galleryGroupId: number;
+  thumbnailImageKey: string;
   createdAt: Date;
   updatedAt: Date;
 }
