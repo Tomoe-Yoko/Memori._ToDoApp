@@ -30,7 +30,8 @@ const config: Config = {
         trash_bg: "#C86262",
       },
       fontFamily: {
-        Jost: ["var(--JostFont)"],
+        sans: ["Jost"],
+        // sans: ["Jost", "ui-sans-serif", "system-ui"],
       },
       keyframes: {
         fadeout: {

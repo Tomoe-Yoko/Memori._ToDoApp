@@ -47,7 +47,7 @@ export default function Page() {
         height={200}
         className="mx-auto my-8"
       />
-      <h2 className="text-center text-2xl my-4 text-text_button">
+      <h2 className="text-center text-xl my-4 text-text_button">
         サインアップ
       </h2>
       <div className="flex justify-center py-8 mx-8 bg-[#fff6]">

@@ -33,7 +33,7 @@ const Items: React.FC<Props> = ({
           key={id}
           className="flex w-[95%] m-auto py-1 text-lg text-text_button"
         >
-          <div className="flex items-center justify-center w-[20rem]  ml-4">
+          <div className="flex items-center justify-center w-[20rem] mb-1 ml-4">
             <button
               onClick={() => toggleCompletion(id)}
               className={`w-7 h-7 rounded-full border-2 flex justify-center items-center  ${

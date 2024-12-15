@@ -33,9 +33,9 @@ const RoutineList: React.FC<RoutineListProps> = ({
       {routineList.map((item) => (
         <li
           key={item.id}
-          className="flex w-[95%] m-auto py-1 text-lg text-text_button"
+          className="flex w-[90%] mx-auto py-1 text-lg text-text_button"
         >
-          <div className="flex items-center w-[20rem]  ml-4">
+          <div className="flex items-center w-full min-w-[300px] mX-auto mb-1 ml-2">
             <button
               onClick={() => toggleCompletion(item.id)}
               className={`w-7 h-7 rounded-full border-2 flex justify-center items-center  ${
@@ -73,8 +73,8 @@ const RoutineList: React.FC<RoutineListProps> = ({
         </li>
       ))}
       {isSetNewRoutine && (
-        <li className="flex w-[95%] m-auto py-1 text-lg text-text_button">
-          <div className="flex items-center w-[20rem]  ml-4">
+        <li className="flex w-[90%] m-auto py-1 text-lg text-text_button">
+          <div className="flex items-center w-full min-w-[300px] mX-auto ml-2">
             <button
               className={`w-7 h-7 rounded-full border-2 flex justify-center items-center border-text_button`}
             ></button>

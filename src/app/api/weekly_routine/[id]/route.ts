@@ -75,12 +75,11 @@ export const DELETE = async (
       { message: "ユーザーが見つかりませんでした" },
       { status: 404 }
     );
-  console.log(params);
 
   const { id } = params;
   const routineId = parseInt(id);
   if (isNaN(routineId)) {
-    console.error("Invalid routineId ID:", id); //「無効なtroutineId ID」:`id`と表示
+    console.error("Invalid routineId ID:", id); //「無効なroutineId ID」:`id`と表示
     return NextResponse.json({ message: "無効なIDです" }, { status: 400 });
   }
   try {

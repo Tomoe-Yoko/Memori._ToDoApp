@@ -6,7 +6,8 @@ import { CreatePostRequestBody } from "@/app/_type/Todo";
 import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
-import Input from "./Input";
+import Input from "@/app/_components/Input";
+import { useMouseDrag } from "@/app/_hooks/useMouseDrag";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];
@@ -21,11 +22,10 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
-  const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
 
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0); //タブドラッグ
+  const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
+  const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
+    useMouseDrag(tabContainerRef);
 
   const fetcher = useCallback(async () => {
     const response = await fetch("/api/todo_group", {
@@ -59,7 +59,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   };
   //タブのデフォルト設定
   useEffect(() => {
-    if (tabs.length > 0 && activeTabId === null) {
+    if (tabs.length > 0 && activeTabId === 0) {
       setActiveTabId(tabs[0].id);
     }
   }, [tabs, activeTabId]);
@@ -93,6 +93,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
         );
         setEditTab(null);
         fetcher();
+        setActiveTabId(editTab.id);
       } else {
         console.error("Failed to update tab");
       }
@@ -113,7 +114,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
         headers: { "Content-Type": "application/json", Authorization: token! },
       });
       if (response.ok) {
-        toast.success("予定を削除しました。", {
+        toast.success("タブを一つ削除しました。", {
           duration: 2100, //ポップアップ表示時間
         });
         setTabs(tabs.filter((t) => t.id !== editTab.id));
@@ -125,44 +126,6 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
       console.error("Error deleting tab:", error);
     }
   };
-  //タブドラッグ
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (tabContainerRef.current?.offsetLeft || 0);
-    scrollLeft.current = tabContainerRef.current?.scrollLeft || 0;
-  };
-  const handleMouseLeaveOrUp = () => {
-    isDragging.current = false;
-  };
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current) return;
-    e.preventDefault();
-    const x = e.pageX - (tabContainerRef.current?.offsetLeft || 0);
-    const walk = (x - startX.current) * 2; // スクロール速度を調整
-    if (tabContainerRef.current) {
-      tabContainerRef.current.scrollLeft = scrollLeft.current - walk;
-    }
-  };
-
-  //タブscroll
-  useEffect(() => {
-    const handleWheel = (event: WheelEvent) => {
-      if (tabContainerRef.current) {
-        tabContainerRef.current.scrollLeft += event.deltaY;
-      }
-    };
-
-    const container = tabContainerRef.current;
-    if (container) {
-      container.addEventListener("wheel", handleWheel);
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("wheel", handleWheel);
-      }
-    };
-  }, []);
 
   // 新しいタブを追加
   const addTab = async () => {
@@ -252,12 +215,12 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
             placeholder="タブ名を編集"
           />
 
-          <div className="mt-4">
+          <div className="mt-4 flex gap-4">
             <div onClick={updateTab}>
-              <Button text="更新" />
+              <Button text="更新" size="small" />
             </div>
             <div onClick={deleteTab}>
-              <Button text="削除" />
+              <Button text="削除" size="small" bgColor="delete" />
             </div>
           </div>
           <Toaster position="top-center" />

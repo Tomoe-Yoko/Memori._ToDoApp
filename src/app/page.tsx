@@ -39,7 +39,7 @@ export default function Home() {
           </Link>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">
+          <h2 className="text-white text-4xl text-center py-8">
             01．Calendar.
           </h2>
           <Image src={top01} alt="calendar" className="m-auto" />
@@ -50,7 +50,7 @@ export default function Home() {
           </p>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">02．Todo.</h2>
+          <h2 className="text-white text-4xl text-center py-8">02．Todo.</h2>
           <Image src={top02} alt="todo" className="m-auto" />
           <p className="w-72 mx-auto text-text_button py-4">
             買うものリストで買い忘れなし。
@@ -59,14 +59,14 @@ export default function Home() {
           </p>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">03．Gallery.</h2>
+          <h2 className="text-white text-4xl text-center py-8">03．Gallery.</h2>
           <Image src={top03} alt="gallery" className="m-auto" />
           <p className="w-72 mx-auto text-text_button py-4">
             子供が持ち帰るプリントは、画像で残しておけば外出先でも確認できちゃう。
           </p>
         </section>
         <section className="py-28">
-          <h2 className="text-white text-5xl text-center py-8">
+          <h2 className="text-white text-4xl text-center py-8">
             04．Routine work.
           </h2>
           <Image src={top04} alt="routinework" className="m-auto" />

@@ -1,36 +1,60 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-// import { supabase } from "@/utils/supabase";
+import { CreateGalleryGroupRequestBody } from "@/app/_type/Gallery";
+import { supabase } from "@/utils/supabase";
 
 const prisma = new PrismaClient();
 
-///////POST
-//リクエストボディの型
-interface CreateGalleryGroupRequestBody {
-  userId: number;
-  galleryGroupTitle: string;
-  thumbnailImageKey: string;
-}
+export const GET = async (request: Request) => {
+  const token = request.headers.get("Authorization") ?? "";
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ status: error.message }, { status: 400 });
+  const supabaseUserId = data.user.id;
+  const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
+  try {
+    const galleryGroups = await prisma.galleryGroup.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json({ status: "OK", galleryGroups });
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+};
 
-export const POST = async (request: Request) => {
+///////POST
+export const POST = async (request: NextRequest) => {
+  const token = request.headers.get("Authorization") ?? "";
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ status: error.message }, { status: 400 });
+  const supabaseUserId = data.user.id;
+  const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
   try {
     //リクエストのbodyを取得
-    const body = await request.json();
-    //bodyの中から以下の４つを取り出す
-    const {
-      galleryGroupTitle,
-      thumbnailImageKey,
-    }: CreateGalleryGroupRequestBody = body;
-    const data = await prisma.calendar.create({
-      data: {
-        galleryGroupTitle,
-        thumbnailImageKey,
-      },
+    const body: CreateGalleryGroupRequestBody = await request.json();
+    //bodyの中から以下を取り出す
+    const { galleryGroupTitle } = body;
+    const data = await prisma.galleryGroup.create({
+      data: { userId: user.id, galleryGroupTitle },
     });
 
     return NextResponse.json({
       status: "OK",
-      message: "送信しました",
+      message: "GalleryGroup created successfully",
       id: data.id,
     });
   } catch (error) {
