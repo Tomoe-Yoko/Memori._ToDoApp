@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { supabase } from "@/utils/supabase";
 import { NextResponse, NextRequest } from "next/server";
-
 import { CreateTodoItemRequestBody } from "@/app/_type/Todo";
 
 const prisma = new PrismaClient();

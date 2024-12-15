@@ -204,3 +204,5 @@ const Page = () => {
 };
 
 export default Page;
+
+//参考 chap11-blog-next/src/app/admin/posts/new/page.tsx

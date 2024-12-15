@@ -8,7 +8,6 @@ export interface GalleryGroup {
 }
 export interface CreateGalleryGroupRequestBody {
   userId: number;
-
   galleryGroupTitle: string;
   createdAt: string;
   updatedAt: string;
@@ -26,3 +25,4 @@ export interface GalleryItem {
   createdAt: Date;
   updatedAt: Date;
 }
+export type CreateGalleryItemRequestBody = GalleryItem;
