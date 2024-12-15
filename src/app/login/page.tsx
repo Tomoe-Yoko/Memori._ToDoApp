@@ -67,7 +67,7 @@ const Page = () => {
         height={200}
         className="mx-auto my-8"
       />
-      <h2 className="text-center text-2xl my-4 text-text_button">ログイン</h2>
+      <h2 className="text-center text-xl my-4 text-text_button">ログイン</h2>
       <div className="flex justify-center py-8 mx-8 bg-[#fff6]">
         <form
           onSubmit={handleSubmit}
@@ -117,7 +117,7 @@ const Page = () => {
               )}
             </div>
           </div>
-          <p className="text-center text-[#729EF0] text-xl">
+          <p className="text-center text-[#729EF0] text-base">
             <a href="">※パスワードを忘れた方はこちら</a>
           </p>
           <div>

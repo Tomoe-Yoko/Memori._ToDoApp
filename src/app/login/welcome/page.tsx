@@ -37,7 +37,7 @@ const WelcomePage: React.FC<Props> = () => {
   return (
     <div className="relative max-w-md bg-001 m-auto border-r border-l border-white">
       <div className="absolute inset-0 w-full h-screen bg-tether-line bg-no-repeat bg-right flex justify-center items-center text-white animate-fadeout">
-        <p className="text-center tracking-tight mt-[-10rem] text-[1.8rem]">
+        <p className="text-center tracking-tight mt-[-10rem] text-[1.5rem]">
           {useName}さん
           <br />
           今日もおつかれさま

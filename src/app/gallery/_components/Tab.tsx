@@ -1,16 +1,11 @@
 import Modal from "react-modal";
 import Button from "@/app/_components/Button";
 import { GalleryGroup } from "@/app/_type/Gallery";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import Input from "@/app/_components/Input";
 import { Toaster } from "react-hot-toast";
-import {
-  handleMouseDown,
-  handleMouseLeaveOrUp,
-  handleMouseMove,
-  handleWheel,
-} from "@/app/_utils/MouseDragAction";
+import { useMouseDrag } from "@/app/_hooks/useMouseDrag";
 
 interface Props {
   galleryGroups: GalleryGroup[];
@@ -52,36 +47,17 @@ const Tab: React.FC<Props> = ({
   deleteTab,
 }) => {
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0); //タブドラッグ
-
-  //タブドラッグはMouseDragAction.tsから
-  //タブscroll
-  useEffect(() => {
-    const container = tabContainerRef.current;
-    if (container) {
-      const wheelHandler = (event: WheelEvent) =>
-        handleWheel(event, tabContainerRef);
-      container.addEventListener("wheel", wheelHandler);
-      return () => {
-        container.removeEventListener("wheel", wheelHandler);
-      };
-    }
-  }, []);
+  const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
+    useMouseDrag(tabContainerRef);
   return (
     <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
       <div
         className="flex overflow-x-auto scrollbar-hide"
         ref={tabContainerRef}
-        onMouseDown={(e) =>
-          handleMouseDown(e, isDragging, startX, scrollLeft, tabContainerRef)
-        }
-        onMouseLeave={() => handleMouseLeaveOrUp(isDragging)}
-        onMouseUp={() => handleMouseLeaveOrUp(isDragging)}
-        onMouseMove={(e) =>
-          handleMouseMove(e, isDragging, startX, scrollLeft, tabContainerRef)
-        }
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeaveOrUp}
+        onMouseUp={handleMouseLeaveOrUp}
+        onMouseMove={handleMouseMove}
       >
         {galleryGroups.map((galleryGroup) => (
           <button

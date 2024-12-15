@@ -198,21 +198,23 @@ const Page: React.FC = () => {
   return (
     <div className="relative h-svh">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
-      <Calendar
-        locale="ja-JP"
-        prev2Label={null}
-        next2Label={null}
-        formatDay={(_, date) => date.getDate().toString()}
-        formatMonthYear={(_, date) =>
-          `${date.getFullYear()}.${date.getMonth() + 1}`
-        }
-        formatShortWeekday={(_, date) =>
-          ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]
-        }
-        tileContent={tileContent}
-        onClickDay={onCalendarClick}
-        className={"react-calendar"}
-      />
+      <div className="pb-[70px]">
+        <Calendar
+          locale="ja-JP"
+          prev2Label={null}
+          next2Label={null}
+          formatDay={(_, date) => date.getDate().toString()}
+          formatMonthYear={(_, date) =>
+            `${date.getFullYear()}.${date.getMonth() + 1}`
+          }
+          formatShortWeekday={(_, date) =>
+            ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]
+          }
+          tileContent={tileContent}
+          onClickDay={onCalendarClick}
+          className={"react-calendar"}
+        />
+      </div>
 
       <PlusButton handleAddEvent={() => setAddScheduleModal(true)} />
 

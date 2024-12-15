@@ -7,12 +7,7 @@ import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
 import Input from "@/app/_components/Input";
-import {
-  handleMouseDown,
-  handleMouseLeaveOrUp,
-  handleMouseMove,
-  handleWheel,
-} from "@/app/_utils/MouseDragAction";
+import { useMouseDrag } from "@/app/_hooks/useMouseDrag";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];
@@ -29,9 +24,8 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
 
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0); //タブドラッグ
+  const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
+    useMouseDrag(tabContainerRef);
 
   const fetcher = useCallback(async () => {
     const response = await fetch("/api/todo_group", {
@@ -132,19 +126,6 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
       console.error("Error deleting tab:", error);
     }
   };
-  //タブドラッグはMouseDragAction.tsから
-  //タブscroll
-  useEffect(() => {
-    const container = tabContainerRef.current;
-    if (container) {
-      const wheelHandler = (event: WheelEvent) =>
-        handleWheel(event, tabContainerRef);
-      container.addEventListener("wheel", wheelHandler);
-      return () => {
-        container.removeEventListener("wheel", wheelHandler);
-      };
-    }
-  }, []);
 
   // 新しいタブを追加
   const addTab = async () => {
@@ -190,14 +171,10 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
       <div
         className="flex overflow-x-auto scrollbar-hide"
         ref={tabContainerRef}
-        onMouseDown={(e) =>
-          handleMouseDown(e, isDragging, startX, scrollLeft, tabContainerRef)
-        }
-        onMouseLeave={() => handleMouseLeaveOrUp(isDragging)}
-        onMouseUp={() => handleMouseLeaveOrUp(isDragging)}
-        onMouseMove={(e) =>
-          handleMouseMove(e, isDragging, startX, scrollLeft, tabContainerRef)
-        }
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeaveOrUp}
+        onMouseUp={handleMouseLeaveOrUp}
+        onMouseMove={handleMouseMove}
       >
         {tabs.map((tab) => (
           <button

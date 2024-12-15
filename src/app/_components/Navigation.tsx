@@ -68,7 +68,7 @@ const Navigation = () => {
               height={32}
               className="mx-auto"
             />
-            <p className="text-[10px]">設定</p>
+            <p className="text-[10px] text-center">設定</p>
           </Link>
         </li>
       </ul>

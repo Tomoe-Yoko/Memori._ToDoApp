@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 export const useTodo = () => {
   const { token } = useSupabaseSession();
   const [todoGroups, setTodoGroups] = useState<CreatePostRequestBody[]>([]);
-  const [activeTabId, setActiveTabId] = useState<number | null>(0);
+  const [activeTabId, setActiveTabId] = useState<number>(0);
   //////親コンポーネントでタブ一覧取得、フックで引数で渡すその配列の先頭のIDをセット
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

@@ -81,20 +81,20 @@ export const DELETE = async (
   }
 
   try {
-    const galleryGroup = await prisma.galleryGroup.findUnique({
-      where: {
-        userId: user.id,
-        id: galleryGroupId,
-      },
-    });
+    // const galleryGroup = await prisma.galleryGroup.findUnique({
+    //   where: {
+    //     userId: user.id,
+    //     id: galleryGroupId,
+    //   },
+    // });
 
-    if (!galleryGroup) {
-      console.error("GalleryGroup entry not found for ID:", galleryGroupId);
-      return NextResponse.json(
-        { message: "削除するギャラリータイトルがが見つかりません" },
-        { status: 404 }
-      );
-    }
+    // if (!galleryGroup) {
+    //   console.error("GalleryGroup entry not found for ID:", galleryGroupId);
+    //   return NextResponse.json(
+    //     { message: "削除するギャラリータイトルがが見つかりません" },
+    //     { status: 404 }
+    //   );
+    // }
 
     await prisma.galleryGroup.delete({
       where: {
