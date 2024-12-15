@@ -196,7 +196,7 @@ const Page: React.FC = () => {
     return <Loading />;
   }
   return (
-    <div className="relative h-svh">
+    <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
       <div className="pb-[70px]">
         <Calendar

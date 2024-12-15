@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const Navigation = () => {
   return (
-    <div className="fixed -bottom-0 -inset-x-0 max-w-md bg-[#fffe] m-auto py-2">
+    <div className="fixed -bottom-0 -inset-x-0 max-w-[500px] bg-[#fffe] m-auto py-3">
       <ul className="w-11/12 mx-auto flex justify-around">
         <li>
           <Link href="./calendar">

@@ -220,29 +220,33 @@ const Page: React.FC = () => {
     <div>
       <h2 className="text-white text-2xl text-center">Routine work.</h2>
       <WeekdaySelect currentDay={currentDay} setCurrentDay={setCurrentDay} />
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg mb-2 text-text_button">
-          {days.find((day) => day.key === currentDay)?.label}
-        </h2>
-        <RoutineList
-          toggleCompletion={toggleCompletion}
-          isSetNewRoutine={isSetNewRoutine}
-          routineList={routineList}
-          setRoutineList={setRoutineList}
-          updateRoutine={updateRoutine}
-          deleteRoutine={deleteRoutine}
-          inputRef={inputRef}
-          newRoutine={newRoutine}
-          setNewRoutine={setNewRoutine}
-          addRoutine={addRoutine}
-        />
-        <div className="py-11 relative">
-          <AllClearButton
-            clearAllChecks={clearAllChecks}
-            isAnimating={isAnimating}
-            allChecked={allChecked}
+      <div className="w-11/12 mx-auto">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg mb-2 pl-4 text-text_button">
+            {days.find((day) => day.key === currentDay)?.label}
+          </h3>
+
+          <RoutineList
+            toggleCompletion={toggleCompletion}
+            isSetNewRoutine={isSetNewRoutine}
+            routineList={routineList}
+            setRoutineList={setRoutineList}
+            updateRoutine={updateRoutine}
+            deleteRoutine={deleteRoutine}
+            inputRef={inputRef}
+            newRoutine={newRoutine}
+            setNewRoutine={setNewRoutine}
+            addRoutine={addRoutine}
           />
-          <span id="rewardId" className="absolute top-18 left-32 w-32 h-4" />
+
+          <div className="py-11 relative">
+            <AllClearButton
+              clearAllChecks={clearAllChecks}
+              isAnimating={isAnimating}
+              allChecked={allChecked}
+            />
+            <span id="rewardId" className="absolute top-18 left-32 w-32 h-4" />
+          </div>
         </div>
         <PlusButton handleAddEvent={addEmptyRoutine} />
       </div>
