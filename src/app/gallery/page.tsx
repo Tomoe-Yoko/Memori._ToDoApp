@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 // import PlusButton from "../_components/PlusButton";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -7,6 +7,8 @@ import Tab from "./_components/Tab";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { GalleryGroup } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
+import { v4 as uuidv4 } from "uuid";
+import { supabase } from "@/utils/supabase";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -19,6 +21,12 @@ const Page = () => {
     null
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
+    null
+  );
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
+    null
+  );
   const fetcher = useCallback(async () => {
     setLoading(true);
     try {
@@ -169,6 +177,92 @@ const Page = () => {
     setNewTabName("");
   };
 
+  //////////GalleryItem
+  //画像表示
+  // 画像のURLを取得するためのuseEffect
+  useEffect(() => {
+    if (!thumbnailImageKey) return;
+    const fetchImage = async () => {
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items?key=${thumbnailImageKey}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setThumbnailImageUrl(data.publicUrl);
+      } else {
+        console.error("Failed to fetch image URL:", data);
+      }
+    };
+    fetchImage();
+  }, [thumbnailImageKey]);
+
+  //画像追加
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    const filePath = `private/${uuidv4()}`;
+
+    const { data, error } = await supabase.storage
+      .from("galleryItems")
+      .upload(filePath, file, {
+        cacheControl: "3600", //キャッシュ制御の設定です。3600秒（1時間）キャッシュされるように指定
+        upsert: false, //同じ名前のファイルが存在する場合に上書きするかどうか（ここでは上書きしない）。
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setThumbnailImageKey(data.path);
+    // 新しい画像情報をAPIに送信する
+    try {
+      const response = await fetch(
+        ` /api/gallery_group/${selectedTabId}/gallery_item`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+          body: JSON.stringify({
+            galleryGroupId: selectedTabId,
+            thumbnailImageKey: data.path,
+          }),
+        }
+      );
+      if (response.ok) {
+        toast.success("画像が正常に追加されました。");
+      } else {
+        console.error("Failed to add image to gallery:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error adding image to gallery:", error);
+    }
+  };
+  // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
+  useEffect(() => {
+    if (!thumbnailImageKey) return;
+    const fetcherImage = async () => {
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        .from("galleryItems")
+        .getPublicUrl(thumbnailImageKey);
+      //supabaseの仕様なので、覚える
+
+      setThumbnailImageUrl(publicUrl);
+    };
+    fetcherImage();
+  }, [thumbnailImageKey]);
+
+  //画像変更（Modal）
+  //画像削除（Modal）
+  //
+  //
+  //
+
   if (loading) return <Loading />;
   return (
     <div>
@@ -193,7 +287,27 @@ const Page = () => {
           deleteTab={deleteTab}
         />
         <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
-          <li>画像を入れていくところ</li>
+          <li>
+            <div>
+              {selectedTabId && (
+                <div>
+                  <input
+                    type="file"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                  />
+                  {thumbnailImageUrl && (
+                    <img
+                      src={thumbnailImageUrl}
+                      alt="Selected Tab Image"
+                      width={600}
+                      height={300}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          </li>
         </ul>
         {/* <PlusButton handleAddEvent={addImg} /> */}
         <Navigation />
