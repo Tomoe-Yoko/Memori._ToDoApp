@@ -1,6 +1,5 @@
 "use client";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-// import PlusButton from "../_components/PlusButton";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
@@ -9,6 +8,8 @@ import { GalleryGroup } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
+import Image from "next/image"; //
+// import PlusButton from "../_components/PlusButton";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -181,20 +182,36 @@ const Page = () => {
   //画像表示
   // 画像のURLを取得するためのuseEffect
   useEffect(() => {
+    if (!token || selectedTabId === null) return;
     if (!thumbnailImageKey) return;
+
     const fetchImage = async () => {
-      const response = await fetch(
-        `/api/gallery_group/${selectedTabId}/gallery_items?key=${thumbnailImageKey}`
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setThumbnailImageUrl(data.publicUrl);
-      } else {
-        console.error("Failed to fetch image URL:", data);
+      try {
+        const response = await fetch(
+          `/api/gallery_group/${selectedTabId}/gallery_items?key=${thumbnailImageKey}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token!,
+            },
+          }
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setThumbnailImageUrl(data.publicUrl);
+        } else {
+          console.error("Failed to fetch image URL:", data);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
+      } finally {
+        setLoading(false);
       }
     };
     fetchImage();
-  }, [thumbnailImageKey]);
+  }, [selectedTabId, thumbnailImageKey]);
 
   //画像追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -204,7 +221,7 @@ const Page = () => {
     const filePath = `private/${uuidv4()}`;
 
     const { data, error } = await supabase.storage
-      .from("galleryItems")
+      .from("gallery_item")
       .upload(filePath, file, {
         cacheControl: "3600", //キャッシュ制御の設定です。3600秒（1時間）キャッシュされるように指定
         upsert: false, //同じ名前のファイルが存在する場合に上書きするかどうか（ここでは上書きしない）。
@@ -212,14 +229,16 @@ const Page = () => {
 
     if (error) {
       alert(error.message);
+
       return;
     }
 
     setThumbnailImageKey(data.path);
+
     // 新しい画像情報をAPIに送信する
     try {
       const response = await fetch(
-        ` /api/gallery_group/${selectedTabId}/gallery_item`,
+        `/api/gallery_group/${selectedTabId}/gallery_items`,
         {
           method: "POST",
           headers: {
@@ -248,10 +267,10 @@ const Page = () => {
       const {
         data: { publicUrl },
       } = await supabase.storage
-        .from("galleryItems")
+        .from("gallery_item")
         .getPublicUrl(thumbnailImageKey);
       //supabaseの仕様なので、覚える
-
+      console.log("取得したPublic URL:", publicUrl); // ←ここを追加
       setThumbnailImageUrl(publicUrl);
     };
     fetcherImage();
@@ -293,13 +312,14 @@ const Page = () => {
                 <div>
                   <input
                     type="file"
+                    id="thumbnailImageKey"
                     onChange={handleImageChange}
                     accept="image/*"
                   />
                   {thumbnailImageUrl && (
-                    <img
+                    <Image
                       src={thumbnailImageUrl}
-                      alt="Selected Tab Image"
+                      alt="Selected Image"
                       width={600}
                       height={300}
                     />
@@ -309,7 +329,7 @@ const Page = () => {
             </div>
           </li>
         </ul>
-        {/* <PlusButton handleAddEvent={addImg} /> */}
+        {/* <PlusButton handleAddEvent={handleImageChange} /> */}
         <Navigation />
         <Toaster position="top-center" />
       </div>

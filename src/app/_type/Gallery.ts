@@ -25,4 +25,8 @@ export interface GalleryItem {
   createdAt: Date;
   updatedAt: Date;
 }
-export type CreateGalleryItemRequestBody = GalleryItem;
+// export type CreateGalleryItemRequestBody = GalleryItem;
+export type CreateGalleryItemRequestBody = {
+  galleryGroupId: number;
+  thumbnailImageKey: string;
+};

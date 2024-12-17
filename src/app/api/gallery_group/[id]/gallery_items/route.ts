@@ -82,7 +82,7 @@ export const POST = async (
     //リクエストのbodyを取得
     const body: CreateGalleryItemRequestBody = await request.json();
     //bodyの中から以下を取り出す
-
+    console.log("Received body:", body);
     const { galleryGroupId, thumbnailImageKey } = body;
     const data = await prisma.galleryItems.create({
       data: { galleryGroupId, thumbnailImageKey },
