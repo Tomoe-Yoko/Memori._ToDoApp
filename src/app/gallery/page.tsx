@@ -101,9 +101,9 @@ const Page = () => {
     }
   };
   // タブを切り替える処理
-  // const selectTab = (tabId: number) => {
-  //   setSelectedTabId(tabId);
-  // };
+  const selectTab = (tabId: number) => {
+    setSelectedTabId(tabId);
+  };
   //タブを編集・削除するためのモーダル表示
   const handleTabDoubleClick = (id: number) => {
     const tab = galleryGroups.find((g) => g.id === id);
@@ -195,40 +195,49 @@ const Page = () => {
     if (!token || selectedTabId === null) return;
     if (!thumbnailImageKey) return;
 
-    const fetchImage = async () => {
-      try {
-        // const response = await fetch(
-        //   `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: token!,
-        //     },
-        //   }
-        // );
-        const {
-          data: { publicUrl },
-        } = await supabase.storage
-          .from("gallery_item")
-          .getPublicUrl(thumbnailImageKey);
-        setThumbnailImageUrl(publicUrl);
-        // const data = await response.json();
-        // if (response.ok) {
-        //   setThumbnailImageUrl(data.publicUrl);
-        // } else {
-        //   console.error("Failed to fetch image URL:", data);
-        // }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
-      } finally {
-        setLoading(false);
-      }
+    const fetcherImg = async () => {
+      const { data } = await supabase.storage
+        .from("gallery_item")
+        .getPublicUrl(thumbnailImageKey);
+      setThumbnailImageUrls((prevUrls) => [...prevUrls, data.publicUrl]);
     };
-    fetchImage();
-  }, [selectedTabId, setThumbnailImageKey]);
-  console.log(thumbnailImageKey);
+    fetcherImg();
+  }, [thumbnailImageKey]);
+
+  //   const fetchImage = async () => {
+  //     try {
+  //       // const response = await fetch(
+  //       //   `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
+  //       //   {
+  //       //     headers: {
+  //       //       "Content-Type": "application/json",
+  //       //       Authorization: token!,
+  //       //     },
+  //       //   }
+  //       // );
+  //       const {
+  //         data: { publicUrl },
+  //       } = await supabase.storage
+  //         .from("gallery_item")
+  //         .getPublicUrl(thumbnailImageKey);
+  //       setThumbnailImageUrl(publicUrl);
+  //       // const data = await response.json();
+  //       // if (response.ok) {
+  //       //   setThumbnailImageUrl(data.publicUrl);
+  //       // } else {
+  //       //   console.error("Failed to fetch image URL:", data);
+  //       // }
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         console.error(error.message);
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchImage();
+  // }, [selectedTabId, setThumbnailImageKey]);
+  // console.log(thumbnailImageKey);
 
   //画像追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -345,11 +354,11 @@ const Page = () => {
                   />
 
                   {thumbnailImageUrl &&
-                    thumbnailImageUrls.map((thumbnailImageUrl, index) => (
+                    thumbnailImageUrls.map((url, index) => (
                       <Image
                         key={index}
-                        src={thumbnailImageUrl}
-                        alt={`Selected Image ${index}`}
+                        src={url}
+                        alt={`elected Image ${index}`}
                         width={600}
                         height={300}
                       />
@@ -366,7 +375,5 @@ const Page = () => {
     </div>
   );
 };
-
 export default Page;
-
 //参考 chap11-blog-next/src/app/admin/posts/new/page.tsx
