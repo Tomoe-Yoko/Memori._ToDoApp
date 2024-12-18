@@ -1,5 +1,11 @@
 "use client";
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
@@ -8,8 +14,8 @@ import { GalleryGroup } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
-import Image from "next/image"; //
-// import PlusButton from "../_components/PlusButton";
+import Image from "next/image";
+import PlusButton from "../_components/PlusButton";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -22,12 +28,16 @@ const Page = () => {
     null
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
+  /////imgのステート
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
     null
   );
   const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
     null
   );
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [thumbnailImageUrls, setThumbnailImageUrls] = useState<string[]>([]);
+
   const fetcher = useCallback(async () => {
     setLoading(true);
     try {
@@ -91,9 +101,9 @@ const Page = () => {
     }
   };
   // タブを切り替える処理
-  const selectTab = (tabId: number) => {
-    setSelectedTabId(tabId);
-  };
+  // const selectTab = (tabId: number) => {
+  //   setSelectedTabId(tabId);
+  // };
   //タブを編集・削除するためのモーダル表示
   const handleTabDoubleClick = (id: number) => {
     const tab = galleryGroups.find((g) => g.id === id);
@@ -187,21 +197,27 @@ const Page = () => {
 
     const fetchImage = async () => {
       try {
-        const response = await fetch(
-          `/api/gallery_group/${selectedTabId}/gallery_items?key=${thumbnailImageKey}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token!,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setThumbnailImageUrl(data.publicUrl);
-        } else {
-          console.error("Failed to fetch image URL:", data);
-        }
+        // const response = await fetch(
+        //   `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: token!,
+        //     },
+        //   }
+        // );
+        const {
+          data: { publicUrl },
+        } = await supabase.storage
+          .from("gallery_item")
+          .getPublicUrl(thumbnailImageKey);
+        setThumbnailImageUrl(publicUrl);
+        // const data = await response.json();
+        // if (response.ok) {
+        //   setThumbnailImageUrl(data.publicUrl);
+        // } else {
+        //   console.error("Failed to fetch image URL:", data);
+        // }
       } catch (error) {
         if (error instanceof Error) {
           console.error(error.message);
@@ -211,7 +227,8 @@ const Page = () => {
       }
     };
     fetchImage();
-  }, [selectedTabId, thumbnailImageKey]);
+  }, [selectedTabId, setThumbnailImageKey]);
+  console.log(thumbnailImageKey);
 
   //画像追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -263,19 +280,28 @@ const Page = () => {
   // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
   useEffect(() => {
     if (!thumbnailImageKey) return;
-    const fetcherImage = async () => {
-      const {
-        data: { publicUrl },
-      } = await supabase.storage
+    const fetcherImg = async () => {
+      const { data } = await supabase.storage
         .from("gallery_item")
         .getPublicUrl(thumbnailImageKey);
-      //supabaseの仕様なので、覚える
-      console.log("取得したPublic URL:", publicUrl); // ←ここを追加
-      setThumbnailImageUrl(publicUrl);
-    };
-    fetcherImage();
-  }, [thumbnailImageKey]);
+      // if (error) {
+      //   console.error("Error fetching public URL:", error.message);
+      //   return;
+      // }
 
+      setThumbnailImageUrl(data.publicUrl);
+    };
+    fetcherImg();
+  }, [thumbnailImageKey]); //supabaseの仕様なので、覚える
+
+  const handleAddEvent = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // inputのクリックイベントをトリガー
+    }
+  };
+  console.log(fileInputRef);
+  //  console.log(data);
+  //       console.log(thumbnailImageKey);
   //画像変更（Modal）
   //画像削除（Modal）
   //
@@ -312,24 +338,28 @@ const Page = () => {
                 <div>
                   <input
                     type="file"
-                    id="thumbnailImageKey"
+                    ref={fileInputRef}
                     onChange={handleImageChange}
                     accept="image/*"
+                    className="hidden"
                   />
-                  {thumbnailImageUrl && (
-                    <Image
-                      src={thumbnailImageUrl}
-                      alt="Selected Image"
-                      width={600}
-                      height={300}
-                    />
-                  )}
+
+                  {thumbnailImageUrl &&
+                    thumbnailImageUrls.map((thumbnailImageUrl, index) => (
+                      <Image
+                        key={index}
+                        src={thumbnailImageUrl}
+                        alt={`Selected Image ${index}`}
+                        width={600}
+                        height={300}
+                      />
+                    ))}
                 </div>
               )}
             </div>
           </li>
         </ul>
-        {/* <PlusButton handleAddEvent={handleImageChange} /> */}
+        <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
         <Toaster position="top-center" />
       </div>
