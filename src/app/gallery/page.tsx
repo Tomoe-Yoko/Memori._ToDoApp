@@ -195,49 +195,41 @@ const Page = () => {
     if (!token || selectedTabId === null) return;
     if (!thumbnailImageKey) return;
 
-    const fetcherImg = async () => {
-      const { data } = await supabase.storage
-        .from("gallery_item")
-        .getPublicUrl(thumbnailImageKey);
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(
+          `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token!,
+            },
+          }
+        );
+        const {
+          data: { publicUrl },
+        } = await supabase.storage
+          .from("gallery_item")
+          .getPublicUrl(thumbnailImageKey);
+        setThumbnailImageUrl(publicUrl);
+
+        if (response.ok) {
+          setThumbnailImageUrl(publicUrl);
+        } else {
+          console.error("Failed to fetch image URL:", publicUrl);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
       setThumbnailImageUrls((prevUrls) => [...prevUrls, data.publicUrl]);
     };
-    fetcherImg();
-  }, [thumbnailImageKey]);
-
-  //   const fetchImage = async () => {
-  //     try {
-  //       // const response = await fetch(
-  //       //   `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
-  //       //   {
-  //       //     headers: {
-  //       //       "Content-Type": "application/json",
-  //       //       Authorization: token!,
-  //       //     },
-  //       //   }
-  //       // );
-  //       const {
-  //         data: { publicUrl },
-  //       } = await supabase.storage
-  //         .from("gallery_item")
-  //         .getPublicUrl(thumbnailImageKey);
-  //       setThumbnailImageUrl(publicUrl);
-  //       // const data = await response.json();
-  //       // if (response.ok) {
-  //       //   setThumbnailImageUrl(data.publicUrl);
-  //       // } else {
-  //       //   console.error("Failed to fetch image URL:", data);
-  //       // }
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         console.error(error.message);
-  //       }
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchImage();
-  // }, [selectedTabId, setThumbnailImageKey]);
-  // console.log(thumbnailImageKey);
+    fetchImage();
+  }, [selectedTabId, setThumbnailImageKey]);
+  console.log(thumbnailImageKey);
 
   //画像追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -286,29 +278,13 @@ const Page = () => {
       console.error("Error adding image to gallery:", error);
     }
   };
-  // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
-  useEffect(() => {
-    if (!thumbnailImageKey) return;
-    const fetcherImg = async () => {
-      const { data } = await supabase.storage
-        .from("gallery_item")
-        .getPublicUrl(thumbnailImageKey);
-      // if (error) {
-      //   console.error("Error fetching public URL:", error.message);
-      //   return;
-      // }
-
-      setThumbnailImageUrl(data.publicUrl);
-    };
-    fetcherImg();
-  }, [thumbnailImageKey]); //supabaseの仕様なので、覚える
 
   const handleAddEvent = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // inputのクリックイベントをトリガー
     }
   };
-  console.log(fileInputRef);
+
   //  console.log(data);
   //       console.log(thumbnailImageKey);
   //画像変更（Modal）
@@ -353,16 +329,15 @@ const Page = () => {
                     className="hidden"
                   />
 
-                  {thumbnailImageUrl &&
-                    thumbnailImageUrls.map((url, index) => (
-                      <Image
-                        key={index}
-                        src={url}
-                        alt={`elected Image ${index}`}
-                        width={600}
-                        height={300}
-                      />
-                    ))}
+                  {thumbnailImageUrls.map((url, index) => (
+                    <Image
+                      key={index}
+                      src={url}
+                      alt={`Selected Image ${index}`}
+                      width={300}
+                      height={300}
+                    />
+                  ))}
                 </div>
               )}
             </div>
