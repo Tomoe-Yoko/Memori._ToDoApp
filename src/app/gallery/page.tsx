@@ -29,9 +29,9 @@ const Page = () => {
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
   /////imgのステート
-  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
-    null
-  );
+  // const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
+  //   null
+  // );
   const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
     null
   );
@@ -53,8 +53,13 @@ const Page = () => {
         setGalleryGroups(data.galleryGroups);
       } else {
         console.error("Fetched data is not an array:", data);
-        setGalleryGroups([]); // デフォルトで空の配列を設定
+        setGalleryGroups(galleryGroups);
       }
+      // const {
+      //   galleryGroups,
+      // }: { galleryGroups: CreateGalleryItemRequestBody[] } =
+      //   await response.json();
+      // setGalleryGroups(()=>galleryGroups);
     } catch (error) {
       console.error("Error fetching routines:", error);
       setGalleryGroups([]); // デフォルトで空の配列を設定
@@ -194,11 +199,10 @@ const Page = () => {
   useEffect(() => {
     if (!token || selectedTabId === null) return;
     if (!thumbnailImageKey) return;
-
     const fetchImage = async () => {
       try {
         const response = await fetch(
-          `/api/gallery_group/${selectedTabId}/gallery_items/[itemid]}`,
+          `/api/gallery_group/${selectedTabId}/gallery_items`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -206,18 +210,27 @@ const Page = () => {
             },
           }
         );
-        const {
-          data: { publicUrl },
-        } = await supabase.storage
-          .from("gallery_item")
-          .getPublicUrl(thumbnailImageKey);
-        setThumbnailImageUrl(publicUrl);
-
+        console.log(selectedTabId);
+        const data = await response.json();
         if (response.ok) {
-          setThumbnailImageUrl(publicUrl);
+          setThumbnailImageUrls(data.thumbnailImageUrls);
         } else {
-          console.error("Failed to fetch image URL:", publicUrl);
+          console.error("Failed to fetch todo items:", data);
         }
+
+        // const {
+        //   data: { publicUrl },
+        // } = await supabase.storage
+        //   .from("gallery_item")
+        //   .getPublicUrl(thumbnailImageKey);
+        // // setThumbnailImageUrl(publicUrl);
+        // console.log(publicUrl);
+        // console.log("Response status:", response.status);
+        // if (response.ok) {
+        //   setThumbnailImageUrls((prevUrls) => [...prevUrls]);
+        // } else {
+        //   console.error("Failed to fetch image URL:", publicUrl);
+        // }
       } catch (error) {
         if (error instanceof Error) {
           console.error(error.message);
@@ -225,11 +238,10 @@ const Page = () => {
       } finally {
         setLoading(false);
       }
-      setThumbnailImageUrls((prevUrls) => [...prevUrls, data.publicUrl]);
     };
+    // setThumbnailImageUrls((prevUrls) => [...prevUrls]);
     fetchImage();
-  }, [selectedTabId, setThumbnailImageKey]);
-  console.log(thumbnailImageKey);
+  }, [token, selectedTabId]);
 
   //画像追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -326,7 +338,7 @@ const Page = () => {
                     ref={fileInputRef}
                     onChange={handleImageChange}
                     accept="image/*"
-                    className="hidden"
+                    // className="hidden"
                   />
 
                   {thumbnailImageUrls.map((url, index) => (
@@ -336,6 +348,7 @@ const Page = () => {
                       alt={`Selected Image ${index}`}
                       width={300}
                       height={300}
+                      priority
                     />
                   ))}
                 </div>

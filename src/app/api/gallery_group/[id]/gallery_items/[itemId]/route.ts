@@ -23,12 +23,17 @@ export const GET = async (
     );
 
   const { id, key } = params;
+
   const galleryGroupId = parseInt(id, 10);
+
   if (isNaN(galleryGroupId))
     return NextResponse.json(
       { message: "目的のタブが指定されていません。" },
       { status: 400 }
     );
+  console.log(`key:${key}`);
+  console.log(id);
+
   try {
     const galleryGroup = await prisma.galleryGroup.findUnique({
       where: { id: galleryGroupId, userId: user.id },
