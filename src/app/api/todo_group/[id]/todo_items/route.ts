@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { supabase } from "@/utils/supabase";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { CreateTodoItemRequestBody } from "@/app/_type/Todo";
 
 const prisma = new PrismaClient();
 
 export const GET = async (
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) => {
   const token = request.headers.get("Authorization") ?? "";
@@ -18,7 +18,7 @@ export const GET = async (
   if (!user)
     return NextResponse.json(
       { message: "ユーザーが見つかりませんでした" },
-      { status: 400 }
+      { status: 404 }
     );
 
   // ↓エンドポイントの [id] のtodoGroupに紐づくtodoItemsのみ(全部ではなく)を取得するエンドポイントにする
@@ -52,6 +52,7 @@ export const GET = async (
   }
 };
 
+///////POST
 export const POST = async (
   request: Request,
   { params }: { params: { id: string } }
@@ -80,8 +81,8 @@ export const POST = async (
     );
   }
   try {
-    const body = await request.json();
-    const { toDoItem, isChecked }: CreateTodoItemRequestBody = body;
+    const body: CreateTodoItemRequestBody = await request.json();
+    const { toDoItem, isChecked } = body;
 
     const todoGroup = await prisma.todoGroup.findUnique({
       where: {

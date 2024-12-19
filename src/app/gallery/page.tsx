@@ -1,12 +1,21 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-// import PlusButton from "../_components/PlusButton";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { GalleryGroup } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
+import { v4 as uuidv4 } from "uuid";
+import { supabase } from "@/utils/supabase";
+import Image from "next/image";
+import PlusButton from "../_components/PlusButton";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -19,6 +28,16 @@ const Page = () => {
     null
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
+  /////imgのステート
+  // const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
+  //   null
+  // );
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
+    null
+  );
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [thumbnailImageUrls, setThumbnailImageUrls] = useState<string[]>([]);
+
   const fetcher = useCallback(async () => {
     setLoading(true);
     try {
@@ -34,8 +53,13 @@ const Page = () => {
         setGalleryGroups(data.galleryGroups);
       } else {
         console.error("Fetched data is not an array:", data);
-        setGalleryGroups([]); // デフォルトで空の配列を設定
+        setGalleryGroups(galleryGroups);
       }
+      // const {
+      //   galleryGroups,
+      // }: { galleryGroups: CreateGalleryItemRequestBody[] } =
+      //   await response.json();
+      // setGalleryGroups(()=>galleryGroups);
     } catch (error) {
       console.error("Error fetching routines:", error);
       setGalleryGroups([]); // デフォルトで空の配列を設定
@@ -169,6 +193,118 @@ const Page = () => {
     setNewTabName("");
   };
 
+  //////////GalleryItem
+  //画像表示
+  // 画像のURLを取得するためのuseEffect
+  useEffect(() => {
+    if (!token || selectedTabId === null) return;
+    if (!thumbnailImageKey) return;
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(
+          `/api/gallery_group/${selectedTabId}/gallery_items`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token!,
+            },
+          }
+        );
+        console.log(selectedTabId);
+        const data = await response.json();
+        if (response.ok) {
+          setThumbnailImageUrls(data.thumbnailImageUrls);
+        } else {
+          console.error("Failed to fetch todo items:", data);
+        }
+
+        // const {
+        //   data: { publicUrl },
+        // } = await supabase.storage
+        //   .from("gallery_item")
+        //   .getPublicUrl(thumbnailImageKey);
+        // // setThumbnailImageUrl(publicUrl);
+        // console.log(publicUrl);
+        // console.log("Response status:", response.status);
+        // if (response.ok) {
+        //   setThumbnailImageUrls((prevUrls) => [...prevUrls]);
+        // } else {
+        //   console.error("Failed to fetch image URL:", publicUrl);
+        // }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    // setThumbnailImageUrls((prevUrls) => [...prevUrls]);
+    fetchImage();
+  }, [token, selectedTabId]);
+
+  //画像追加
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    const filePath = `private/${uuidv4()}`;
+
+    const { data, error } = await supabase.storage
+      .from("gallery_item")
+      .upload(filePath, file, {
+        cacheControl: "3600", //キャッシュ制御の設定です。3600秒（1時間）キャッシュされるように指定
+        upsert: false, //同じ名前のファイルが存在する場合に上書きするかどうか（ここでは上書きしない）。
+      });
+
+    if (error) {
+      alert(error.message);
+
+      return;
+    }
+
+    setThumbnailImageKey(data.path);
+
+    // 新しい画像情報をAPIに送信する
+    try {
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+          body: JSON.stringify({
+            galleryGroupId: selectedTabId,
+            thumbnailImageKey: data.path,
+          }),
+        }
+      );
+      if (response.ok) {
+        toast.success("画像が正常に追加されました。");
+      } else {
+        console.error("Failed to add image to gallery:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error adding image to gallery:", error);
+    }
+  };
+
+  const handleAddEvent = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // inputのクリックイベントをトリガー
+    }
+  };
+
+  //  console.log(data);
+  //       console.log(thumbnailImageKey);
+  //画像変更（Modal）
+  //画像削除（Modal）
+  //
+  //
+  //
+
   if (loading) return <Loading />;
   return (
     <div>
@@ -193,14 +329,39 @@ const Page = () => {
           deleteTab={deleteTab}
         />
         <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
-          <li>画像を入れていくところ</li>
+          <li>
+            <div>
+              {selectedTabId && (
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    accept="image/*"
+                    // className="hidden"
+                  />
+
+                  {thumbnailImageUrls.map((url, index) => (
+                    <Image
+                      key={index}
+                      src={url}
+                      alt={`Selected Image ${index}`}
+                      width={300}
+                      height={300}
+                      priority
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </li>
         </ul>
-        {/* <PlusButton handleAddEvent={addImg} /> */}
+        <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
         <Toaster position="top-center" />
       </div>
     </div>
   );
 };
-
 export default Page;
+//参考 chap11-blog-next/src/app/admin/posts/new/page.tsx

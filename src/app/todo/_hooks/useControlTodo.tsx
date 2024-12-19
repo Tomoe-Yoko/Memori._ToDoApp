@@ -70,6 +70,7 @@ export const useTodo = () => {
         const data = await response.json();
         if (response.ok) {
           setTodoItems(data.todoItems);
+          console.log(data.todoItems);
         } else {
           console.error("Failed to fetch todo items:", data);
         }
