@@ -10,7 +10,7 @@ import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { GalleryGroup } from "@/app/_type/Gallery";
+import { GalleryGroup, GalleryItem } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
@@ -194,53 +194,57 @@ const Page = () => {
   };
 
   //////////GalleryItem
-  //画像表示
-  // 画像のURLを取得するためのuseEffect
+  // 画像表示;
+
+  // 画像のURLを取得するためのuseEffect;
   useEffect(() => {
-    if (!token || selectedTabId === null) return;
-    if (!thumbnailImageKey) return;
-    const fetchImage = async () => {
+    if (!token || !selectedTabId) return;
+
+    const fetchGalleryItems = async () => {
       try {
+        // API経由でGalleryItemsテーブルからデータを取得
         const response = await fetch(
           `/api/gallery_group/${selectedTabId}/gallery_items`,
           {
             headers: {
-              "Content-Type": "application/json",
               Authorization: token!,
             },
           }
         );
-        console.log(selectedTabId);
-        const data = await response.json();
-        if (response.ok) {
-          setThumbnailImageUrls(data.thumbnailImageUrls);
-        } else {
-          console.error("Failed to fetch todo items:", data);
+
+        const data: GalleryItem[] = await response.json();
+
+        if (!response.ok || !Array.isArray(data)) {
+          console.error("Failed to fetch gallery items:", data);
+          setThumbnailImageUrls([]);
+          return;
         }
 
-        // const {
-        //   data: { publicUrl },
-        // } = await supabase.storage
-        //   .from("gallery_item")
-        //   .getPublicUrl(thumbnailImageKey);
-        // // setThumbnailImageUrl(publicUrl);
-        // console.log(publicUrl);
-        // console.log("Response status:", response.status);
-        // if (response.ok) {
-        //   setThumbnailImageUrls((prevUrls) => [...prevUrls]);
-        // } else {
-        //   console.error("Failed to fetch image URL:", publicUrl);
-        // }
+        // Supabaseから画像URLを取得
+        const urls = await Promise.all(
+          data.map(async (item) => {
+            const { data: signedUrlData, error } = await supabase.storage
+              .from("gallery_item")
+              .createSignedUrl(item.thumbnailImageKey, 60 * 60); // 有効期限1時間
+
+            if (error) {
+              console.error("Error creating signed URL:", error.message);
+              return null;
+            }
+            return signedUrlData?.signedUrl || null;
+          })
+        );
+        console.log(urls);
+
+        // 有効なURLのみをセット
+        setThumbnailImageUrls(urls.filter((url) => url !== null) as string[]);
       } catch (error) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
-      } finally {
-        setLoading(false);
+        console.error("Error fetching gallery items:", error);
+        setThumbnailImageUrls([]);
       }
     };
-    // setThumbnailImageUrls((prevUrls) => [...prevUrls]);
-    fetchImage();
+
+    fetchGalleryItems();
   }, [token, selectedTabId]);
 
   //画像追加
@@ -265,7 +269,7 @@ const Page = () => {
 
     setThumbnailImageKey(data.path);
 
-    // 新しい画像情報をAPIに送信する
+    // 新しい画像情報をAPI(table)に送信する
     try {
       const response = await fetch(
         `/api/gallery_group/${selectedTabId}/gallery_items`,
@@ -290,7 +294,57 @@ const Page = () => {
       console.error("Error adding image to gallery:", error);
     }
   };
+  // 画像表示
+  // useEffect(() => {
+  //   if (!token || selectedTabId === null) return;
+  //   const fetcher = async () => {
+  //     try {
+  //       const {
+  //         data: { publicUrl },
+  //       } = await supabase.storage
+  //         .from("post_thumbnail")
+  //         .getPublicUrl(thumbnailImageKey!);
 
+  //       if (publicUrl && !thumbnailImageUrls.includes(publicUrl)) {
+  //         setThumbnailImageUrls((prevUrls) => [...prevUrls, publicUrl]); // 重複を防ぐ
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching image URL:", error);
+  //     }
+  //   };
+
+  //   fetcher();
+  // }, [thumbnailImageKey, token, selectedTabId, thumbnailImageUrls]);
+  //ファイルを一時的にアクセス可能にする サインドURL
+  const fetchSignedUrl = async (thumbnailImageKey: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("gallery_item") // バケット名を指定
+        .createSignedUrl(thumbnailImageKey, 60 * 60); // 有効期限を1時間(3600秒)に設定
+
+      if (error) {
+        console.error("Error creating signed URL:", error.message);
+        return null;
+      }
+
+      return data.signedUrl; // サインドURLを返す
+    } catch (error) {
+      console.error("Error fetching signed URL:", error);
+      return null;
+    }
+  };
+  useEffect(() => {
+    if (!token || !selectedTabId || !thumbnailImageKey) return;
+
+    const fetcher = async () => {
+      const signedUrl = await fetchSignedUrl(thumbnailImageKey);
+      if (signedUrl) {
+        setThumbnailImageUrls((prevUrls) => [...prevUrls, signedUrl]);
+      }
+    };
+
+    fetcher();
+  }, [thumbnailImageKey, token, selectedTabId]);
   const handleAddEvent = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // inputのクリックイベントをトリガー
@@ -338,19 +392,25 @@ const Page = () => {
                     ref={fileInputRef}
                     onChange={handleImageChange}
                     accept="image/*"
-                    // className="hidden"
+                    className="hidden"
                   />
 
-                  {thumbnailImageUrls.map((url, index) => (
-                    <Image
-                      key={index}
-                      src={url}
-                      alt={`Selected Image ${index}`}
-                      width={300}
-                      height={300}
-                      priority
-                    />
-                  ))}
+                  {thumbnailImageUrls.length > 0 ? (
+                    thumbnailImageUrls.map((url, index) => (
+                      <Image
+                        key={index}
+                        src={url}
+                        alt={`Selected Image ${index}`} // 修正: テンプレートリテラルを正しく設定
+                        width={300}
+                        height={300}
+                        priority
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center">
+                      画像が見つかりません。
+                    </p> // 空のときの表示
+                  )}
                 </div>
               )}
             </div>
