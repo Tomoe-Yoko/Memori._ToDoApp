@@ -195,6 +195,17 @@ const Page = () => {
 
   //////////GalleryItem
   // 画像表示;
+  const generateSignedImageUrl = async (key: string) => {
+    const { data, error } = await supabase.storage
+      .from("gallery_item") // 正しいバケット名を指定
+      .createSignedUrl(key, 60 * 60); // 有効期限を1時間に設定
+
+    if (error) {
+      console.error("Error creating signed URL:", error.message);
+      return null;
+    }
+    return data.signedUrl;
+  };
 
   // 画像のURLを取得するためのuseEffect;
   useEffect(() => {
@@ -212,32 +223,25 @@ const Page = () => {
           }
         );
 
-        const data: GalleryItem[] = await response.json();
+        const data = await response.json();
 
-        if (!response.ok || !Array.isArray(data)) {
+        if (!response.ok || !data.galleryItems) {
           console.error("Failed to fetch gallery items:", data);
           setThumbnailImageUrls([]);
           return;
         }
 
         // Supabaseから画像URLを取得
-        const urls = await Promise.all(
-          data.map(async (item) => {
-            const { data: signedUrlData, error } = await supabase.storage
-              .from("gallery_item")
-              .createSignedUrl(item.thumbnailImageKey, 60 * 60); // 有効期限1時間
-
-            if (error) {
-              console.error("Error creating signed URL:", error.message);
-              return null;
-            }
-            return signedUrlData?.signedUrl || null;
-          })
+        const urls = data.galleryItems.map((item: GalleryItem) =>
+          generateSignedImageUrl(item.thumbnailImageKey)
         );
-        console.log(urls);
+
+        console.log("Generated URLs:", urls);
 
         // 有効なURLのみをセット
-        setThumbnailImageUrls(urls.filter((url) => url !== null) as string[]);
+        setThumbnailImageUrls(
+          urls.filter((url: string) => url !== null) as string[]
+        );
       } catch (error) {
         console.error("Error fetching gallery items:", error);
         setThumbnailImageUrls([]);
@@ -335,6 +339,7 @@ const Page = () => {
   };
   useEffect(() => {
     if (!token || !selectedTabId || !thumbnailImageKey) return;
+    console.log(thumbnailImageUrls);
 
     const fetcher = async () => {
       const signedUrl = await fetchSignedUrl(thumbnailImageKey);
@@ -401,8 +406,8 @@ const Page = () => {
                         key={index}
                         src={url}
                         alt={`Selected Image ${index}`} // 修正: テンプレートリテラルを正しく設定
-                        width={300}
-                        height={300}
+                        width={100}
+                        height={160}
                         priority
                       />
                     ))
