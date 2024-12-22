@@ -5,61 +5,6 @@ import { CreateGalleryItemRequestBody } from "@/app/_type/Gallery";
 
 const prisma = new PrismaClient();
 
-export const GET = async (
-  request: NextRequest,
-  { params }: { params: { id: string; key: string } }
-) => {
-  const token = request.headers.get("Authorization") ?? "";
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error)
-    return NextResponse.json({ status: error.message }, { status: 400 });
-  const supabaseUserId = data.user.id;
-  const user = await prisma.users.findUnique({ where: { supabaseUserId } });
-
-  if (!user)
-    return NextResponse.json(
-      { message: "ユーザーが見つかりませんでした" },
-      { status: 404 }
-    );
-
-  const { id, key } = params;
-
-  const galleryGroupId = parseInt(id, 10);
-
-  if (isNaN(galleryGroupId))
-    return NextResponse.json(
-      { message: "目的のタブが指定されていません。" },
-      { status: 400 }
-    );
-  console.log(`key:${key}`);
-  console.log(id);
-
-  try {
-    const galleryGroup = await prisma.galleryGroup.findUnique({
-      where: { id: galleryGroupId, userId: user.id },
-    });
-    if (!galleryGroup)
-      return NextResponse.json(
-        { message: "galleryタブがみつかりません。" },
-        { status: 404 }
-      );
-    const galleryItem = await prisma.galleryItems.findMany({
-      where: { galleryGroupId, thumbnailImageKey: key },
-      orderBy: { createdAt: "asc" }, // 昇順
-    });
-    if (!galleryItem) {
-      return NextResponse.json(
-        { message: "ギャラリーアイテムが見つかりません。" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({ status: "OK", galleryItem });
-  } catch (error) {
-    if (error instanceof Error)
-      return NextResponse.json({ status: error.message }, { status: 400 });
-  }
-};
-
 export const DELETE = async (
   request: NextRequest,
   { params }: { params: { id: string; itemId: string } }

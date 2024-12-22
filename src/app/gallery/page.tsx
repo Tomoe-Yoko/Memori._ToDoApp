@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import Modal from "react-modal";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
@@ -16,6 +17,8 @@ import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import PlusButton from "../_components/PlusButton";
+import CloseButton from "../_components/CloseButton";
+import Button from "../_components/Button";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -24,6 +27,7 @@ const Page = () => {
   const [selectedTabId, setSelectedTabId] = useState<number>(0); // 現在選択中のタブID
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImgModalOpen, setIsImgModalOpen] = useState(false);
   const [editGalleryGroup, setEditGalleryGroup] = useState<GalleryGroup | null>(
     null
   ); //現在編集対象のタブを管理
@@ -34,6 +38,8 @@ const Page = () => {
   );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [thumbnailImageUrls, setThumbnailImageUrls] = useState<string[]>([]);
+
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null); // クリックされた画像をModal表示（URLを保持する状態）
 
   const fetcher = useCallback(async () => {
     setLoading(true);
@@ -174,12 +180,12 @@ const Page = () => {
       console.error("Error deleting tab:", error);
     }
   };
-  // モーダルを開く
+  // Tabモーダルを開く
   const openModal = () => {
     setIsModalOpen(true);
   };
 
-  // モーダルを閉じる
+  // Tabモーダルを閉じる
   const closeModal = () => {
     setIsModalOpen(false);
     setNewTabName("");
@@ -200,57 +206,53 @@ const Page = () => {
   };
 
   // 画像のURLを取得するためのuseEffect;
-  useEffect(() => {
+  const fetchGalleryItems = useCallback(async () => {
     if (!token || !selectedTabId) return;
 
-    const fetchGalleryItems = async () => {
-      setLoading(true);
-      try {
-        // API経由でGalleryItemsテーブルからデータを取得
-        const response = await fetch(
-          `/api/gallery_group/${selectedTabId}/gallery_items`,
-          {
-            headers: {
-              Authorization: token!,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || !data.galleryItems) {
-          console.error("Failed to fetch gallery items:", data);
-          setThumbnailImageUrls([]);
-          return;
+    setLoading(true);
+    try {
+      // API経由でGalleryItemsテーブルからデータを取得
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items`,
+        {
+          headers: {
+            Authorization: token!,
+          },
         }
+      );
 
-        const urls = await Promise.all(
-          data.galleryItems.map(async (item: GalleryItem) => {
-            const signedUrl = await generateSignedImageUrl(
-              item.thumbnailImageKey
-            );
-            return signedUrl;
-          })
-        );
-
-        console.log("Generated URLs:", urls);
-
-        // 有効なURLのみをセット
-        setThumbnailImageUrls(
-          urls.filter((url: string) => url !== null) as string[]
-        );
-      } catch (error) {
-        console.error("Error fetching gallery items:", error);
+      const data = await response.json();
+      if (!response.ok || !data.galleryItems) {
+        console.error("Failed to fetch gallery items:", data);
         setThumbnailImageUrls([]);
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
+      const urls = await Promise.all(
+        data.galleryItems.map(async (item: GalleryItem) => {
+          const signedUrl = await generateSignedImageUrl(
+            item.thumbnailImageKey
+          );
+          return signedUrl;
+        })
+      );
+
+      // 有効なURLのみをセット
+      setThumbnailImageUrls(
+        urls.filter((url: string) => url !== null) as string[]
+      );
+    } catch (error) {
+      console.error("Error fetching gallery items:", error);
+      setThumbnailImageUrls([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, selectedTabId]); // 依存関係に token と selectedTabId を追加
+
+  useEffect(() => {
     fetchGalleryItems();
-  }, [token, selectedTabId]);
-
-  //画像追加
+  }, [fetchGalleryItems]); // useCallback でメモ化された fetchGalleryItems を依存関係に追加
+  //画像をstorageに追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) return;
 
@@ -260,7 +262,7 @@ const Page = () => {
     const { data, error } = await supabase.storage
       .from("gallery_item")
       .upload(filePath, file, {
-        cacheControl: "3600", //キャッシュ制御の設定です。3600秒（1時間）キャッシュされるように指定
+        cacheControl: "3600", //キャッシュ制御の設定。3600秒（1時間）キャッシュされるように指定
         upsert: false, //同じ名前のファイルが存在する場合に上書きするかどうか（ここでは上書きしない）。
       });
 
@@ -272,7 +274,7 @@ const Page = () => {
 
     setThumbnailImageKey(data.path);
 
-    // 新しい画像情報をAPI(table)に送信する
+    // 新しい画像情報をAPI(table)にも送信
     try {
       const response = await fetch(
         `/api/gallery_group/${selectedTabId}/gallery_items`,
@@ -318,7 +320,7 @@ const Page = () => {
   };
   useEffect(() => {
     if (!token || !selectedTabId || !thumbnailImageKey) return;
-    console.log(thumbnailImageUrls);
+    // console.log(thumbnailImageUrls);
 
     const fetcher = async () => {
       const signedUrl = await fetchSignedUrl(thumbnailImageKey);
@@ -330,6 +332,20 @@ const Page = () => {
     fetcher();
   }, [thumbnailImageKey, token, selectedTabId]);
 
+  //画像拡大Modal
+
+  // 画像クリック時の処理
+  const handleImgClick = (url: string) => {
+    setSelectedImageUrl(url);
+    setIsImgModalOpen(true);
+  };
+
+  // モーダルを閉じる処理を修正して画像リセット
+  const closeImgModal = () => {
+    setIsImgModalOpen(false);
+    setSelectedImageUrl(null); // 選択された画像をリセット
+  };
+
   const handleAddEvent = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // inputのクリックイベントをトリガー
@@ -340,9 +356,48 @@ const Page = () => {
   //       console.log(thumbnailImageKey);
   //画像変更（Modal）
   //画像削除（Modal）
-  //
-  //
-  //
+  const deleteImg = async () => {
+    if (!token) return;
+    if (!selectedImageUrl || !thumbnailImageKey) return;
+    if (!confirm("画像を削除しますか？")) return;
+    try {
+      // バケット内の画像を削除
+      const { error: storageError } = await supabase.storage
+        .from("gallery_item") // バケット名を指定
+        .remove([thumbnailImageKey]); // thumbnailImageKeyを利用
+
+      if (storageError) {
+        console.error(
+          "Failed to delete image from bucket:",
+          storageError.message
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items/${thumbnailImageKey}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+        }
+      );
+
+      if (response.ok) {
+        toast.success("画像を一つ削除しました。", {
+          duration: 2100, //ポップアップ表示時間
+        });
+        await fetchGalleryItems(); // 最新状態を取得
+        setSelectedImageUrl(null);
+      } else {
+        console.error("Failed to delete tab");
+      }
+    } catch (error) {
+      console.error("Error deleting Image:", error);
+    }
+  };
 
   if (loading) return <Loading />;
   return (
@@ -386,10 +441,11 @@ const Page = () => {
                         key={index}
                         src={url}
                         alt={`Selected Image ${index}`} // 修正: テンプレートリテラルを正しく設定
-                        width={300}
-                        height={424}
+                        width={600}
+                        height={848}
                         priority
                         className="max-w-[50%]  min-w-[150px] min-h-[212px] object-contain bg-[#eee]"
+                        onClick={() => handleImgClick(url)} // クリック時にURLを設定
                       />
                     ))
                   ) : (
@@ -404,10 +460,39 @@ const Page = () => {
         </ul>
         <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
-        <Toaster position="top-center" />
+        <Toaster position="top-center" />{" "}
+        <Modal
+          isOpen={isImgModalOpen}
+          onRequestClose={closeImgModal}
+          ariaHideApp={false}
+          className="  max-w-lg mx-auto"
+          overlayClassName="absolute inset-0 w-full h-max min-h-screen bg-black bg-opacity-80 flex justify-center items-center"
+        >
+          {selectedImageUrl && (
+            <div>
+              <div className="absolute top-12 right-[10%]  ">
+                <CloseButton onClick={closeImgModal} />
+              </div>
+              <Image
+                src={selectedImageUrl}
+                alt="LargeImage"
+                width={600}
+                height={848}
+                className="w-full h-auto object-contain"
+              />
+              <div className="mt-4 flex gap-4 justify-center">
+                <div>
+                  <Button text="更新" size="small" />
+                </div>
+                <div onClick={deleteImg}>
+                  <Button text="削除" size="small" bgColor="delete" />
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
       </div>
     </div>
   );
 };
 export default Page;
-//参考 chap11-blog-next/src/app/admin/posts/new/page.tsx
