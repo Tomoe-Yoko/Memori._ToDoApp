@@ -29,9 +29,6 @@ const Page = () => {
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
   /////imgのステート
-  // const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
-  //   null
-  // );
   const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
     null
   );
@@ -55,11 +52,6 @@ const Page = () => {
         console.error("Fetched data is not an array:", data);
         setGalleryGroups(galleryGroups);
       }
-      // const {
-      //   galleryGroups,
-      // }: { galleryGroups: CreateGalleryItemRequestBody[] } =
-      //   await response.json();
-      // setGalleryGroups(()=>galleryGroups);
     } catch (error) {
       console.error("Error fetching routines:", error);
       setGalleryGroups([]); // デフォルトで空の配列を設定
@@ -212,6 +204,7 @@ const Page = () => {
     if (!token || !selectedTabId) return;
 
     const fetchGalleryItems = async () => {
+      setLoading(true);
       try {
         // API経由でGalleryItemsテーブルからデータを取得
         const response = await fetch(
@@ -231,9 +224,13 @@ const Page = () => {
           return;
         }
 
-        // Supabaseから画像URLを取得
-        const urls = data.galleryItems.map((item: GalleryItem) =>
-          generateSignedImageUrl(item.thumbnailImageKey)
+        const urls = await Promise.all(
+          data.galleryItems.map(async (item: GalleryItem) => {
+            const signedUrl = await generateSignedImageUrl(
+              item.thumbnailImageKey
+            );
+            return signedUrl;
+          })
         );
 
         console.log("Generated URLs:", urls);
@@ -245,6 +242,8 @@ const Page = () => {
       } catch (error) {
         console.error("Error fetching gallery items:", error);
         setThumbnailImageUrls([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -298,27 +297,7 @@ const Page = () => {
       console.error("Error adding image to gallery:", error);
     }
   };
-  // 画像表示
-  // useEffect(() => {
-  //   if (!token || selectedTabId === null) return;
-  //   const fetcher = async () => {
-  //     try {
-  //       const {
-  //         data: { publicUrl },
-  //       } = await supabase.storage
-  //         .from("post_thumbnail")
-  //         .getPublicUrl(thumbnailImageKey!);
 
-  //       if (publicUrl && !thumbnailImageUrls.includes(publicUrl)) {
-  //         setThumbnailImageUrls((prevUrls) => [...prevUrls, publicUrl]); // 重複を防ぐ
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching image URL:", error);
-  //     }
-  //   };
-
-  //   fetcher();
-  // }, [thumbnailImageKey, token, selectedTabId, thumbnailImageUrls]);
   //ファイルを一時的にアクセス可能にする サインドURL
   const fetchSignedUrl = async (thumbnailImageKey: string) => {
     try {
@@ -350,6 +329,7 @@ const Page = () => {
 
     fetcher();
   }, [thumbnailImageKey, token, selectedTabId]);
+
   const handleAddEvent = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // inputのクリックイベントをトリガー
@@ -389,9 +369,9 @@ const Page = () => {
         />
         <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
           <li>
-            <div>
+            <div className="w-[95%] mx-auto">
               {selectedTabId && (
-                <div>
+                <div className=" flex flex-wrap justify-between items-center">
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -406,14 +386,15 @@ const Page = () => {
                         key={index}
                         src={url}
                         alt={`Selected Image ${index}`} // 修正: テンプレートリテラルを正しく設定
-                        width={100}
-                        height={160}
+                        width={300}
+                        height={424}
                         priority
+                        className="max-w-[50%]  min-w-[150px] min-h-[212px] object-contain bg-[#eee]"
                       />
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center">
-                      画像が見つかりません。
+                    <p className="mx-auto text-text_button text-lg">
+                      画像はまだありません。
                     </p> // 空のときの表示
                   )}
                 </div>
