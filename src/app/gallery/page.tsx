@@ -335,8 +335,9 @@ const Page = () => {
   //画像拡大Modal
 
   // 画像クリック時の処理
-  const handleImgClick = (url: string) => {
+  const handleImgClick = (url: string, key: string) => {
     setSelectedImageUrl(url);
+    setThumbnailImageKey(key); // 削除対象のキーを設定
     setIsImgModalOpen(true);
   };
 
@@ -353,7 +354,8 @@ const Page = () => {
   };
 
   //  console.log(data);
-  //       console.log(thumbnailImageKey);
+  console.log(thumbnailImageKey);
+  console.log(selectedImageUrl);
   //画像変更（Modal）
   //画像削除（Modal）
   const deleteImg = async () => {
@@ -391,6 +393,7 @@ const Page = () => {
         });
         await fetchGalleryItems(); // 最新状態を取得
         setSelectedImageUrl(null);
+        setThumbnailImageKey(null); // キーをリセット
       } else {
         console.error("Failed to delete tab");
       }
@@ -436,16 +439,18 @@ const Page = () => {
                   />
 
                   {thumbnailImageUrls.length > 0 ? (
-                    thumbnailImageUrls.map((url, index) => (
+                    thumbnailImageUrls.map((item, index) => (
                       <Image
                         key={index}
-                        src={url}
-                        alt={`Selected Image ${index}`} // 修正: テンプレートリテラルを正しく設定
+                        src={item} // 表示する画像のURL
+                        alt={`Selected Image ${index}`}
                         width={600}
                         height={848}
                         priority
-                        className="max-w-[50%]  min-w-[150px] min-h-[212px] object-contain bg-[#eee]"
-                        onClick={() => handleImgClick(url)} // クリック時にURLを設定
+                        className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
+                        onClick={() =>
+                          handleImgClick(()=item, item.thumbnailImageKey)
+                        } // URLとキーを渡す
                       />
                     ))
                   ) : (
