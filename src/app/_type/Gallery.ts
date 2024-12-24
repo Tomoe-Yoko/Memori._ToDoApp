@@ -24,7 +24,9 @@ export interface GalleryItem {
   thumbnailImageKey: string;
   createdAt: Date;
   updatedAt: Date;
+  signedUrl?: string; // 画像を表示するためのサインドURL
 }
+
 // export type CreateGalleryItemRequestBody = GalleryItem;
 export type CreateGalleryItemRequestBody = {
   galleryGroupId: number;

@@ -35,8 +35,9 @@ const Page = () => {
   /////imgのステート
   const [thumbnailImageKey, setThumbnailImageKey] = useState<string>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [thumbnailImageUrls, setThumbnailImageUrls] = useState<string[]>([]);
-
+  const [thumbnailImageUrls, setThumbnailImageUrls] = useState<GalleryItem[]>(
+    []
+  );
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null); // クリックされた画像をModal表示（URLを保持する状態）
   const [selectedImageId, setSelectedImageId] = useState<number>();
 
@@ -227,18 +228,18 @@ const Page = () => {
         return;
       }
 
-      const urls = await Promise.all(
+      const itemsWithUrls: GalleryItem[] = await Promise.all(
         data.galleryItems.map(async (item: GalleryItem) => {
           const signedUrl = await generateSignedImageUrl(
             item.thumbnailImageKey
           );
-          return signedUrl;
+          return { ...item, signedUrl }; // GalleryItemにsignedUrlを追加
         })
       );
 
       // 有効なURLのみをセット
       setThumbnailImageUrls(
-        urls.filter((url: string) => url !== null) as string[]
+        itemsWithUrls.filter((item) => item.signedUrl !== null)
       );
     } catch (error) {
       console.error("Error fetching gallery items:", error);
@@ -246,7 +247,7 @@ const Page = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, selectedTabId]); // 依存関係に token と selectedTabId を追加
+  }, [token, selectedTabId]);
 
   useEffect(() => {
     fetchGalleryItems();
@@ -291,6 +292,7 @@ const Page = () => {
       );
       if (response.ok) {
         toast.success("画像が正常に追加されました。");
+        fetchGalleryItems();
       } else {
         console.error("Failed to add image to gallery:", await response.json());
       }
@@ -319,14 +321,12 @@ const Page = () => {
   };
   useEffect(() => {
     if (!token || !selectedTabId || !thumbnailImageKey) return;
-
     const fetcher = async () => {
       const signedUrl = await fetchSignedUrl(thumbnailImageKey);
       if (signedUrl) {
-        setThumbnailImageUrls((prevUrls) => [...prevUrls, signedUrl]);
+        setSelectedImageUrl(signedUrl); // 単一のURLを設定
       }
     };
-
     fetcher();
   }, [thumbnailImageKey, token, selectedTabId]);
 
@@ -335,10 +335,11 @@ const Page = () => {
   // 画像クリック時の処理
   const handleImgClick = (url: string, key: string, id: number) => {
     setSelectedImageUrl(url);
-    setThumbnailImageKey(key);
-    setSelectedImageId(id);
+    setThumbnailImageKey(key); // 正しいキーを設定
+    setSelectedImageId(id); // 正しいIDを設定
     setIsImgModalOpen(true);
   };
+
   // モーダルを閉じる処理を修正して画像リセット
   const closeImgModal = () => {
     setIsImgModalOpen(false);
@@ -365,6 +366,7 @@ const Page = () => {
       const { error: storageError } = await supabase.storage
         .from("gallery_item") // バケット名を指定
         .remove([thumbnailImageKey]); // thumbnailImageKeyを利用
+      console.log(thumbnailImageKey);
 
       if (storageError) {
         console.error(
@@ -392,6 +394,7 @@ const Page = () => {
         await fetchGalleryItems(); // 最新状態を取得
         setSelectedImageUrl(null);
         setThumbnailImageKey(""); // キーをリセット
+        closeImgModal();
       } else {
         console.error("Failed to delete tab");
       }
@@ -437,25 +440,30 @@ const Page = () => {
                   />
 
                   {thumbnailImageUrls.length > 0 ? (
-                    thumbnailImageUrls.map((item, index) => {
-                      const key = `${thumbnailImageKey || ""}-${index}`;
+                    thumbnailImageUrls.map((item: GalleryItem) => {
                       return (
                         <Image
-                          key={key} // サフィックス付きキーを使用
-                          src={item}
-                          alt={`Selected Image ${index}`}
+                          key={item.id}
+                          src={item.signedUrl!}
+                          alt={`Selected Image ${item.id}`}
                           width={600}
                           height={848}
                           priority
                           className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
-                          onClick={() => handleImgClick(item, key, index)} // URLと生成したキーを渡す
+                          onClick={() =>
+                            handleImgClick(
+                              item.signedUrl!,
+                              item.thumbnailImageKey,
+                              item.id
+                            )
+                          } // 正しい情報を渡す
                         />
                       );
                     })
                   ) : (
                     <p className="mx-auto text-text_button text-lg">
                       画像はまだありません。
-                    </p> // 空のときの表示
+                    </p>
                   )}
                 </div>
               )}
