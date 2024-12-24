@@ -32,15 +32,25 @@ export const DELETE = async (
       { message: "目的のギャラリータブが指定されていません。" },
       { status: 400 }
     );
+  const galleryItem = await prisma.galleryItems.findFirst({
+    where: {
+      id: galleryItemId,
+      galleryGroup: {
+        id: galleryGroupId,
+        user: { supabaseUserId },
+      },
+    },
+  });
 
+  if (!galleryItem) {
+    return NextResponse.json(
+      { message: "削除対象のギャラリーアイテムが見つかりませんでした。" },
+      { status: 404 }
+    );
+  }
   try {
     await prisma.galleryItems.delete({
-      where: {
-        id: galleryItemId,
-        galleryGroup: {
-          user: { supabaseUserId },
-        },
-      },
+      where: { id: galleryItemId },
     });
 
     return NextResponse.json({ status: "OK", galleryItemId });

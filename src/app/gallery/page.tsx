@@ -33,13 +33,12 @@ const Page = () => {
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
   /////imgのステート
-  const [thumbnailImageKey, setThumbnailImageKey] = useState<string | null>(
-    null
-  );
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [thumbnailImageUrls, setThumbnailImageUrls] = useState<string[]>([]);
 
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null); // クリックされた画像をModal表示（URLを保持する状態）
+  const [selectedImageId, setSelectedImageId] = useState<number>();
 
   const fetcher = useCallback(async () => {
     setLoading(true);
@@ -320,7 +319,6 @@ const Page = () => {
   };
   useEffect(() => {
     if (!token || !selectedTabId || !thumbnailImageKey) return;
-    // console.log(thumbnailImageUrls);
 
     const fetcher = async () => {
       const signedUrl = await fetchSignedUrl(thumbnailImageKey);
@@ -335,12 +333,12 @@ const Page = () => {
   //画像拡大Modal
 
   // 画像クリック時の処理
-  const handleImgClick = (url: string, key: string) => {
+  const handleImgClick = (url: string, key: string, id: number) => {
     setSelectedImageUrl(url);
-    setThumbnailImageKey(key); // 削除対象のキーを設定
+    setThumbnailImageKey(key);
+    setSelectedImageId(id);
     setIsImgModalOpen(true);
   };
-
   // モーダルを閉じる処理を修正して画像リセット
   const closeImgModal = () => {
     setIsImgModalOpen(false);
@@ -353,14 +351,14 @@ const Page = () => {
     }
   };
 
-  //  console.log(data);
-  console.log(thumbnailImageKey);
-  console.log(selectedImageUrl);
   //画像変更（Modal）
   //画像削除（Modal）
-  const deleteImg = async () => {
+  const deleteImg = async (id?: number) => {
     if (!token) return;
-    if (!selectedImageUrl || !thumbnailImageKey) return;
+    if (!selectedImageUrl || !thumbnailImageKey || id === undefined) {
+      console.error("No image selected for deletion.");
+      return;
+    }
     if (!confirm("画像を削除しますか？")) return;
     try {
       // バケット内の画像を削除
@@ -377,7 +375,7 @@ const Page = () => {
       }
 
       const response = await fetch(
-        `/api/gallery_group/${selectedTabId}/gallery_items/${thumbnailImageKey}`,
+        `/api/gallery_group/${selectedTabId}/gallery_items/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -393,7 +391,7 @@ const Page = () => {
         });
         await fetchGalleryItems(); // 最新状態を取得
         setSelectedImageUrl(null);
-        setThumbnailImageKey(null); // キーをリセット
+        setThumbnailImageKey(""); // キーをリセット
       } else {
         console.error("Failed to delete tab");
       }
@@ -439,20 +437,21 @@ const Page = () => {
                   />
 
                   {thumbnailImageUrls.length > 0 ? (
-                    thumbnailImageUrls.map((item, index) => (
-                      <Image
-                        key={index}
-                        src={item} // 表示する画像のURL
-                        alt={`Selected Image ${index}`}
-                        width={600}
-                        height={848}
-                        priority
-                        className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
-                        onClick={() =>
-                          handleImgClick(()=item, item.thumbnailImageKey)
-                        } // URLとキーを渡す
-                      />
-                    ))
+                    thumbnailImageUrls.map((item, index) => {
+                      const key = `${thumbnailImageKey || ""}-${index}`;
+                      return (
+                        <Image
+                          key={key} // サフィックス付きキーを使用
+                          src={item}
+                          alt={`Selected Image ${index}`}
+                          width={600}
+                          height={848}
+                          priority
+                          className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
+                          onClick={() => handleImgClick(item, key, index)} // URLと生成したキーを渡す
+                        />
+                      );
+                    })
                   ) : (
                     <p className="mx-auto text-text_button text-lg">
                       画像はまだありません。
@@ -489,7 +488,11 @@ const Page = () => {
                 <div>
                   <Button text="更新" size="small" />
                 </div>
-                <div onClick={deleteImg}>
+                <div
+                  onClick={() =>
+                    selectedImageId !== undefined && deleteImg(selectedImageId)
+                  }
+                >
                   <Button text="削除" size="small" bgColor="delete" />
                 </div>
               </div>
