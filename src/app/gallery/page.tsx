@@ -166,13 +166,13 @@ const Page = () => {
         }
       );
       if (response.ok) {
-        toast.success("タブを一つ削除しました。", {
-          duration: 2100, //ポップアップ表示時間
-        });
         setGalleryGroups(
           galleryGroups.filter((g) => g.id !== editGalleryGroup.id)
         );
         setEditGalleryGroup(null);
+        toast.success("タブを一つ削除しました。", {
+          duration: 2100, //ポップアップ表示時間
+        });
       } else {
         console.error("Failed to delete tab");
       }
@@ -291,8 +291,10 @@ const Page = () => {
         }
       );
       if (response.ok) {
-        toast.success("画像が正常に追加されました。");
         fetchGalleryItems();
+        toast.success("画像が正常に追加されました。", {
+          duration: 2100,
+        });
       } else {
         console.error("Failed to add image to gallery:", await response.json());
       }
@@ -343,7 +345,7 @@ const Page = () => {
   // モーダルを閉じる処理を修正して画像リセット
   const closeImgModal = () => {
     setIsImgModalOpen(false);
-    setSelectedImageUrl(null); // 選択された画像をリセット
+    setSelectedImageUrl(null); // 選択された画像をリセット;
   };
 
   const handleAddEvent = () => {
@@ -353,6 +355,58 @@ const Page = () => {
   };
 
   //画像変更（Modal）
+  const updateImg = async (id?: number) => {
+    if (!fileInputRef.current || !fileInputRef.current.files) {
+      console.error("File input is not available or no file selected.");
+      return;
+    }
+
+    const file = fileInputRef.current.files[0];
+    if (!file) {
+      console.error("No image file selected.");
+      return;
+    }
+
+    const newImageKey = `private/${uuidv4()}`;
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from("gallery_item")
+        .upload(newImageKey, file, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("Image upload failed:", uploadError.message);
+        return;
+      }
+
+      // API 経由での更新処理
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+          body: JSON.stringify({ thumbnailImageKey: newImageKey }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(
+          "Failed to update image in database:",
+          await response.json()
+        );
+      } else {
+        fetchGalleryItems();
+        toast.success("画像が変更されました。");
+      }
+    } catch (error) {
+      console.error("Error during image update:", error);
+    }
+  };
   //画像削除（Modal）
   const deleteImg = async (id?: number) => {
     if (!token) return;
@@ -366,7 +420,6 @@ const Page = () => {
       const { error: storageError } = await supabase.storage
         .from("gallery_item") // バケット名を指定
         .remove([thumbnailImageKey]); // thumbnailImageKeyを利用
-      console.log(thumbnailImageKey);
 
       if (storageError) {
         console.error(
@@ -388,13 +441,13 @@ const Page = () => {
       );
 
       if (response.ok) {
-        toast.success("画像を一つ削除しました。", {
-          duration: 2100, //ポップアップ表示時間
-        });
-        await fetchGalleryItems(); // 最新状態を取得
-        setSelectedImageUrl(null);
+        fetchGalleryItems(); // 最新状態を取得
+        // setSelectedImageUrl(null);
         setThumbnailImageKey(""); // キーをリセット
         closeImgModal();
+        toast.success("画像を一つ削除しました。", {
+          duration: 7000, //ポップアップ表示時間
+        });
       } else {
         console.error("Failed to delete tab");
       }
@@ -472,7 +525,7 @@ const Page = () => {
         </ul>
         <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
-        <Toaster position="top-center" />{" "}
+        <Toaster position="top-center" />
         <Modal
           isOpen={isImgModalOpen}
           onRequestClose={closeImgModal}
@@ -493,9 +546,16 @@ const Page = () => {
                 className="w-full h-auto object-contain"
               />
               <div className="mt-4 flex gap-4 justify-center">
-                <div>
+                <div
+                  onClick={() => {
+                    if (selectedImageId !== undefined) {
+                      updateImg(selectedImageId); // 修正した関数を呼び出し
+                    }
+                  }}
+                >
                   <Button text="更新" size="small" />
                 </div>
+                ;
                 <div
                   onClick={() =>
                     selectedImageId !== undefined && deleteImg(selectedImageId)
