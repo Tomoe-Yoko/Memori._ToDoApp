@@ -547,12 +547,15 @@ const Page = () => {
               />
               <div className="mt-4 flex gap-4 justify-center">
                 <div
-                  onClick={() => {
-                    if (selectedImageId !== undefined) {
-                      updateImg(selectedImageId); // 修正した関数を呼び出し
-                    }
-                  }}
+                  onClick={() => fileInputRef.current?.click()} // ボタンを押すとファイル選択をトリガー
                 >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={() => updateImg(selectedImageId)} // ファイルが選択されたら関数を呼び出す
+                  />
                   <Button text="更新" size="small" />
                 </div>
                 ;
