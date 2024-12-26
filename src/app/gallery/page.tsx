@@ -33,7 +33,7 @@ const Page = () => {
   ); //現在編集対象のタブを管理
   const [editGalleryGroupName, setEditGalleryGroupName] = useState(""); //編集用のタブ名を管理
   /////imgのステート
-  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>();
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [thumbnailImageUrls, setThumbnailImageUrls] = useState<GalleryItem[]>(
     []
@@ -380,7 +380,14 @@ const Page = () => {
         console.error("Image upload failed:", uploadError.message);
         return;
       }
+      // 古い画像を削除する処理
+      const { error: deleteError } = await supabase.storage
+        .from("gallery_item")
+        .remove([thumbnailImageKey]);
 
+      if (deleteError) {
+        console.error("Failed to delete old image:", deleteError.message);
+      }
       // API 経由での更新処理
       const response = await fetch(
         `/api/gallery_group/${selectedTabId}/gallery_items/${id}`,
@@ -390,7 +397,10 @@ const Page = () => {
             "Content-Type": "application/json",
             Authorization: token!,
           },
-          body: JSON.stringify({ thumbnailImageKey: newImageKey }),
+          body: JSON.stringify({
+            galleryGroupId: selectedTabId,
+            thumbnailImageKey: newImageKey,
+          }),
         }
       );
 
@@ -400,8 +410,11 @@ const Page = () => {
           await response.json()
         );
       } else {
-        fetchGalleryItems();
-        toast.success("画像が変更されました。");
+        await fetchGalleryItems();
+        closeImgModal();
+        toast.success("画像が変更されました。", {
+          duration: 7000, //ポップアップ表示時間
+        });
       }
     } catch (error) {
       console.error("Error during image update:", error);
@@ -525,7 +538,7 @@ const Page = () => {
         </ul>
         <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
-        <Toaster position="top-center" />
+        {/* <Toaster position="top-center" /> */}
         <Modal
           isOpen={isImgModalOpen}
           onRequestClose={closeImgModal}
@@ -569,7 +582,9 @@ const Page = () => {
               </div>
             </div>
           )}
+          <Toaster position="top-center" />
         </Modal>
+        <Toaster position="top-center" />
       </div>
     </div>
   );
