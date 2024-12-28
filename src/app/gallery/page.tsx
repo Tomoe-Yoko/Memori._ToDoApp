@@ -6,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Modal from "react-modal";
 import Navigation from "../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
@@ -15,10 +14,8 @@ import { GalleryGroup, GalleryItem } from "@/app/_type/Gallery";
 import Loading from "@/app/loading";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
-import Image from "next/image";
 import PlusButton from "../_components/PlusButton";
-import CloseButton from "../_components/CloseButton";
-import Button from "../_components/Button";
+import GalleryImage from "./_components/GalleryImage";
 
 const Page = () => {
   const { token } = useSupabaseSession();
@@ -254,52 +251,73 @@ const Page = () => {
   }, [fetchGalleryItems]); // useCallback でメモ化された fetchGalleryItems を依存関係に追加
   //画像をstorageに追加
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) return;
-
-    const file = event.target.files[0];
-    const filePath = `private/${uuidv4()}`;
-
-    const { data, error } = await supabase.storage
-      .from("gallery_item")
-      .upload(filePath, file, {
-        cacheControl: "3600", //キャッシュ制御の設定。3600秒（1時間）キャッシュされるように指定
-        upsert: false, //同じ名前のファイルが存在する場合に上書きするかどうか（ここでは上書きしない）。
-      });
-
-    if (error) {
-      alert(error.message);
-
-      return;
-    }
-
-    setThumbnailImageKey(data.path);
-
-    // 新しい画像情報をAPI(table)にも送信
     try {
-      const response = await fetch(
-        `/api/gallery_group/${selectedTabId}/gallery_items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token!,
-          },
-          body: JSON.stringify({
-            galleryGroupId: selectedTabId,
-            thumbnailImageKey: data.path,
-          }),
-        }
-      );
-      if (response.ok) {
-        fetchGalleryItems();
-        toast.success("画像が正常に追加されました。", {
-          duration: 2100,
-        });
-      } else {
-        console.error("Failed to add image to gallery:", await response.json());
+      if (!event.target.files || event.target.files.length === 0) {
+        console.error("No image file selected.");
+        return;
       }
-    } catch (error) {
-      console.error("Error adding image to gallery:", error);
+
+      const file = event.target.files[0];
+      const filePath = `private/${uuidv4()}`;
+
+      // Supabase ストレージに画像をアップロード
+      let uploadData;
+      try {
+        const { data, error } = await supabase.storage
+          .from("gallery_item")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (error) {
+          throw new Error(`Upload error: ${error.message}`);
+        }
+
+        uploadData = data;
+        setThumbnailImageKey(uploadData.path);
+      } catch (uploadError) {
+        console.error("Error uploading image to Supabase:", uploadError);
+        alert("画像のアップロードに失敗しました。");
+        return;
+      }
+
+      // API に画像情報を送信
+      try {
+        const response = await fetch(
+          `/api/gallery_group/${selectedTabId}/gallery_items`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token!,
+            },
+            body: JSON.stringify({
+              galleryGroupId: selectedTabId,
+              thumbnailImageKey: uploadData.path,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          fetchGalleryItems(); // 画像のリストを再取得
+          toast.success("画像が正常に追加されました。", {
+            duration: 2100,
+          });
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to add image to gallery:", errorData);
+          throw new Error(
+            `API error: ${errorData.message || "Unknown error occurred"}`
+          );
+        }
+      } catch (apiError) {
+        console.error("Error adding image to gallery:", apiError);
+        alert("画像の追加に失敗しました。");
+      }
+    } catch (generalError) {
+      console.error("Unexpected error occurred:", generalError);
+      alert("予期しないエラーが発生しました。もう一度お試しください。");
     }
   };
 
@@ -404,17 +422,18 @@ const Page = () => {
         }
       );
 
-      if (!response.ok) {
+      if (response.ok) {
+        await fetchGalleryItems();
+
+        toast.success("画像が変更されました。", {
+          duration: 3000, //ポップアップ表示時間
+        });
+        closeImgModal();
+      } else {
         console.error(
           "Failed to update image in database:",
           await response.json()
         );
-      } else {
-        await fetchGalleryItems();
-        closeImgModal();
-        toast.success("画像が変更されました。", {
-          duration: 7000, //ポップアップ表示時間
-        });
       }
     } catch (error) {
       console.error("Error during image update:", error);
@@ -492,98 +511,24 @@ const Page = () => {
           setEditGalleryGroupName={setEditGalleryGroupName}
           deleteTab={deleteTab}
         />
-        <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
-          <li>
-            <div className="w-[95%] mx-auto">
-              {selectedTabId && (
-                <div className=" flex flex-wrap justify-between items-center">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
+        <GalleryImage
+          selectedTabId={selectedTabId}
+          fileInputRef={fileInputRef}
+          handleImageChange={handleImageChange}
+          thumbnailImageUrls={thumbnailImageUrls}
+          handleImgClick={handleImgClick}
+          isImgModalOpen={isImgModalOpen}
+          closeImgModal={closeImgModal}
+          selectedImageUrl={selectedImageUrl}
+          updateImg={updateImg}
+          selectedImageId={selectedImageId}
+          deleteImg={deleteImg}
+        />
 
-                  {thumbnailImageUrls.length > 0 ? (
-                    thumbnailImageUrls.map((item: GalleryItem) => {
-                      return (
-                        <Image
-                          key={item.id}
-                          src={item.signedUrl!}
-                          alt={`Selected Image ${item.id}`}
-                          width={600}
-                          height={848}
-                          priority
-                          className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
-                          onClick={() =>
-                            handleImgClick(
-                              item.signedUrl!,
-                              item.thumbnailImageKey,
-                              item.id
-                            )
-                          } // 正しい情報を渡す
-                        />
-                      );
-                    })
-                  ) : (
-                    <p className="mx-auto text-text_button text-lg">
-                      画像はまだありません。
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </li>
-        </ul>
         <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />
-        {/* <Toaster position="top-center" /> */}
-        <Modal
-          isOpen={isImgModalOpen}
-          onRequestClose={closeImgModal}
-          ariaHideApp={false}
-          className="  max-w-lg mx-auto"
-          overlayClassName="absolute inset-0 w-full h-max min-h-screen bg-black bg-opacity-80 flex justify-center items-center"
-        >
-          {selectedImageUrl && (
-            <div>
-              <div className="absolute top-12 right-[10%]  ">
-                <CloseButton onClick={closeImgModal} />
-              </div>
-              <Image
-                src={selectedImageUrl}
-                alt="LargeImage"
-                width={600}
-                height={848}
-                className="w-full h-auto object-contain"
-              />
-              <div className="mt-4 flex gap-4 justify-center">
-                <div
-                  onClick={() => fileInputRef.current?.click()} // ボタンを押すとファイル選択をトリガー
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={() => updateImg(selectedImageId)} // ファイルが選択されたら関数を呼び出す
-                  />
-                  <Button text="更新" size="small" />
-                </div>
-                ;
-                <div
-                  onClick={() =>
-                    selectedImageId !== undefined && deleteImg(selectedImageId)
-                  }
-                >
-                  <Button text="削除" size="small" bgColor="delete" />
-                </div>
-              </div>
-            </div>
-          )}
-          <Toaster position="top-center" />
-        </Modal>
+        <Toaster position="top-center" />
+
         <Toaster position="top-center" />
       </div>
     </div>
