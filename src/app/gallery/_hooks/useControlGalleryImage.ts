@@ -19,18 +19,22 @@ const useControlGalleryImage = (selectedTabId: number) => {
   const [selectedImageId, setSelectedImageId] = useState<number>();
 
   const generateSignedImageUrl = async (key: string) => {
-    const { data, error } = await supabase.storage
-      .from("gallery_item") // 正しいバケット名を指定
-      .createSignedUrl(key, 60 * 60); // 有効期限を1時間に設定
+    try {
+      const { data, error } = await supabase.storage
+        .from("gallery_item")
+        .createSignedUrl(key, 60 * 60);
 
-    if (error) {
-      console.error("Error creating signed URL:", error.message);
-      return null;
+      if (error) {
+        throw new Error(`Error creating signed URL: ${error.message}`);
+      }
+      return data.signedUrl;
+    } catch (error) {
+      alert("画像のサイン付きURLの生成に失敗しました。");
+      throw error; // 呼び出し元でキャッチするために再スロー
     }
-    return data.signedUrl;
   };
 
-  // 画像のURLを取得するためのuseEffect;
+  // ギャラリー内のすべての画像のURLを取得するためのuseEffect;
   const fetchGalleryItems = useCallback(async () => {
     if (!token || !selectedTabId) return;
 
@@ -47,28 +51,28 @@ const useControlGalleryImage = (selectedTabId: number) => {
       );
 
       const data = await response.json();
-      if (!response.ok || !data.galleryItems) {
-        console.error("Failed to fetch gallery items:", data);
+      if (response.ok || data.galleryItems) {
+        const itemsWithUrls: GalleryItem[] = await Promise.all(
+          data.galleryItems.map(async (item: GalleryItem) => {
+            const signedUrl = await generateSignedImageUrl(
+              item.thumbnailImageKey
+            );
+            return { ...item, signedUrl }; // GalleryItemにsignedUrlを追加
+          })
+        );
+
+        // 有効なURLのみをセット
+        setThumbnailImageUrls(
+          itemsWithUrls.filter((item) => item.signedUrl !== null)
+        );
+      } else {
         setThumbnailImageUrls([]);
-        return;
+        throw new Error(`Failed to fetch gallery items:${data}`);
       }
-
-      const itemsWithUrls: GalleryItem[] = await Promise.all(
-        data.galleryItems.map(async (item: GalleryItem) => {
-          const signedUrl = await generateSignedImageUrl(
-            item.thumbnailImageKey
-          );
-          return { ...item, signedUrl }; // GalleryItemにsignedUrlを追加
-        })
-      );
-
-      // 有効なURLのみをセット
-      setThumbnailImageUrls(
-        itemsWithUrls.filter((item) => item.signedUrl !== null)
-      );
     } catch (error) {
-      console.error("Error fetching gallery items:", error);
+      alert("画像データ取得に失敗しました。");
       setThumbnailImageUrls([]);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -78,17 +82,17 @@ const useControlGalleryImage = (selectedTabId: number) => {
     fetchGalleryItems();
   }, [fetchGalleryItems, selectedTabId]); // useCallbackでメモ化されたfetchGalleryItemsを依存関係に追加
 
-  //画像をstorageに追加
+  //画像を追加
   const handleAddImage = async (event: ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) {
-      console.error("No image file selected.");
-      return;
-    }
-
-    const file = event.target.files[0];
-    const filePath = `private/${uuidv4()}`;
-
     try {
+      if (!event.target.files || event.target.files.length === 0) {
+        alert("画像ファイルが選択されていません。");
+        throw new Error("No image file selected.");
+      }
+
+      const file = event.target.files[0];
+      const filePath = `private/${uuidv4()}`;
+
       // Supabase ストレージに画像をアップロード
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("gallery_item")
@@ -131,12 +135,12 @@ const useControlGalleryImage = (selectedTabId: number) => {
         );
       }
     } catch (error) {
-      console.error("Error handling image upload:", error);
       alert("画像の追加に失敗しました。もう一度お試しください。");
+      throw error;
     }
   };
 
-  //ファイルを一時的にアクセス可能にする サインドURL
+  //特定の画像ファイルにアクセスするためのサイン付きURLを取得
   const fetchSignedUrl = async (thumbnailImageKey: string) => {
     try {
       const { data, error } = await supabase.storage
@@ -144,14 +148,13 @@ const useControlGalleryImage = (selectedTabId: number) => {
         .createSignedUrl(thumbnailImageKey, 60 * 60); // 有効期限を1時間(3600秒)に設定
 
       if (error) {
-        console.error("Error creating signed URL:", error.message);
-        return null;
+        throw new Error(`Error creating signed URL:${error.message}`);
       }
 
       return data.signedUrl; // サインドURLを返す
     } catch (error) {
-      console.error("Error fetching signed URL:", error);
-      return null;
+      alert("画像データ取得に失敗しました。");
+      throw error;
     }
   };
   useEffect(() => {
@@ -190,19 +193,18 @@ const useControlGalleryImage = (selectedTabId: number) => {
 
   //画像変更（Modal）
   const updateImg = async (id?: number) => {
-    if (!fileInputRef.current || !fileInputRef.current.files) {
-      console.error("File input is not available or no file selected.");
-      return;
-    }
-
-    const file = fileInputRef.current.files[0];
-    if (!file) {
-      console.error("No image file selected.");
-      return;
-    }
-    // 既存の画像キーを使用して更新
-    const existingImageKey = thumbnailImageKey; // 既存のキーを使う
     try {
+      if (!fileInputRef.current || !fileInputRef.current.files) {
+        throw new Error("File input is not available or no file selected.");
+      }
+
+      const file = fileInputRef.current.files[0];
+      if (!file) {
+        throw new Error("No image file selected");
+      }
+      // 既存の画像キーを使用して更新
+      const existingImageKey = thumbnailImageKey; // 既存のキーを使う
+
       const { error: uploadError } = await supabase.storage
         .from("gallery_item")
         .update(existingImageKey, file, {
@@ -210,8 +212,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
           upsert: true,
         });
       if (uploadError) {
-        console.error("Image upload failed:", uploadError.message);
-        return;
+        throw new Error(`Image upload failed:${uploadError.message}`);
       }
 
       // API 経由での更新処理
@@ -237,22 +238,24 @@ const useControlGalleryImage = (selectedTabId: number) => {
         });
         closeImgModal();
       } else {
-        console.error(
-          "Failed to update image in database:",
-          await response.json()
-        );
+        throw new Error("Failed to update image in database:");
       }
     } catch (error) {
-      console.error("Error during image update:", error);
+      alert(
+        "ファイル選択が利用できないもしくは、ファイルが選択されていません。"
+      );
+      throw error;
     }
   };
   //画像削除（Modal）
   const deleteImg = async (id?: number) => {
     try {
       if (!token) {
+        alert("認証トークンが利用できません。");
         throw new Error("No authentication token available.");
       }
       if (!selectedImageUrl || !thumbnailImageKey || id === undefined) {
+        alert("削除する画像が選択されていません。");
         throw new Error("No image selected for deletion.");
       }
       if (!confirm("画像を削除しますか？")) return;
@@ -263,6 +266,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
         .remove([thumbnailImageKey]); // thumbnailImageKeyを利用
 
       if (storageError) {
+        alert("バケットから画像を削除できませんでした。");
         throw new Error(
           `Failed to delete image from bucket: ${storageError.message}`
         );
@@ -290,7 +294,8 @@ const useControlGalleryImage = (selectedTabId: number) => {
         throw new Error("Failed to delete image from database.");
       }
     } catch (error) {
-      console.error("Error deleting Image:", error);
+      alert("画像が削除できませんでした。もう一度お試しください。");
+      throw error;
     }
   };
 
