@@ -76,76 +76,63 @@ const useControlGalleryImage = (selectedTabId: number) => {
 
   useEffect(() => {
     fetchGalleryItems();
-  }, [fetchGalleryItems, selectedTabId]); // useCallback でメモ化された fetchGalleryItems を依存関係に追加
+  }, [fetchGalleryItems, selectedTabId]); // useCallbackでメモ化されたfetchGalleryItemsを依存関係に追加
+
   //画像をstorageに追加
-  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleAddImage = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      console.error("No image file selected.");
+      return;
+    }
+
+    const file = event.target.files[0];
+    const filePath = `private/${uuidv4()}`;
+
     try {
-      if (!event.target.files || event.target.files.length === 0) {
-        console.error("No image file selected.");
-        return;
-      }
-
-      const file = event.target.files[0];
-      const filePath = `private/${uuidv4()}`;
-
       // Supabase ストレージに画像をアップロード
-      let uploadData;
-      try {
-        const { data, error } = await supabase.storage
-          .from("gallery_item")
-          .upload(filePath, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("gallery_item")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
-        if (error) {
-          throw new Error(`Upload error: ${error.message}`);
-        }
-
-        uploadData = data;
-        setThumbnailImageKey(uploadData.path);
-      } catch (uploadError) {
-        console.error("Error uploading image to Supabase:", uploadError);
-        alert("画像のアップロードに失敗しました。");
-        return;
+      if (uploadError) {
+        throw new Error(`Upload error: ${uploadError.message}`);
       }
 
-      // API に画像情報を送信
-      try {
-        const response = await fetch(
-          `/api/gallery_group/${selectedTabId}/gallery_items`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token!,
-            },
-            body: JSON.stringify({
-              galleryGroupId: selectedTabId,
-              thumbnailImageKey: uploadData.path,
-            }),
-          }
+      setThumbnailImageKey(uploadData.path);
+
+      // APIに画像情報を送信
+      const response = await fetch(
+        `/api/gallery_group/${selectedTabId}/gallery_items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token!,
+          },
+          body: JSON.stringify({
+            galleryGroupId: selectedTabId,
+            thumbnailImageKey: uploadData.path,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        await fetchGalleryItems(); // 画像のリストを再取得
+        toast.success("画像が正常に追加されました。", {
+          duration: 2100,
+        });
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          `API error: ${errorData.message || "Unknown error occurred"}`
         );
-
-        if (response.ok) {
-          fetchGalleryItems(); // 画像のリストを再取得
-          toast.success("画像が正常に追加されました。", {
-            duration: 2100,
-          });
-        } else {
-          const errorData = await response.json();
-          console.error("Failed to add image to gallery:", errorData);
-          throw new Error(
-            `API error: ${errorData.message || "Unknown error occurred"}`
-          );
-        }
-      } catch (apiError) {
-        console.error("Error adding image to gallery:", apiError);
-        alert("画像の追加に失敗しました。");
       }
-    } catch (generalError) {
-      console.error("Unexpected error occurred:", generalError);
-      alert("予期しないエラーが発生しました。もう一度お試しください。");
+    } catch (error) {
+      console.error("Error handling image upload:", error);
+      alert("画像の追加に失敗しました。もう一度お試しください。");
     }
   };
 
@@ -179,7 +166,6 @@ const useControlGalleryImage = (selectedTabId: number) => {
   }, [thumbnailImageKey, token, selectedTabId]);
 
   //画像拡大Modal
-
   // 画像クリック時の処理
   const handleImgClick = (url: string, key: string, id: number) => {
     setSelectedImageUrl(url);
@@ -192,6 +178,8 @@ const useControlGalleryImage = (selectedTabId: number) => {
   const closeImgModal = () => {
     setIsImgModalOpen(false);
     setSelectedImageUrl(null); // 選択された画像をリセット;
+    setThumbnailImageKey(""); // 選択された画像のキーをリセット
+    setSelectedImageId(undefined); // 選択された画像のIDをリセット
   };
 
   const handleAddEvent = () => {
@@ -212,28 +200,20 @@ const useControlGalleryImage = (selectedTabId: number) => {
       console.error("No image file selected.");
       return;
     }
-
-    const newImageKey = `private/${uuidv4()}`;
+    // 既存の画像キーを使用して更新
+    const existingImageKey = thumbnailImageKey; // 既存のキーを使う
     try {
       const { error: uploadError } = await supabase.storage
         .from("gallery_item")
-        .upload(newImageKey, file, {
+        .update(existingImageKey, file, {
           cacheControl: "3600",
           upsert: true,
         });
-
       if (uploadError) {
         console.error("Image upload failed:", uploadError.message);
         return;
       }
-      // 古い画像を削除する処理
-      const { error: deleteError } = await supabase.storage
-        .from("gallery_item")
-        .remove([thumbnailImageKey]);
 
-      if (deleteError) {
-        console.error("Failed to delete old image:", deleteError.message);
-      }
       // API 経由での更新処理
       const response = await fetch(
         `/api/gallery_group/${selectedTabId}/gallery_items/${id}`,
@@ -244,8 +224,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
             Authorization: token!,
           },
           body: JSON.stringify({
-            galleryGroupId: selectedTabId,
-            thumbnailImageKey: newImageKey,
+            thumbnailImageKey: existingImageKey,
           }),
         }
       );
@@ -269,24 +248,24 @@ const useControlGalleryImage = (selectedTabId: number) => {
   };
   //画像削除（Modal）
   const deleteImg = async (id?: number) => {
-    if (!token) return;
-    if (!selectedImageUrl || !thumbnailImageKey || id === undefined) {
-      console.error("No image selected for deletion.");
-      return;
-    }
-    if (!confirm("画像を削除しますか？")) return;
     try {
+      if (!token) {
+        throw new Error("No authentication token available.");
+      }
+      if (!selectedImageUrl || !thumbnailImageKey || id === undefined) {
+        throw new Error("No image selected for deletion.");
+      }
+      if (!confirm("画像を削除しますか？")) return;
+
       // バケット内の画像を削除
       const { error: storageError } = await supabase.storage
         .from("gallery_item") // バケット名を指定
         .remove([thumbnailImageKey]); // thumbnailImageKeyを利用
 
       if (storageError) {
-        console.error(
-          "Failed to delete image from bucket:",
-          storageError.message
+        throw new Error(
+          `Failed to delete image from bucket: ${storageError.message}`
         );
-        return;
       }
 
       const response = await fetch(
@@ -302,14 +281,13 @@ const useControlGalleryImage = (selectedTabId: number) => {
 
       if (response.ok) {
         fetchGalleryItems(); // 最新状態を取得
-        // setSelectedImageUrl(null);
         setThumbnailImageKey(""); // キーをリセット
         closeImgModal();
         toast.success("画像を一つ削除しました。", {
           duration: 7000, //ポップアップ表示時間
         });
       } else {
-        console.error("Failed to delete tab");
+        throw new Error("Failed to delete image from database.");
       }
     } catch (error) {
       console.error("Error deleting Image:", error);
@@ -319,7 +297,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
   return {
     selectedTabId,
     fileInputRef,
-    handleImageChange,
+    handleAddImage,
     thumbnailImageUrls,
     handleImgClick,
     isImgModalOpen,

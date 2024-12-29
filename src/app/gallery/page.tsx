@@ -34,7 +34,7 @@ const Page: React.FC = () => {
   // //////////GalleryItem
   const {
     fileInputRef,
-    handleImageChange,
+    handleAddImage,
     thumbnailImageUrls,
     handleImgClick,
     isImgModalOpen,
@@ -48,7 +48,6 @@ const Page: React.FC = () => {
   } = useControlGalleryImage(selectedTabId);
 
   if (loading) return <Loading />;
-  if (isLoading) return <Loading />;
 
   return (
     <div>
@@ -72,20 +71,27 @@ const Page: React.FC = () => {
           setEditGalleryGroupName={setEditGalleryGroupName}
           deleteTab={deleteTab}
         />
-
-        <GalleryImage
-          selectedTabId={selectedTabId} // useGalleryTab から渡す
-          fileInputRef={fileInputRef}
-          handleImageChange={handleImageChange}
-          thumbnailImageUrls={thumbnailImageUrls}
-          handleImgClick={handleImgClick}
-          isImgModalOpen={isImgModalOpen}
-          closeImgModal={closeImgModal}
-          selectedImageUrl={selectedImageUrl}
-          updateImg={updateImg}
-          selectedImageId={selectedImageId}
-          deleteImg={deleteImg}
-        />
+        <div>
+          {isLoading ? (
+            <div className="bg-white max-w-md mx-auto">
+              <Loading />
+            </div>
+          ) : (
+            <GalleryImage
+              selectedTabId={selectedTabId} // useGalleryTab から渡す
+              fileInputRef={fileInputRef}
+              handleAddImage={handleAddImage}
+              thumbnailImageUrls={thumbnailImageUrls}
+              handleImgClick={handleImgClick}
+              isImgModalOpen={isImgModalOpen}
+              closeImgModal={closeImgModal}
+              selectedImageUrl={selectedImageUrl}
+              updateImg={updateImg}
+              selectedImageId={selectedImageId}
+              deleteImg={deleteImg}
+            />
+          )}
+        </div>
 
         <PlusButton handleAddEvent={handleAddEvent} />
         <Navigation />

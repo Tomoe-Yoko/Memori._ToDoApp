@@ -8,7 +8,7 @@ import CloseButton from "@/app/_components/CloseButton";
 interface Props {
   selectedTabId: number;
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleAddImage: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   thumbnailImageUrls: GalleryItem[];
   handleImgClick: (url: string, key: string, id: number) => void;
   isImgModalOpen: boolean;
@@ -22,7 +22,7 @@ interface Props {
 const GalleryImage: React.FC<Props> = ({
   selectedTabId,
   fileInputRef,
-  handleImageChange,
+  handleAddImage,
   thumbnailImageUrls,
   handleImgClick,
   isImgModalOpen,
@@ -32,51 +32,49 @@ const GalleryImage: React.FC<Props> = ({
   selectedImageId,
   deleteImg,
 }) => {
+  // タブが選択されていない場合、早期リターン
+  if (typeof selectedTabId === "undefined" || selectedTabId === null) {
+    return <p className="text-red-500">タブが選択されていません。</p>;
+  }
+  // タブが選択されている場合
   return (
     <div>
       <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
         <li>
-          <div className="w-[95%] mx-auto">
-            {/* {typeof selectedTabId && ( */}
-            {typeof selectedTabId === "undefined" || selectedTabId === null ? (
-              <p className="text-red-500">タブが選択されていません。</p>
-            ) : (
-              <div className=" flex flex-wrap justify-between items-center">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageChange}
-                  accept="image/*"
-                  className="hidden"
-                />
+          <div className=" flex flex-wrap justify-between items-center">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAddImage}
+              accept="image/*"
+              className="hidden"
+            />
 
-                {thumbnailImageUrls.length > 0 ? (
-                  thumbnailImageUrls.map((item: GalleryItem) => {
-                    return (
-                      <Image
-                        key={item.id}
-                        src={item.signedUrl!}
-                        alt={`Selected Image ${item.id}`}
-                        width={600}
-                        height={848}
-                        priority
-                        className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
-                        onClick={() =>
-                          handleImgClick(
-                            item.signedUrl!,
-                            item.thumbnailImageKey,
-                            item.id
-                          )
-                        }
-                      />
-                    );
-                  })
-                ) : (
-                  <p className="mx-auto text-text_button text-lg">
-                    画像はまだありません。
-                  </p>
-                )}
-              </div>
+            {thumbnailImageUrls.length > 0 ? (
+              thumbnailImageUrls.map((item: GalleryItem) => {
+                return (
+                  <Image
+                    key={item.id}
+                    src={item.signedUrl!}
+                    alt={`Selected Image ${item.id}`}
+                    width={600}
+                    height={848}
+                    priority
+                    className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
+                    onClick={() =>
+                      handleImgClick(
+                        item.signedUrl!,
+                        item.thumbnailImageKey,
+                        item.id
+                      )
+                    }
+                  />
+                );
+              })
+            ) : (
+              <p className="mx-auto text-text_button text-lg">
+                画像はまだありません。
+              </p>
             )}
           </div>
         </li>

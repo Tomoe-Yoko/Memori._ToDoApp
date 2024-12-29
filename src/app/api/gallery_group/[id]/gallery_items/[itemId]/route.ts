@@ -32,22 +32,6 @@ export const DELETE = async (
       { message: "目的のギャラリータブが指定されていません。" },
       { status: 400 }
     );
-  const galleryItem = await prisma.galleryItems.findFirst({
-    where: {
-      id: galleryItemId,
-      galleryGroup: {
-        id: galleryGroupId,
-        user: { supabaseUserId },
-      },
-    },
-  });
-
-  if (!galleryItem) {
-    return NextResponse.json(
-      { message: "削除対象のギャラリーアイテムが見つかりませんでした。" },
-      { status: 404 }
-    );
-  }
   try {
     await prisma.galleryItems.delete({
       where: { id: galleryItemId },
@@ -81,9 +65,8 @@ export const PUT = async (
       { status: 404 }
     );
 
-  const putGalleryGroupId = parseInt(params.id, 10);
   const putGalleryItemId = parseInt(params.itemId, 10);
-  if (isNaN(putGalleryGroupId) || isNaN(putGalleryItemId))
+  if (isNaN(putGalleryItemId))
     return NextResponse.json(
       {
         message:
@@ -92,15 +75,7 @@ export const PUT = async (
       { status: 400 }
     );
   const body: CreateGalleryItemRequestBody = await request.json();
-  const { galleryGroupId, thumbnailImageKey } = body;
-
-  // todoGroupIdがnullまたはundefinedでないことを確認
-  if (galleryGroupId == null) {
-    return NextResponse.json(
-      { message: "ギャラリータブが指定されていません。" },
-      { status: 400 }
-    );
-  }
+  const { thumbnailImageKey } = body;
 
   try {
     const editingTodoItem = await prisma.galleryItems.update({
@@ -108,7 +83,7 @@ export const PUT = async (
         id: putGalleryItemId,
         galleryGroup: { user: { supabaseUserId } },
       },
-      data: { galleryGroupId, thumbnailImageKey },
+      data: { thumbnailImageKey },
     });
     return NextResponse.json(
       { status: "OK", editingTodoItem },
