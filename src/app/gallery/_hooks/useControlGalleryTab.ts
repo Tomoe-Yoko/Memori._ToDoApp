@@ -32,12 +32,13 @@ const useControlGalleryTab = (
       if (response.ok) {
         setGalleryGroups(data.galleryGroups);
       } else {
-        console.error("Fetched data is not an array:", data);
         setGalleryGroups(galleryGroups);
+        throw new Error(`Fetched data is not an array:${data}`);
       }
     } catch (error) {
-      console.error("Error fetching routines:", error);
       setGalleryGroups([]); // デフォルトで空の配列を設定
+      alert("タブデータの取得に失敗しました。");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -70,14 +71,15 @@ const useControlGalleryTab = (
 
       const data = await response.json();
       if (response.ok) {
-        fetcher();
+        await fetcher();
         setSelectedTabId(data.id); // 新しいタブのIDを設定
         closeModal();
       } else {
-        console.error("Failed to add tab");
+        throw new Error("Failed to add tab.");
       }
     } catch (error) {
-      console.error("Error adding tab:", error);
+      alert("タブの追加に失敗しました。");
+      throw error;
     }
   };
   // タブを切り替える処理
@@ -120,10 +122,11 @@ const useControlGalleryTab = (
         setEditGalleryGroup(null);
         fetcher();
       } else {
-        console.error("Failed to update tab");
+        throw new Error("Failed to update tab");
       }
     } catch (error) {
-      console.error("Error updating tab:", error);
+      alert("タブ名の更新に失敗しました。");
+      throw error;
     }
   };
 
@@ -152,10 +155,11 @@ const useControlGalleryTab = (
           duration: 2100, //ポップアップ表示時間
         });
       } else {
-        console.error("Failed to delete tab");
+        throw new Error("Failed to delete tab");
       }
     } catch (error) {
-      console.error("Error deleting tab:", error);
+      alert("タブを削除できませんでした。もう一度お試しください。");
+      throw error;
     }
   };
   // Tabモーダルを開く

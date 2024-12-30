@@ -49,12 +49,13 @@ const Page: React.FC = () => {
         if (Array.isArray(data)) {
           setRoutineList(data);
         } else {
-          console.error("Fetched data is not an array:", data);
           setRoutineList([]); // デフォルトで空の配列を設定
+          throw new Error(`Fetched data is not an array:${data}`);
         }
       } catch (error) {
-        console.error("Error fetching routines:", error);
+        alert("曜日データを取得できませんでした。");
         setRoutineList([]); // デフォルトで空の配列を設定
+        throw error;
       } finally {
         setLoading(false);
       }
