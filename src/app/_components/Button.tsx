@@ -18,14 +18,14 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const bgColors = {
-    normal: "", // （デフォルト）
+    normal: "hover:bg-[#eeea] ", // （デフォルト）
     delete: "text-white bg-trash_bg hover:bg-[#C86262aa] ",
   };
   return (
     <div className="w-full">
       <button
         type="submit"
-        className={`block mx-auto px-4 text-text_button border-2 border-text_button rounded-lg  hover:bg-[#fffa] focus:outline-none ${sizeClasses[size]} ${bgColors[bgColor]}`}
+        className={`block mx-auto px-4 text-text_button border-2 border-text_button rounded-lg  focus:outline-none ${sizeClasses[size]} ${bgColors[bgColor]}`}
       >
         {text}
       </button>

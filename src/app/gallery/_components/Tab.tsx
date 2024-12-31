@@ -90,7 +90,7 @@ const Tab: React.FC<Props> = ({
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <h2 className="text-lg font-semibold mb-4 text-text_button">
-          ToDoタブ追加
+          Galleryタブ追加
         </h2>
         <Input
           value={newTabName}
