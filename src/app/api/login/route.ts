@@ -9,7 +9,6 @@ const prisma = new PrismaClient();
 export const POST = async (request: NextRequest) => {
   const body: CreateLoginPostRequestBody = await request.json(); // 型適用
   const token = request.headers.get("Authorization") ?? "";
-  console.log(body);
 
   const { data, error } = await supabase.auth.getUser(token);
 
