@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ThemeColorId } from "@prisma/client";
 import { CreateLoginPostRequestBody } from "@/app/_type/login";
 import { supabase } from "@/utils/supabase";
 
@@ -47,6 +47,67 @@ export const POST = async (request: NextRequest) => {
       status: 201,
       message: "success",
       user: userPostResponse,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ status: 400, message: error.message });
+    }
+    return NextResponse.json({ status: 500, message: "Internal Server Error" });
+  }
+};
+
+////PUT
+export const PUT = async (request: NextRequest) => {
+  const body: CreateLoginPostRequestBody = await request.json();
+  const token = request.headers.get("Authorization") ?? "";
+
+  // Supabase認証
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data.user) {
+    return NextResponse.json(
+      { status: 401, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    // ユーザーがデータベースに存在するか確認
+    const user = await prisma.users.findUnique({
+      where: {
+        supabaseUserId: data.user.id,
+      },
+    });
+    if (!user) {
+      console.error("User not found for ID:", data.user.id);
+      // ユーザーが存在しない場合
+      return NextResponse.json(
+        { status: 404, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // 更新データを作成（nullまたはundefinedのフィールドは無視）
+    const updateData: { userName?: string; themeColorId?: ThemeColorId } = {};
+    if (body.userName !== undefined) {
+      updateData.userName = body.userName;
+    }
+    if (body.themeColorId !== undefined) {
+      updateData.themeColorId = body.themeColorId;
+    }
+
+    // データベースの更新
+    const updatedUser = await prisma.users.update({
+      where: {
+        supabaseUserId: data.user.id,
+      },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      status: 200,
+      message: "User updated successfully",
+      user: updatedUser,
     });
   } catch (error) {
     if (error instanceof Error) {
