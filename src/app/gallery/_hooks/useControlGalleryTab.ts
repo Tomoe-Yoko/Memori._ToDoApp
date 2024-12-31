@@ -118,9 +118,13 @@ const useControlGalleryTab = (
               : g
           )
         );
+
         setSelectedTabId(editGalleryGroup.id);
         setEditGalleryGroup(null);
         fetcher();
+        toast.success("画像が変更されました。", {
+          duration: 2100, //ポップアップ表示時間
+        });
       } else {
         throw new Error("Failed to update tab");
       }

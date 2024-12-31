@@ -86,7 +86,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
   const handleAddImage = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
       if (!event.target.files || event.target.files.length === 0) {
-        alert("画像ファイルが選択されていません。");
+        alert("画像ファイル（タブ）が選択されていません。");
         throw new Error("No image file selected.");
       }
 
@@ -104,7 +104,6 @@ const useControlGalleryImage = (selectedTabId: number) => {
       if (uploadError) {
         throw new Error(`Upload error: ${uploadError.message}`);
       }
-
       setThumbnailImageKey(uploadData.path);
 
       // APIに画像情報を送信
@@ -234,7 +233,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
         await fetchGalleryItems();
 
         toast.success("画像が変更されました。", {
-          duration: 3000, //ポップアップ表示時間
+          duration: 2100, //ポップアップ表示時間
         });
         closeImgModal();
       } else {
