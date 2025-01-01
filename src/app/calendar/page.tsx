@@ -223,7 +223,7 @@ const Page: React.FC = () => {
       <Modal
         isOpen={addScheduleModal} //closeModal
         onRequestClose={() => setAddScheduleModal(false)}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        className="p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         //モーダルの外でクローズ
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >

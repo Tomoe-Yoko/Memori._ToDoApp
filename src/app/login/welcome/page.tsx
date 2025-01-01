@@ -8,7 +8,7 @@ interface Props {
 }
 
 const WelcomePage: React.FC<Props> = () => {
-  const [useName, setUserName] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   useEffect(() => {
     const fetchUserName = async () => {
@@ -38,7 +38,7 @@ const WelcomePage: React.FC<Props> = () => {
     <div className="relative max-w-md min-h-svh m-auto ">
       <div className="absolute inset-0 w-full h-screen bg-tether-line bg-no-repeat bg-right flex justify-center items-center text-white animate-fadeout">
         <p className="text-center tracking-tight mt-[-10rem] text-[1.5rem]">
-          {useName}さん
+          {userName}さん
           <br />
           今日もおつかれさま
         </p>
