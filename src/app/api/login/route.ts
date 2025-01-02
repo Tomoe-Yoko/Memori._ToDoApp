@@ -56,6 +56,33 @@ export const POST = async (request: NextRequest) => {
   }
 };
 
+////GET
+export const GET = async (request: NextRequest) => {
+  const token = request.headers.get("Authorization") ?? "";
+  const { error, data } = await supabase.auth.getUser(token);
+  if (error)
+    return NextResponse.json({ status: error.message }, { status: 400 });
+  const supabaseUserId = data.user.id;
+  const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+  if (!user)
+    return NextResponse.json(
+      { message: "ユーザーが見つかりませんでした" },
+      { status: 404 }
+    );
+  try {
+    const userData = {
+      userName: user.userName,
+      themeColor: user.themeColorId,
+    };
+
+    return NextResponse.json({ status: "OK", userData });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+  }
+};
+
 ////PUT
 export const PUT = async (request: NextRequest) => {
   const body: CreateLoginPostRequestBody = await request.json();

@@ -19,7 +19,7 @@ const Page = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    // Supabaseでログイン
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
