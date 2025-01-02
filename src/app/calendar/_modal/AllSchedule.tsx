@@ -73,11 +73,11 @@ const AllSchedule: React.FC<Props> = ({
     setEditingId(null);
   };
   return (
-    <div className="relative">
+    <div className="relative ">
       <div className="absolute top-[-40px] right-[-30px]">
         <CloseButton onClick={closeModal} />
       </div>
-      <h2 className="text-white text-2xl py-4">
+      <h2 className="text-text_button text-2xl py-4">
         {selectedDate?.toLocaleDateString("ja-JP", {
           year: "numeric",
           month: "2-digit",
@@ -85,7 +85,7 @@ const AllSchedule: React.FC<Props> = ({
           weekday: "short",
         })}
       </h2>
-      <div className="space-y-2 bg-[#fffa] rounded-xl p-4 leading-normal">
+      <div className="space-y-2 bg-[#ccca] rounded-xl p-4 leading-normal">
         {schedules.length > 0 ? (
           schedules.map((entry) => {
             const colorCode = Object.keys(scheduleColorMap).find(
@@ -145,7 +145,7 @@ const AllSchedule: React.FC<Props> = ({
       <Modal
         isOpen={addModalOpen}
         onRequestClose={() => setAddModalOpen(false)}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        className="bg-white p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
         {/* <NewPost onSuccess={() => setAddModalOpen(false)} /> */}
@@ -158,7 +158,10 @@ const AllSchedule: React.FC<Props> = ({
             }}
             initialDate={selectedDate} // 選択された日付を渡す
           />
-        )}
+        )}{" "}
+        {/* <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
+          <Button text="キャンセル" />
+        </div> */}
       </Modal>
     </div>
   );

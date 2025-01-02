@@ -7,13 +7,16 @@ import Navigation from "../_components/Navigation";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import { themeColors } from "../_type/login";
 import Input from "../_components/Input";
+import toast, { Toaster } from "react-hot-toast";
+// import useLogout from "../_hooks/useLogout"; // ログアウトフック
 
 const SettingsPage: React.FC = () => {
   const { themeColor, setThemeColor } = useTheme();
   const { token } = useSupabaseSession();
-  const [currentTheme, setCurrentTheme] = useState<string>("Theme01");
+  const [currentTheme, setCurrentTheme] = useState<string>(""); // 明示的な初期値
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  // const logout = useLogout(); // ログアウト関数を取得
 
   useEffect(() => {
     const fetcher = async () => {
@@ -28,14 +31,15 @@ const SettingsPage: React.FC = () => {
         });
         if (res.ok) {
           const { userData } = await res.json();
-          setCurrentTheme(userData.themeColorId);
-          setThemeColor(themeColors[userData.themeColorId]);
+          setCurrentTheme(userData.themeColorId); // データベースから取得したテーマカラーを設定
+          setThemeColor(themeColors[userData.themeColorId]); // テーマカラーを設定
           setUserName(userData.userName);
         } else {
           throw new Error("現在のテーマカラーを取得できませんでした。");
         }
       } catch (error) {
-        if (error instanceof Error) console.error(error.message);
+        alert("現在のテーマカラーを取得できませんでした。");
+        throw error;
       }
     };
     fetcher();
@@ -66,8 +70,8 @@ const SettingsPage: React.FC = () => {
 
       setCurrentTheme(themeId);
     } catch (error) {
-      console.error(error);
       alert("テーマ色の変更に失敗しました。");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -89,17 +93,19 @@ const SettingsPage: React.FC = () => {
       if (!response.ok) {
         throw new Error("ユーザーネームの変更に失敗しました。");
       }
-      alert("ユーザーネームが変更されました");
+      toast.success("ユーザーネームが変更されました", {
+        duration: 2100, //ポップアップ表示時間
+      });
     } catch (error) {
-      if (error instanceof Error) console.error(error.message);
+      alert("ユーザーネームの変更に失敗しました。");
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ backgroundColor: themeColor, minHeight: "100vh" }}>
-      {/* <div className={`bg-${themeColor}`}> */}
+    <div>
       <h2 className="text-white text-2xl text-center">Setting.</h2>
       <div className="w-[80%] mx-auto my-8 bg-white p-4">
         <div className="grid grid-cols-5 gap-5 mb-12">
@@ -119,7 +125,7 @@ const SettingsPage: React.FC = () => {
           ))}
         </div>
         {/* <hr className="text-text_button" /> */}
-        <div className="mt-8 mx-auto w-[70%]">
+        <div className="mt-8 mx-auto w-56 text-lg text-text_button">
           <Input
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
@@ -138,6 +144,7 @@ const SettingsPage: React.FC = () => {
         </div>
       </div>
       <Navigation />
+      <Toaster position="top-center" />
     </div>
   );
 };
