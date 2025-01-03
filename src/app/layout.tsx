@@ -3,8 +3,8 @@
 import { Jost } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/Header";
-import { ThemeProvider } from "./_context/ThemeContext";
-
+import { ThemeProvider, ThemeContext } from "./_context/ThemeContext";
+import { useContext } from "react";
 const jost = Jost({
   subsets: ["latin"],
 });
@@ -19,10 +19,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { themeColor } = useContext(ThemeContext);
   return (
     <html lang="ja">
       <ThemeProvider>
-        <body className={`${jost} bg-Theme01`}>
+        <body className={`${jost.className} bg-${themeColor}`}>
           <div className="max-w-[500px] min-h-svh m-auto border-r border-l border-white">
             <Header />
             {children}

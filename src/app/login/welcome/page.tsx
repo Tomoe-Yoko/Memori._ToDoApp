@@ -21,15 +21,13 @@ const WelcomePage: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // if (!token) {
-      //   console.error("トークンが存在しません。");
-      //   return;
-      // }
+      if (!token) return;
+
       try {
         const response = await fetch("/api/login", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: token!,
+            Authorization: token,
           },
         });
 

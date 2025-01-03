@@ -1,19 +1,19 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useSupabaseSession } from "../_hooks/useSupabaseSession";
+import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
 import { ScheduleColor } from "@prisma/client";
-import { CalendarData } from "../_type/Calendar";
+import { CalendarData } from "../../_type/Calendar";
 import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import AllSchedule from "./_modal/AllSchedule";
 import { scheduleColorMap } from "./_modal/NewPost";
 // import Button from "../_components/Button";
-import Navigation from "../_components/Navigation";
+import Navigation from "../../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
-import "../../app/globals.css";
-import PlusButton from "../_components/PlusButton";
+import "../../../app/globals.css";
+import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
 
 const Page: React.FC = () => {

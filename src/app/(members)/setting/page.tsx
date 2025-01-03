@@ -1,22 +1,23 @@
 //setting/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
-import { useTheme } from "../_context/ThemeContext";
-import Button from "../_components/Button";
-import Navigation from "../_components/Navigation";
-import { useSupabaseSession } from "../_hooks/useSupabaseSession";
-import { themeColors } from "../_type/login";
-import Input from "../_components/Input";
-import toast, { Toaster } from "react-hot-toast";
-import useLogout from "../_hooks/useLogout"; // ログアウトフック
 
+import Button from "../../_components/Button";
+import Navigation from "../../_components/Navigation";
+import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
+import { themeColors } from "../../_type/login";
+import Input from "../../_components/Input";
+import toast, { Toaster } from "react-hot-toast";
+import useLogout from "../../_hooks/useLogout"; // ログアウトフック
+import { ThemeContext } from "../../_context/ThemeContext";
+import { useContext } from "react";
 const SettingsPage: React.FC = () => {
-  const { themeColor, setThemeColor } = useTheme();
   const { token } = useSupabaseSession();
   const [currentTheme, setCurrentTheme] = useState<string>("themeColorId"); // 明示的な初期値
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const logout = useLogout(); // ログアウト関数を取得
+  const { themeColor, setThemeColor } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetcher = async () => {
@@ -34,8 +35,7 @@ const SettingsPage: React.FC = () => {
           console.log(userData);
 
           // setCurrentTheme(userData.themeColorId); // データベースから取得したテーマカラーを設定
-          setThemeColor(themeColors[userData.themeColorId]); // テーマカラーを設定
-          console.log(userData.themeColorId);
+          setThemeColor(userData.themeColor); // テーマカラーを設定
 
           setUserName(userData.userName);
         } else {
@@ -49,15 +49,16 @@ const SettingsPage: React.FC = () => {
     fetcher();
   }, [token]);
 
-  useEffect(() => {
-    // bodyの背景色を設定
-    document.body.style.backgroundColor = themeColor;
-  }, [themeColor]);
+  // useEffect(() => {
+  //   // bodyの背景色を設定
+  //   document.body.style.backgroundColor = themeColor;
+  // }, [themeColor]);
 
   const handleThemeChange = async (themeId: string) => {
     if (!token) return;
-    setThemeColor(themeColors[themeId]); // 即時にテーマカラーを更新
+    setThemeColor(themeId); // 即時にテーマカラーを更新
     setLoading(true);
+    console.log(themeColor);
     try {
       const response = await fetch("/api/login", {
         method: "PUT",

@@ -13,7 +13,10 @@ type ThemeContextType = {
   setThemeColor: (color: string) => void;
 };
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextType>({
+  themeColor: "Theme01",
+  setThemeColor: () => {},
+});
 
 //ユーザーのテーマカラーを取得する関数
 const fetchUserThemeColor = async (token: string): Promise<string> => {
@@ -32,7 +35,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { token, isLoading } = useSupabaseSession(); // ログイン状態とトークンを取得
-  const [themeColor, setThemeColor] = useState<string>("#E4C8CE"); // デフォルトの背景色
+  const [themeColor, setThemeColor] = useState<string>("Theme01"); // デフォルトの背景色
 
   useEffect(() => {
     const initializeThemeColor = async () => {
