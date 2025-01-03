@@ -8,15 +8,15 @@ import { useSupabaseSession } from "../_hooks/useSupabaseSession";
 import { themeColors } from "../_type/login";
 import Input from "../_components/Input";
 import toast, { Toaster } from "react-hot-toast";
-// import useLogout from "../_hooks/useLogout"; // ログアウトフック
+import useLogout from "../_hooks/useLogout"; // ログアウトフック
 
 const SettingsPage: React.FC = () => {
   const { themeColor, setThemeColor } = useTheme();
   const { token } = useSupabaseSession();
-  const [currentTheme, setCurrentTheme] = useState<string>(""); // 明示的な初期値
+  const [currentTheme, setCurrentTheme] = useState<string>("themeColorId"); // 明示的な初期値
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  // const logout = useLogout(); // ログアウト関数を取得
+  const logout = useLogout(); // ログアウト関数を取得
 
   useEffect(() => {
     const fetcher = async () => {
@@ -31,8 +31,12 @@ const SettingsPage: React.FC = () => {
         });
         if (res.ok) {
           const { userData } = await res.json();
-          setCurrentTheme(userData.themeColorId); // データベースから取得したテーマカラーを設定
+          console.log(userData);
+
+          // setCurrentTheme(userData.themeColorId); // データベースから取得したテーマカラーを設定
           setThemeColor(themeColors[userData.themeColorId]); // テーマカラーを設定
+          console.log(userData.themeColorId);
+
           setUserName(userData.userName);
         } else {
           throw new Error("現在のテーマカラーを取得できませんでした。");
@@ -139,7 +143,7 @@ const SettingsPage: React.FC = () => {
         <div className="mt-8">
           <Button text="お問合せ" />
         </div>
-        <div className="mt-8">
+        <div className="mt-8" onClick={logout}>
           <Button text="ログアウト" />
         </div>
       </div>

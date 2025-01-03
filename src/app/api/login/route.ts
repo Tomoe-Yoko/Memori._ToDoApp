@@ -74,6 +74,7 @@ export const GET = async (request: NextRequest) => {
       userName: user.userName,
       themeColor: user.themeColorId,
     };
+    console.log(user.themeColorId);
 
     return NextResponse.json({ status: "OK", userData });
   } catch (error) {

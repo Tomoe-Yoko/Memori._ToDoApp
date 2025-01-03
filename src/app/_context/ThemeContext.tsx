@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import { useSupabaseSession } from "../_hooks/useSupabaseSession"; // Supabaseのセッションフックをインポート
 
 type ThemeContextType = {
   themeColor: string;
@@ -15,9 +16,11 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 //ユーザーのテーマカラーを取得する関数
-const fetchUserThemeColor = async (): Promise<string> => {
+const fetchUserThemeColor = async (token: string): Promise<string> => {
   // API呼び出しをしてユーザーのテーマカラーを取得する
-  const response = await fetch("/api/user/theme-color");
+  const response = await fetch("/api/login", {
+    headers: { "Content-Type": "application/json", Authorization: token! },
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch user theme color");
   }
@@ -28,12 +31,14 @@ const fetchUserThemeColor = async (): Promise<string> => {
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { token, isLoading } = useSupabaseSession(); // ログイン状態とトークンを取得
   const [themeColor, setThemeColor] = useState<string>("#E4C8CE"); // デフォルトの背景色
 
   useEffect(() => {
     const initializeThemeColor = async () => {
+      if (isLoading || !token) return; // ロード中またはトークンがない場合は何もしない
       try {
-        const userThemeColor = await fetchUserThemeColor();
+        const userThemeColor = await fetchUserThemeColor(token);
         setThemeColor(userThemeColor);
       } catch (error) {
         console.error("Error fetching user theme color:", error);
@@ -41,7 +46,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     initializeThemeColor();
-  }, []); // コンポーネントがマウントされたときに一度だけ実行
+  }, [token, isLoading]); // コンポーネントがマウントされたときに一度だけ実行
 
   return (
     <ThemeContext.Provider value={{ themeColor, setThemeColor }}>
