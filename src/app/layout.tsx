@@ -1,31 +1,35 @@
-import type { Metadata } from "next";
+"use client";
+// import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/Header";
-
+import { ThemeProvider, ThemeContext } from "./_context/ThemeContext";
+import { useContext } from "react";
 const jost = Jost({
-  // weight: "500",
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Memori Todo App",
-  description: "todoアプリで快適な生活を",
-};
+// export const metadata: Metadata = {
+//   title: "Memori Todo App",
+//   description: "todoアプリで快適な生活を",
+// };
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { themeColor } = useContext(ThemeContext);
   return (
     <html lang="ja">
-      <body className={`${jost} bg-001`}>
-        <div className="max-w-[500px] min-h-svh bg-001 m-auto border-r border-l border-white">
-          <Header />
-          {children}
-        </div>
-      </body>
+      <ThemeProvider>
+        <body className={`${jost.className} bg-${themeColor}`}>
+          <div className="max-w-[500px] min-h-svh m-auto border-r border-l border-white">
+            <Header />
+            {children}
+          </div>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

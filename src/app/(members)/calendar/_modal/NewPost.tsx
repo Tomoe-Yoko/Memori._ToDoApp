@@ -59,8 +59,8 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
   };
 
   return (
-    <div>
-      <h2 className="text-center text-2xl mb-4 text-white">Calendar.</h2>
+    <div className="bg-white">
+      <h2 className="text-center text-2xl mb-4 text-text_button">Calendar.</h2>
       <form onSubmit={handleSubmit}>
         {/* 予定の内容 */}
         <div className="mb-8">

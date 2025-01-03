@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import Tabs from "./_components/Tabs";
-import Navigation from "../_components/Navigation";
+import Navigation from "../../_components/Navigation";
 import Items from "./_components/Items";
-import PlusButton from "../_components/PlusButton";
+import PlusButton from "../../_components/PlusButton";
 import { Toaster } from "react-hot-toast";
 import { useTodo } from "./_hooks/useControlTodo";
 

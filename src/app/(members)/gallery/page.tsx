@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import Navigation from "../_components/Navigation";
+import Navigation from "@/app/_components/Navigation";
 import { Toaster } from "react-hot-toast";
 import Tab from "./_components/Tab";
-import PlusButton from "../_components/PlusButton";
+import PlusButton from "@/app/_components/PlusButton";
 import GalleryImage from "./_components/GalleryImage";
 import useControlGalleryTab from "./_hooks/useControlGalleryTab";
 import useControlGalleryImage from "./_hooks/useControlGalleryImage";
-import Loading from "../loading";
+import Loading from "@/app/loading";
 
 const Page: React.FC = () => {
   const [selectedTabId, setSelectedTabId] = useState<number>(0); // 現在選択中のタブID。useControlGalleryTabとuseControlGalleryImage使うためここに記入

@@ -1,19 +1,19 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useSupabaseSession } from "../_hooks/useSupabaseSession";
+import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
 import { ScheduleColor } from "@prisma/client";
-import { CalendarData } from "../_type/Calendar";
+import { CalendarData } from "../../_type/Calendar";
 import Modal from "react-modal";
 import NewPost from "./_modal/NewPost";
 import AllSchedule from "./_modal/AllSchedule";
 import { scheduleColorMap } from "./_modal/NewPost";
-import Button from "../_components/Button";
-import Navigation from "../_components/Navigation";
+// import Button from "../_components/Button";
+import Navigation from "../../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
-import "../../app/globals.css";
-import PlusButton from "../_components/PlusButton";
+import "../../../app/globals.css";
+import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
 
 const Page: React.FC = () => {
@@ -223,19 +223,19 @@ const Page: React.FC = () => {
       <Modal
         isOpen={addScheduleModal} //closeModal
         onRequestClose={() => setAddScheduleModal(false)}
-        className="bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        className="bg-white p-16 max-w-lg mx-auto mt-24 rounded shadow-lg "
         //モーダルの外でクローズ
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
         <NewPost onSuccess={handleSuccess} initialDate={new Date()} />
-        <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
+        {/* <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
           <Button text="キャンセル" />
-        </div>
+        </div> */}
       </Modal>
       <Modal
         isOpen={showAllScheduleModal}
         onRequestClose={() => setShowAllScheduleModal(false)}
-        className=" bg-001 p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
+        className=" bg-white p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         overlayClassName="absolute inset-0 w-full h-max min-h-screen bg-black bg-opacity-50 flex justify-center items-center"
       >
         <AllSchedule

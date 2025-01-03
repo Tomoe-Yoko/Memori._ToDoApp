@@ -1,14 +1,14 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Routine } from "../_type/WeeklyRoutine";
-import { useSupabaseSession } from "../_hooks/useSupabaseSession";
+import { Routine } from "@/app/_type/WeeklyRoutine";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { Weekly } from "@prisma/client";
-import PlusButton from "../_components/PlusButton";
-import Navigation from "../_components/Navigation";
+import PlusButton from "@/app/_components/PlusButton";
+import Navigation from "@/app/_components/Navigation";
 import AllClearButton from "./_components/AllClearButton";
 import { useReward } from "react-rewards";
 import toast from "react-hot-toast";
-import Loading from "../loading";
+import Loading from "@/app/loading";
 import WeekdaySelect from "./_components/WeekdaySelect";
 import RoutineList from "./_components/RoutineList";
 
