@@ -1,13 +1,14 @@
 "use client";
 // import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+// import { Jost } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/Header";
 import { ThemeProvider, ThemeContext } from "./_context/ThemeContext";
 import { useContext } from "react";
-const jost = Jost({
-  subsets: ["latin"],
-});
+import { themeColors } from "./_type/login";
+// const jost = Jost({
+//   subsets: ["latin"],
+// });
 
 // export const metadata: Metadata = {
 //   title: "Memori Todo App",
@@ -23,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <ThemeProvider>
-        <body className={`${jost.className} bg-${themeColor}`}>
+        <body style={{ backgroundColor: themeColors[themeColor] }}>
           <div className="max-w-[500px] min-h-svh m-auto border-r border-l border-white">
             <Header />
             {children}

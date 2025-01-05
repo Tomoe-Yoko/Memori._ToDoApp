@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { themeColors } from "@/app/_type/login";
+// import { themeColors } from "@/app/_type/login";
 
 // interface LoginUserData {
 //   userName: string;
@@ -12,12 +12,12 @@ import { themeColors } from "@/app/_type/login";
 const WelcomePage: React.FC = () => {
   const { token } = useSupabaseSession();
   const [userName, setUserName] = useState<string>("ユーザー");
-  const [themeColor, setThemeColor] = useState<string | null>("#E4C8CE");
+  // const [themeColor, setThemeColor] = useState<string | null>("#E4C8CE");
   const router = useRouter();
 
-  const getThemeColor = (themeColorId: string): string => {
-    return themeColors[themeColorId] || "#E4C8CE"; // デフォルトカラー
-  };
+  // const getThemeColor = (themeColorId: string): string => {
+  //   return themeColors[themeColorId] || "#E4C8CE"; // デフォルトカラー
+  // };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -41,11 +41,12 @@ const WelcomePage: React.FC = () => {
         }
 
         const result = await response.json();
-        const { userName, themeColor } = result.userData; // userDataを展開
+        // const { userName, themeColor } = result.userData; // userDataを展開
+        const { userName } = result.userData; // userDataを展開
 
         // ユーザー名とテーマカラーをステートに設定
         setUserName(userName || "ユーザー");
-        setThemeColor(getThemeColor(themeColor));
+        // setThemeColor(getThemeColor(themeColor));
       } catch (error) {
         console.error("APIリクエスト中にエラーが発生しました: ", error);
       }
@@ -61,12 +62,12 @@ const WelcomePage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [router, token]);
 
-  useEffect(() => {
-    // テーマカラーを背景色に適用
-    if (themeColor) {
-      document.body.style.backgroundColor = themeColor;
-    }
-  }, [themeColor]);
+  // useEffect(() => {
+  //   // テーマカラーを背景色に適用
+  //   if (themeColor) {
+  //     document.body.style.backgroundColor = themeColor;
+  //   }
+  // }, [themeColor]);
 
   return (
     <div className="relative max-w-md min-h-svh m-auto">

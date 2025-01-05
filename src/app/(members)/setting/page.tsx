@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Button from "../../_components/Button";
 import Navigation from "../../_components/Navigation";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
-import { themeColors } from "../../_type/login";
+import { themeColors, ThemeColor } from "../../_type/login";
 import Input from "../../_components/Input";
 import toast, { Toaster } from "react-hot-toast";
 import useLogout from "../../_hooks/useLogout"; // ログアウトフック
@@ -13,11 +13,13 @@ import { ThemeContext } from "../../_context/ThemeContext";
 import { useContext } from "react";
 const SettingsPage: React.FC = () => {
   const { token } = useSupabaseSession();
-  const [currentTheme, setCurrentTheme] = useState<string>("themeColorId"); // 明示的な初期値
+  const [currentTheme, setCurrentTheme] = useState<ThemeColor>(
+    ThemeColor.Theme01
+  );
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const logout = useLogout(); // ログアウト関数を取得
-  const { themeColor, setThemeColor } = useContext(ThemeContext);
+  const { setThemeColor } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetcher = async () => {
@@ -35,7 +37,7 @@ const SettingsPage: React.FC = () => {
           console.log(userData);
 
           // setCurrentTheme(userData.themeColorId); // データベースから取得したテーマカラーを設定
-          setThemeColor(userData.themeColor); // テーマカラーを設定
+          setThemeColor(userData.themeColor as ThemeColor); // テーマカラーを設定
 
           setUserName(userData.userName);
         } else {
@@ -47,7 +49,7 @@ const SettingsPage: React.FC = () => {
       }
     };
     fetcher();
-  }, [token]);
+  }, [token, setThemeColor]);
 
   // useEffect(() => {
   //   // bodyの背景色を設定
@@ -56,10 +58,11 @@ const SettingsPage: React.FC = () => {
 
   const handleThemeChange = async (themeId: string) => {
     if (!token) return;
-    setThemeColor(themeId); // 即時にテーマカラーを更新
     setLoading(true);
-    console.log(themeColor);
+
     try {
+      const themeColorId = themeId as ThemeColor;
+      setThemeColor(themeColorId); // 即時にテーマカラーを更新
       const response = await fetch("/api/login", {
         method: "PUT",
         headers: {
@@ -73,7 +76,7 @@ const SettingsPage: React.FC = () => {
         throw new Error("Failed to update theme color");
       }
 
-      setCurrentTheme(themeId);
+      setCurrentTheme(themeColorId);
     } catch (error) {
       alert("テーマ色の変更に失敗しました。");
       throw error;
@@ -111,10 +114,17 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div>
+      <div className="hidden">
+        <div
+          className="bg-Theme01 bg-Theme02 bg-Theme03 bg-Theme04 bg-Theme05 bg-Theme06
+          bg-Theme07 bg-Theme08 bg-Theme09 bg-Theme10 bg-Theme11 bg-Theme12
+          bg-Theme13 bg-Theme14 bg-Theme15"
+        ></div>
+      </div>
       <h2 className="text-white text-2xl text-center">Setting.</h2>
       <div className="w-[80%] mx-auto my-8 bg-white p-4">
         <div className="grid grid-cols-5 gap-5 mb-12">
-          {Object.entries(themeColors).map(([themeId, color]) => (
+          {Object.entries(themeColors).map(([themeId]) => (
             <div
               key={themeId}
               onClick={() => handleThemeChange(themeId)}
@@ -124,8 +134,9 @@ const SettingsPage: React.FC = () => {
                 currentTheme === themeId
                   ? "border-4 border-text_button"
                   : "border border-gray-300"
-              }`}
-              style={{ backgroundColor: color }}
+              } bg-${themeId}`}
+
+              // style={{ backgroundColor: color }}
             ></div>
           ))}
         </div>
