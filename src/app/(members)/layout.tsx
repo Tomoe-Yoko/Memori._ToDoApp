@@ -1,5 +1,5 @@
 "use client";
 
 export default function Members({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <div>{children}</div>;
 }

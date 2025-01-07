@@ -60,12 +60,18 @@ export const POST = async (request: NextRequest) => {
 
 ////GET
 export const GET = async (request: NextRequest) => {
-  const token = request.headers.get("Authorization") ?? "";
+  const token = request.headers.get("Authorization") || "";
+
   const { error, data } = await supabase.auth.getUser(token);
   if (error)
-    return NextResponse.json({ status: error.message }, { status: 400 });
+    return NextResponse.json({
+      status: "OK",
+      userData: { userName: null, themeColor: `bg-Theme01` },
+    });
+
   const supabaseUserId = data.user.id;
   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
+
   if (!user)
     return NextResponse.json(
       { message: "ユーザーが見つかりませんでした" },
@@ -74,9 +80,9 @@ export const GET = async (request: NextRequest) => {
   try {
     const userData = {
       userName: user.userName,
-      themeColor: user.themeColorId,
+      themeColor: `bg-${user.themeColorId}`,
     };
-    console.log(user.themeColorId);
+    console.log(`test100${user.themeColorId}`);
 
     return NextResponse.json({ status: "OK", userData });
   } catch (error) {
