@@ -1,13 +1,5 @@
 import { ThemeColorId } from "@prisma/client";
 
-// export interface LoginUserData {
-//   id: number;
-//   supabaseUserId: string;
-//   userName?: string;
-//   themeColorId: ThemeColorId;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
 export interface LoginUserData {
   userName: string;
   themeColor: ThemeColor;

@@ -2,7 +2,6 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-
 import { useUser } from "@/app/_hooks/useUser";
 
 // interface LoginUserData {

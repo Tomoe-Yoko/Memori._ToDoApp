@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../_components/Button";
 import Navigation from "../../_components/Navigation";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
@@ -18,11 +18,17 @@ const SettingsPage: React.FC = () => {
     getUserName
   );
   const [currentTheme, setCurrentTheme] = useState<ThemeColor>(
-    themeColor
-      ? (themeColor.replace("bg-", "") as ThemeColor)
-      : ThemeColor.Theme01
+    ThemeColor.Theme01
   );
-  console.log(currentTheme);
+
+  // 初期テーマカラーを設定
+  useEffect(() => {
+    mutate();
+    if (themeColor) {
+      const initialTheme = themeColor.replace("bg-", "") as ThemeColor;
+      setCurrentTheme(initialTheme);
+    }
+  }, [themeColor]);
 
   const handleThemeChange = async (themeId: ThemeColor) => {
     if (!token) return;
@@ -41,9 +47,6 @@ const SettingsPage: React.FC = () => {
       }
       mutate({ userData: { userName, themeColor } });
       setCurrentTheme(themeId);
-      toast.success("テーマカラーが変更されました", {
-        duration: 2100, //ポップアップ表示時間
-      });
     } catch (error) {
       console.error("テーマ色の変更に失敗しました。", error);
       alert("テーマ色の変更に失敗しました。");
@@ -66,7 +69,7 @@ const SettingsPage: React.FC = () => {
       if (!response.ok) {
         throw new Error("ユーザーネームの変更に失敗しました。");
       }
-      mutate({ userData: { userName, themeColor } });
+      mutate({ userData: { userName, themeColor: currentTheme } });
       toast.success("ユーザーネームが変更されました", {
         duration: 2100, //ポップアップ表示時間
       });
@@ -101,7 +104,7 @@ const SettingsPage: React.FC = () => {
         </div>
         <div className="mt-8 mx-auto w-56 text-lg text-text_button">
           <Input
-            value={userName || ""}
+            value={getUserName || ""}
             onChange={(e) => setUserName(e.target.value)}
             placeholder="新しいユーザーネームを入力"
           />

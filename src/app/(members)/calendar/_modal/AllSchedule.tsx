@@ -131,8 +131,6 @@ const AllSchedule: React.FC<Props> = ({
       </div>
       <div
         onClick={() => {
-          console.log(selectedDate);
-
           setAddModalOpen(true);
         }}
         className="mt-8"

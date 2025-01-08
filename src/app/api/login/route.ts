@@ -11,7 +11,6 @@ export const POST = async (request: NextRequest) => {
   const token = request.headers.get("Authorization") ?? "";
 
   const { data, error } = await supabase.auth.getUser(token);
-  console.log("test14");
 
   if (error || !data.user) {
     return NextResponse.json(
@@ -34,7 +33,6 @@ export const POST = async (request: NextRequest) => {
         userExists: true,
       });
     }
-    console.log("test37");
 
     // 新しいユーザーを作成
     const userPostResponse = await prisma.users.create({
@@ -82,7 +80,6 @@ export const GET = async (request: NextRequest) => {
       userName: user.userName,
       themeColor: `bg-${user.themeColorId}`,
     };
-    console.log(`test100${user.themeColorId}`);
 
     return NextResponse.json({ status: "OK", userData });
   } catch (error) {

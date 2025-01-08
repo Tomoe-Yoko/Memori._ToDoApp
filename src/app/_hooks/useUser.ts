@@ -4,11 +4,8 @@ import { useSupabaseSession } from "./useSupabaseSession";
 import { ThemeColorId } from "@prisma/client";
 export const useUser = () => {
   const { token, isLoading } = useSupabaseSession();
-  console.log(token, isLoading);
 
   const fetcher = async () => {
-    console.log(token);
-
     if (isLoading === undefined) return;
     //null=ログイン画面の状態
     const prams = {
