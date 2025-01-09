@@ -1,6 +1,5 @@
-export interface Contact {
-  id: number;
+export interface CreateContactRequestBody {
   userName: string;
   text: string;
-  createdAt: Date;
+  email: string;
 }

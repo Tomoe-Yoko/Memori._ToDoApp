@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import Button from "../../_components/Button";
 import Navigation from "../../_components/Navigation";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
@@ -23,7 +24,7 @@ const SettingsPage: React.FC = () => {
 
   // 初期テーマカラーを設定
   useEffect(() => {
-    mutate();
+    // mutate();
     if (themeColor) {
       const initialTheme = themeColor.replace("bg-", "") as ThemeColor;
       setCurrentTheme(initialTheme);
@@ -112,9 +113,10 @@ const SettingsPage: React.FC = () => {
         <div onClick={handleUserNameChange}>
           <Button text="ユーザーネーム変更" />
         </div>
-        <div className="mt-8">
+        <Link href="/contact" className="block mt-8">
           <Button text="お問合せ" />
-        </div>
+        </Link>
+
         <div className="mt-8" onClick={logout}>
           <Button text="ログアウト" />
         </div>
