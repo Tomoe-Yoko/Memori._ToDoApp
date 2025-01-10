@@ -80,6 +80,7 @@ const Contact: React.FC = () => {
         headers: { "Content-Type": "application/json", Authorization: token },
         body: JSON.stringify({ userName, email, text }),
       });
+      console.log(res);
 
       if (res.ok) {
         // フォームの送信処理をここに記述
@@ -88,7 +89,7 @@ const Contact: React.FC = () => {
           <span>
             メールが送信されました。
             <br />
-            返信までしばらくお待ちいただけますようお願いいたします。
+            返信までしばらくお待ちください。
           </span>,
           {
             duration: 2100,

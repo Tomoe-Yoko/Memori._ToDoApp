@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreateContactRequestBody } from "@/app/_type/Contact";
 import { supabase } from "@/utils/supabase";
-import fetch from "isomorphic-fetch"; // isomorphic-fetchを使用
+import fetch from "node-fetch";
 const prisma = new PrismaClient();
 
 export const POST = async (request: NextRequest) => {
@@ -34,6 +34,7 @@ export const POST = async (request: NextRequest) => {
         text,
       },
     });
+    console.log("37test");
 
     // Slackに通知を送信
     const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
@@ -42,10 +43,12 @@ export const POST = async (request: NextRequest) => {
         "Slack Webhook URL is not defined in environment variables"
       );
     }
+    console.log("46test");
 
     const slackMessage = {
       text: `新しいお問い合わせがありました。\n\n名前: ${userName}\nメール: ${email}\n内容: ${text}`,
     };
+    console.log("51test");
 
     await fetch(slackWebhookUrl, {
       method: "POST",
@@ -54,6 +57,7 @@ export const POST = async (request: NextRequest) => {
       },
       body: JSON.stringify(slackMessage),
     });
+    console.log("60test");
 
     return NextResponse.json({
       status: "OK",
@@ -63,5 +67,6 @@ export const POST = async (request: NextRequest) => {
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ error: error.message }, { status: 400 });
+    throw error; // 必要に応じてエラーを再スロー
   }
 };
