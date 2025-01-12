@@ -4,19 +4,10 @@ import { useRouter } from "next/navigation";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { useUser } from "@/app/_hooks/useUser";
 
-// interface LoginUserData {
-//   userName: string;
-//   themeColor: string;
-// }
-
 const WelcomePage: React.FC = () => {
   const { token } = useSupabaseSession();
   const { userName, isLoading } = useUser();
   const router = useRouter();
-
-  // const getThemeColor = (themeColorId: string): string => {
-  //   return themeColors[themeColorId] || "#E4C8CE"; // デフォルトカラー
-  // };
 
   useEffect(() => {
     if (isLoading) return;

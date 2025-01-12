@@ -120,7 +120,7 @@ export const PUT = async (request: NextRequest) => {
       );
     }
 
-    // 更新データを作成（nullまたはundefinedのフィールドは無視）
+    // POST更新データを作成（nullまたはundefinedのフィールドは無視）
     const updateData: { userName?: string; themeColorId?: ThemeColorId } = {};
     if (body.userName !== undefined) {
       updateData.userName = body.userName;

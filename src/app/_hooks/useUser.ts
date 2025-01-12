@@ -30,6 +30,8 @@ export const useUser = () => {
     } = await resp.json();
     return data;
   };
+  console.log("isLoading:", isLoading);
+  console.log("token:", token);
   const {
     data,
     mutate,

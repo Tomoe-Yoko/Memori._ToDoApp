@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import Button from "../_components/Button";
 import Footer from "../_components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
-import memo from "../../../public/img/memo.png";
-import openPw from "../../img/openPw.png";
-import closePw from "../../img/closePw.png";
+import memo from "@/app/public/img/memo.png";
+import openPw from "@/app/public/img/openPw.png";
+import closePw from "@/app/public/img/closePw.png";
 import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -118,7 +119,9 @@ const Page = () => {
             </div>
           </div>
           <p className="text-center text-[#729EF0] text-base">
-            <a href="">※パスワードを忘れた方はこちら</a>
+            <Link href="/resetPassword/sendEmail">
+              ※パスワードを忘れた方はこちら
+            </Link>
           </p>
           <div>
             <Button text="送信" />

@@ -43,12 +43,10 @@ export const POST = async (request: NextRequest) => {
         "Slack Webhook URL is not defined in environment variables"
       );
     }
-    console.log("46test");
 
     const slackMessage = {
       text: `新しいお問い合わせがありました。\n\n名前: ${userName}\nメール: ${email}\n内容: ${text}`,
     };
-    console.log("51test");
 
     await fetch(slackWebhookUrl, {
       method: "POST",
@@ -57,8 +55,6 @@ export const POST = async (request: NextRequest) => {
       },
       body: JSON.stringify(slackMessage),
     });
-    console.log("60test");
-
     return NextResponse.json({
       status: "OK",
       message: "Contact entry created and Slack notification sent successfully",

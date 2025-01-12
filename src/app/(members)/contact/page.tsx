@@ -4,7 +4,6 @@ import Button from "@/app/_components/Button";
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import toast, { Toaster } from "react-hot-toast";
-// import Loading from "@/app/loading";
 import Navigation from "../../_components/Navigation";
 
 interface Errors {
@@ -18,7 +17,6 @@ const Contact: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [text, setText] = useState<string>("");
-  // const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Errors>({
     name: "",
     email: "",
@@ -29,13 +27,7 @@ const Contact: React.FC = () => {
   //送信中かどうかを管理
 
   const validate = () => {
-    const newErrors: Errors = {
-      //初期値なにもなくす
-      // name: "",
-      // email: "",
-      // message: "",
-    };
-    //↑バリデーションとして生成されたエラーのオブジェクト
+    const newErrors: Errors = {};
 
     if (!userName) {
       newErrors.name = "お名前は必須です";
@@ -46,7 +38,6 @@ const Contact: React.FC = () => {
     if (!email) {
       newErrors.email = "メールアドレスは必須です";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      //空白以外の文字が1回以上続き、その後@があり、その後再び空白以外の文字が1回以上続き、最後に.があり再び空白以外の文字が1回以上続く。test(email)は、emailがこのパターンにマッチするかどうかをチェック、!はその結果を否定するので、もしemailがこのパターンにマッチしない場合に、ifブロック内のコードが実行
       newErrors.email = "有効なメールアドレスを入力してください";
     }
 
@@ -59,7 +50,6 @@ const Contact: React.FC = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-    //↑エラーが存在しない場合trueを返し、エラーが存在する場合にはfalseを返す。これにより、バリデーションが成功したかどうかを判定。この二つはセット
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -69,7 +59,6 @@ const Contact: React.FC = () => {
       return;
     }
     e.preventDefault();
-    //早期リターンでネストをわかりやすく
     if (!validate()) {
       return;
     }
@@ -83,7 +72,6 @@ const Contact: React.FC = () => {
       console.log(res);
 
       if (res.ok) {
-        // フォームの送信処理をここに記述
         setSubmitting(true);
         toast.success(
           <span>
@@ -120,9 +108,6 @@ const Contact: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserName(e.target.value);
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <div className="mb-[73px]">
       <h2 className="text-white text-2xl text-center">Contact.</h2>
@@ -137,7 +122,6 @@ const Contact: React.FC = () => {
               id="name"
               type="text"
               value={userName}
-              //(e) =>setName(e.target.value);
               onChange={handleChange}
               disabled={submitting}
               className=" w-full p-3"
@@ -175,13 +159,6 @@ const Contact: React.FC = () => {
         </div>
         <div className="flex justify-center" onClick={handleSubmit}>
           <Button text="送信" />
-          {/* <button
-            type="submit"
-            disabled={submitting}
-            className="block mx-4 py-3 px-4 rounded-xl bg-slate-700 text-white"
-          >
-            送信
-          </button> */}
         </div>
       </form>
       <Navigation />
