@@ -32,7 +32,7 @@ const Page = () => {
       // APIにリクエストを送信する処理
       const token = data.session?.access_token;
       try {
-        const response = await fetch("/api/login", {
+        const response = await fetch("/api/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const Page = () => {
         if (response.ok) {
           router.replace("/login/welcome");
         } else {
-          toast.error("APIリクエストに失敗しました: " + result.message);
+          toast.error(`APIリクエストに失敗しました: ${result.message} `);
         }
       } catch (apiError) {
         console.error("APIリクエストエラー:", apiError);

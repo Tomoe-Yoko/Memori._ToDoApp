@@ -34,7 +34,6 @@ export const POST = async (request: NextRequest) => {
         text,
       },
     });
-    console.log("37test");
 
     // Slackに通知を送信
     const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;

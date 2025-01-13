@@ -46,7 +46,6 @@ const Contact: React.FC = () => {
     } else if (text.length >= 500) {
       newErrors.text = "本文は500文字以内で入力してください";
     }
-    console.log(Object.keys(newErrors).length);
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -69,7 +68,6 @@ const Contact: React.FC = () => {
         headers: { "Content-Type": "application/json", Authorization: token },
         body: JSON.stringify({ userName, email, text }),
       });
-      console.log(res);
 
       if (res.ok) {
         setSubmitting(true);

@@ -17,27 +17,33 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const access_token = query.get("access_token");
-    const type = query.get("type");
+    const setSessionAsync = async () => {
+      const query = new URLSearchParams(window.location.search);
+      const access_token = query.get("access_token");
+      const type = query.get("type");
 
-    if (type === "recovery" && access_token) {
-      // トークンを使ってセッションを設定
-      supabase.auth
-        .setSession({
-          access_token: access_token,
-          refresh_token: "", // 必要に応じて設定
-        })
-        .then(({ error }) => {
+      if (type === "recovery" && access_token) {
+        try {
+          const { error } = await supabase.auth.setSession({
+            access_token: access_token,
+            refresh_token: "", // 必要に応じて設定
+          });
+
           if (error) {
-            console.error("Failed to set session:", error.message);
             toast.error("セッションの設定に失敗しました。");
+            throw new Error("Failed to set session:", error);
           } else {
             console.log("Session set successfully");
             // 必要に応じて追加の処理を行う
           }
-        });
-    }
+        } catch (error) {
+          console.error("An unexpected error occurred:", error);
+          toast.error("予期しないエラーが発生しました。");
+        }
+      }
+    };
+
+    setSessionAsync();
   }, []);
 
   // パスワードリセットの処理
@@ -48,12 +54,21 @@ const Page = () => {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      console.error("Error updating password:", error.message);
-      toast.error("パスワードの再設定に失敗しました。");
+      toast.error(
+        <span>
+          パスワードの再設定に失敗しました。
+          <br />
+          違うパスワードを試してください。
+        </span>,
+        {
+          duration: 2100, //ポップアップ表示時間
+        }
+      );
+      console.error("Error updating password:", error);
     } else {
       setPassword("");
       toast.success("再設定に成功しました。ログインしてください");
-      router.push("/login/");
+      router.push("/login");
     }
     setIsSubmitting(false);
   };

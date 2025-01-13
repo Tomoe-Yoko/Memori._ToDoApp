@@ -6,16 +6,17 @@ export const useUser = () => {
   const { token, isLoading } = useSupabaseSession();
 
   const fetcher = async () => {
+    if (!token) return;
     if (isLoading === undefined) return;
     //null=ログイン画面の状態
     const prams = {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token || "", //””ログイン画面の時
+        Authorization: token,
       },
     };
-    const resp = await fetch(`/api/login`, prams);
+    const resp = await fetch(`/api/users`, prams);
     if (resp.status !== 200) {
       const errorData = await resp.json();
       throw new Error(
@@ -30,14 +31,12 @@ export const useUser = () => {
     } = await resp.json();
     return data;
   };
-  console.log("isLoading:", isLoading);
-  console.log("token:", token);
   const {
     data,
     mutate,
     error,
     isLoading: dataIsLoading,
-  } = useSWR(isLoading === false ? "/api/login" : null, fetcher);
+  } = useSWR(isLoading === false ? "/api/users" : null, fetcher);
   return {
     themeColor: data?.userData.themeColor,
     userName: data?.userData.userName,

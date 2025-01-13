@@ -15,12 +15,13 @@ const SettingsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const logout = useLogout(); // ログアウト関数を取得
   const { mutate, themeColor, userName: getUserName } = useUser();
-  const [userName, setUserName] = useState<string | null | undefined>(
-    getUserName
-  );
+  const [userName, setUserName] = useState<string | null | undefined>("");
   const [currentTheme, setCurrentTheme] = useState<ThemeColor>(
     ThemeColor.Theme01
   );
+  useEffect(() => {
+    if (getUserName) setUserName(getUserName);
+  }, [getUserName]);
 
   // 初期テーマカラーを設定
   useEffect(() => {
@@ -35,7 +36,7 @@ const SettingsPage: React.FC = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/users", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +47,7 @@ const SettingsPage: React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to update theme color");
       }
-      mutate({ userData: { userName, themeColor } });
+      mutate();
       setCurrentTheme(themeId);
     } catch (error) {
       console.error("テーマ色の変更に失敗しました。", error);
@@ -59,7 +60,7 @@ const SettingsPage: React.FC = () => {
     if (!token || !userName) return;
     setLoading(true);
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/users", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +106,7 @@ const SettingsPage: React.FC = () => {
         </div>
         <div className="mt-8 mx-auto w-56 text-lg text-text_button">
           <Input
-            value={getUserName || ""}
+            value={userName || ""}
             onChange={(e) => setUserName(e.target.value)}
             placeholder="新しいユーザーネームを入力"
           />

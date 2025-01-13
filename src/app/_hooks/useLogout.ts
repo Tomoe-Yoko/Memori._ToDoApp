@@ -12,10 +12,8 @@ const useLogout = () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       alert("ログアウトに失敗しました");
-      console.error("Logout error:", error.message);
-      return;
+      throw new Error("Logout error:", error);
     }
-    // mutate(() => true, undefined, { revalidate: false });
     mutate();
     // ログアウト後にホームページなどにリダイレクト
     router.push("/");

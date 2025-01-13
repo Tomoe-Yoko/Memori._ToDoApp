@@ -109,7 +109,6 @@ export const DELETE = async (
         id: calendarId,
       },
     });
-    console.log("Calendar entry deleted for ID:", calendarId);
     return NextResponse.json({ status: "OK" }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {

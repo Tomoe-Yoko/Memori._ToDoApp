@@ -14,7 +14,6 @@ const Page = () => {
   const sendEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    console.log(email);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_URL}/resetPassword/settingPass`,
@@ -23,7 +22,16 @@ const Page = () => {
       toast.error("再設定メールの送信に失敗しました");
     } else {
       setEmail("");
-      toast.success("メールを送信しました。ご確認ください");
+      toast.success(
+        <span>
+          メールを送信しました。
+          <br />
+          ご確認お願いします。
+        </span>,
+        {
+          duration: 2100, //ポップアップ表示時間
+        }
+      );
     }
     setIsSubmitting(false);
   };

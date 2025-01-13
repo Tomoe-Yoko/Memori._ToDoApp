@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
@@ -20,14 +21,36 @@ const WelcomePage: React.FC = () => {
   }, [router, token, isLoading]);
 
   return (
-    <div className="relative max-w-md min-h-svh m-auto">
-      <div className="absolute inset-0 w-full h-screen bg-tether-line bg-no-repeat bg-right flex justify-center items-center text-white animate-fadeout">
-        <p className="text-center tracking-tight mt-[-10rem] text-[1.5rem]">
-          {userName}さん
+    <div className="">
+      <div className="text-white text-2xl">
+        <p className="leading-relaxed text-white pt-[12rem] text-center text-2xl">
+          <span className="text-[28px]">{userName}さん</span>
           <br />
           今日もおつかれさま
         </p>
       </div>
+      <svg
+        width="148"
+        height="127"
+        viewBox="0 0 148 127"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full pl-[13rem]"
+      >
+        <path
+          d="M6.31356 115.845C7.77746 105.845 15.3474 85.0141 33.9161 81.6948C57.127 77.5457 80.2161 85.6571 100.198 75.6623C120.507 65.5037 131.56 43.5679 135.299 30.7671"
+          stroke="white"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <circle
+          cx="142.877"
+          cy="15.318"
+          r="4.21685"
+          transform="rotate(4.75489 142.877 15.318)"
+          fill="white"
+        />
+      </svg>
     </div>
   );
 };
