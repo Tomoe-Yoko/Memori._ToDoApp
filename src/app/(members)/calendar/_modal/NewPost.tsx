@@ -124,7 +124,7 @@ const NewPost: React.FC<ModalProps> = ({ onSuccess, initialDate }) => {
                 }}
                 className={`w-10 aspect-square rounded-full ${
                   selectedColor === color
-                    ? "border-white border-solid border-4"
+                    ? "border-text_button border-solid border-4"
                     : ""
                 }`}
                 style={{ backgroundColor: color.toLowerCase() }}

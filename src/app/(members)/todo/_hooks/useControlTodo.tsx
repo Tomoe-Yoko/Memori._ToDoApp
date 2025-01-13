@@ -40,12 +40,42 @@ export const useTodo = () => {
       console.error("Failed to fetch todo groups:", error);
     }
   }, [token]);
+  const fetchTodoItems = useCallback(async () => {
+    if (!token || !activeTabId) return;
+
+    setLoading(true);
+    try {
+      // 選択されたタブのToDoアイテムを取得するAPIエンドポイント
+      const response = await fetch(
+        `/api/todo_group/${activeTabId}/todo_items`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // ToDoアイテムを状態にセット
+        setTodoItems(data.todoItems);
+      } else {
+        console.error("Failed to fetch todo items:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching todo items:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, activeTabId]);
 
   useEffect(() => {
     if (todoGroups.length !== 0 && activeTabId === 0) {
       setActiveTabId(todoGroups[0].id);
     }
-  }, [todoGroups, activeTabId]);
+    fetchTodoItems();
+  }, [todoGroups, activeTabId, fetchTodoItems]);
 
   useEffect(() => {
     if (!token) return;
