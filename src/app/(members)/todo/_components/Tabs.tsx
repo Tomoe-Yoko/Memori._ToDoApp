@@ -62,7 +62,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
     if (tabs.length > 0 && activeTabId === 0) {
       setActiveTabId(tabs[0].id);
     }
-  }, [tabs, activeTabId]);
+  }, [tabs, activeTabId, setActiveTabId]);
 
   //タブを切り替える処理
   const handleTabClick = (id: number) => {

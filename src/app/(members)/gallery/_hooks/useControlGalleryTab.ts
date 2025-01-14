@@ -42,7 +42,7 @@ const useControlGalleryTab = (
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, galleryGroups]);
 
   // 初回レンダリングおよび曜日が変更された際にデータを取得
   //不必要な再レンダリング（無限ループなど）や処理の実行を防ぐためuseEffectを分ける
@@ -55,7 +55,7 @@ const useControlGalleryTab = (
       // 初回ロード時にだけ最初のタブを選択
       setSelectedTabId(galleryGroups[0].id);
     }
-  }, [galleryGroups, selectedTabId]);
+  }, [galleryGroups, selectedTabId, setSelectedTabId]);
 
   const addTab = async () => {
     if (!token || !newTabName.trim()) return; //newTabNameが空だとreturn
