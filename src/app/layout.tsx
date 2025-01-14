@@ -24,8 +24,8 @@ export default function RootLayout({
     "/",
     "/login",
     "/signup",
-    "/resetPassword/sendEmail",
-    "/resetPassword/settingPass",
+    "/reset_password/send_email",
+    "/reset_password/setting_pass",
   ];
   const isDefaultBackground = defaultBackgroundPaths.includes(passName); // ここに影響を受けたくないパスを追加
 

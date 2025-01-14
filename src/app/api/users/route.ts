@@ -120,15 +120,15 @@ export const PUT = async (request: NextRequest) => {
       );
     }
 
-    // POST更新データを作成（nullまたはundefinedのフィールドは無視）
-    const updateData: { userName?: string; themeColorId?: ThemeColorId } = {};
-    if (body.userName !== undefined) {
-      updateData.userName = body.userName;
-    }
-    if (body.themeColorId !== undefined) {
-      updateData.themeColorId = body.themeColorId;
-    }
-
+    //  POST更新データを作成（nullまたはundefinedのフィールドは無視）
+    // 分割代入とスプレッド構文の合わせ技
+    //`userName`が`undefined`でない場合にのみ`{ userName }`を`updateData`に追加する.カラーも同様
+    const updateData: { userName?: string; themeColorId?: ThemeColorId } = {
+      ...(body.userName !== undefined && { userName: body.userName }),
+      ...(body.themeColorId !== undefined && {
+        themeColorId: body.themeColorId,
+      }),
+    };
     // データベースの更新
     const updatedUser = await prisma.users.update({
       where: {
@@ -136,11 +136,11 @@ export const PUT = async (request: NextRequest) => {
       },
       data: updateData,
     });
+    console.log(`140:${updatedUser}`);
 
     return NextResponse.json({
       status: 200,
       message: "User updated successfully",
-      user: updatedUser,
     });
   } catch (error) {
     if (error instanceof Error) {

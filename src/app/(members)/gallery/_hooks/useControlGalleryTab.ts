@@ -37,8 +37,8 @@ const useControlGalleryTab = (
       }
     } catch (error) {
       setGalleryGroups([]); // デフォルトで空の配列を設定
+      console.error("タブデータの取得に失敗しました。:", error);
       alert("タブデータの取得に失敗しました。");
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -78,8 +78,8 @@ const useControlGalleryTab = (
         throw new Error("Failed to add tab.");
       }
     } catch (error) {
+      console.error("タブデータの追加に失敗しました。:", error);
       alert("タブの追加に失敗しました。");
-      throw error;
     }
   };
   // タブを切り替える処理
@@ -129,8 +129,8 @@ const useControlGalleryTab = (
         throw new Error("Failed to update tab");
       }
     } catch (error) {
+      console.error("タブ名の更新に失敗しました。:", error);
       alert("タブ名の更新に失敗しました。");
-      throw error;
     }
   };
 
@@ -162,8 +162,11 @@ const useControlGalleryTab = (
         throw new Error("Failed to delete tab");
       }
     } catch (error) {
+      console.error(
+        "タブを削除できませんでした。もう一度お試しください。:",
+        error
+      );
       alert("タブを削除できませんでした。もう一度お試しください。");
-      throw error;
     }
   };
   // Tabモーダルを開く

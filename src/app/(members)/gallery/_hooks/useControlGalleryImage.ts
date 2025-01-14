@@ -29,8 +29,8 @@ const useControlGalleryImage = (selectedTabId: number) => {
       }
       return data.signedUrl;
     } catch (error) {
+      console.error("画像のサイン付きURLの生成に失敗しました。", error);
       alert("画像のサイン付きURLの生成に失敗しました。");
-      throw error; // 呼び出し元でキャッチするために再スロー
     }
   };
 
@@ -70,9 +70,9 @@ const useControlGalleryImage = (selectedTabId: number) => {
         throw new Error(`Failed to fetch gallery items:${data}`);
       }
     } catch (error) {
+      console.error("画像データ取得に失敗しました。:", error);
       alert("画像データ取得に失敗しました。");
       setThumbnailImageUrls([]);
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -134,8 +134,11 @@ const useControlGalleryImage = (selectedTabId: number) => {
         );
       }
     } catch (error) {
+      console.error(
+        "画像の追加に失敗しました。もう一度お試しください。:",
+        error
+      );
       alert("画像の追加に失敗しました。もう一度お試しください。");
-      throw error;
     }
   };
 
@@ -152,8 +155,8 @@ const useControlGalleryImage = (selectedTabId: number) => {
 
       return data.signedUrl; // サインドURLを返す
     } catch (error) {
+      console.error("画像データ取得に失敗しました。:", error);
       alert("画像データ取得に失敗しました。");
-      throw error;
     }
   };
   useEffect(() => {
@@ -240,10 +243,13 @@ const useControlGalleryImage = (selectedTabId: number) => {
         throw new Error("Failed to update image in database:");
       }
     } catch (error) {
+      console.error(
+        "ファイル選択が利用できないもしくは、ファイルが選択されていません:",
+        error
+      );
       alert(
         "ファイル選択が利用できないもしくは、ファイルが選択されていません。"
       );
-      throw error;
     }
   };
   //画像削除（Modal）
@@ -293,8 +299,11 @@ const useControlGalleryImage = (selectedTabId: number) => {
         throw new Error("Failed to delete image from database.");
       }
     } catch (error) {
+      console.error(
+        "画像が削除できませんでした。もう一度お試しください。:",
+        error
+      );
       alert("画像が削除できませんでした。もう一度お試しください。");
-      throw error;
     }
   };
 

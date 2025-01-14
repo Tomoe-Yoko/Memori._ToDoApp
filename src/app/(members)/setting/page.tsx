@@ -4,11 +4,12 @@ import Link from "next/link";
 import Button from "../../_components/Button";
 import Navigation from "../../_components/Navigation";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
-import { themeColors, ThemeColor } from "../../_type/login";
-import Input from "../../_components/Input";
+import { ThemeColor } from "../../_type/login";
 import toast, { Toaster } from "react-hot-toast";
 import useLogout from "../../_hooks/useLogout";
 import { useUser } from "@/app/_hooks/useUser";
+import ThemeSelector from "./_components/ThemeSelector";
+import UserNameChange from "./_components/UserNameChange";
 const SettingsPage: React.FC = () => {
   const { token } = useSupabaseSession();
 
@@ -86,7 +87,7 @@ const SettingsPage: React.FC = () => {
     <div>
       <h2 className="text-white text-2xl text-center">Setting.</h2>
       <div className="w-[80%] mx-auto my-8 bg-white p-4">
-        <div className="grid grid-cols-5 gap-5 mb-12">
+        {/* <div className="grid grid-cols-5 gap-5 mb-12">
           {Object.entries(themeColors).map(([themeId, color]) => {
             const themeKey = themeId as ThemeColor;
             return (
@@ -103,8 +104,13 @@ const SettingsPage: React.FC = () => {
               ></div>
             );
           })}
-        </div>
-        <div className="mt-8 mx-auto w-56 text-lg text-text_button">
+        </div> */}
+        <ThemeSelector
+          currentTheme={currentTheme}
+          loading={loading}
+          handleThemeChange={handleThemeChange}
+        />
+        {/* <div className="mt-8 mx-auto w-56 text-lg text-text_button">
           <Input
             value={userName || ""}
             onChange={(e) => setUserName(e.target.value)}
@@ -113,7 +119,12 @@ const SettingsPage: React.FC = () => {
         </div>
         <div onClick={handleUserNameChange}>
           <Button text="ユーザーネーム変更" />
-        </div>
+        </div> */}
+        <UserNameChange
+          userName={userName}
+          setUserName={setUserName}
+          handleUserNameChange={handleUserNameChange}
+        />
         <Link href="/contact" className="block mt-8">
           <Button text="お問合せ" />
         </Link>

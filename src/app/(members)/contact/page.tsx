@@ -61,7 +61,7 @@ const Contact: React.FC = () => {
     if (!validate()) {
       return;
     }
-
+    setSubmitting(true); // 送信処理(tryブロック)の直前に!
     try {
       const res = await fetch("api/contact", {
         method: "POST",
@@ -70,7 +70,6 @@ const Contact: React.FC = () => {
       });
 
       if (res.ok) {
-        setSubmitting(true);
         toast.success(
           <span>
             メールが送信されました。
@@ -86,8 +85,8 @@ const Contact: React.FC = () => {
         throw new Error("送信に失敗しました");
       }
     } catch (error) {
+      console.error("送信中にエラーが発生しました:", error);
       alert("送信中にエラーが発生しました");
-      throw error;
     } finally {
       setSubmitting(false);
     }

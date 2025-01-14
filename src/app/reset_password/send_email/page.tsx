@@ -16,7 +16,7 @@ const Page = () => {
     setIsSubmitting(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_URL}/resetPassword/settingPass`,
+      redirectTo: `${process.env.NEXT_PUBLIC_URL}/reset_password/setting_pass`,
     });
     if (error) {
       toast.error("再設定メールの送信に失敗しました");

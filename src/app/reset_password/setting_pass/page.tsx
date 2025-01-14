@@ -6,14 +6,12 @@ import Button from "@/app/_components/Button";
 import Footer from "@/app/_components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "@/app/public/img/memo.png";
-import openPw from "@/app/public/img/openPw.png";
-import closePw from "@/app/public/img/closePw.png";
 import toast, { Toaster } from "react-hot-toast";
+import PasswordInput from "@/app/_components/PasswordInput";
 
 const Page = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -90,40 +88,11 @@ const Page = () => {
           onSubmit={handleResetPassword}
           className="space-y-4 w-full max-w-[400px]"
         >
-          <div className="relative w-full">
-            <input
-              type={showPassword ? "text" : "password"} // パスワードの表示/非表示を切り替え
-              name="password"
-              placeholder="パスワード"
-              className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              disabled={isSubmitting}
-            />
-            <div
-              className="absolute right-12 top-3 transform-translate-y-1/2 cursor-pointer"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <Image
-                  src={closePw}
-                  alt="closePw"
-                  width={32}
-                  height={32}
-                  className="w-5 h-5 text-[#CCCCCC]"
-                />
-              ) : (
-                <Image
-                  src={openPw}
-                  alt="openPw"
-                  width={32}
-                  height={32}
-                  className="w-5 h-5 text-[#CCCCCC]"
-                />
-              )}
-            </div>
-          </div>
+          <PasswordInput
+            password={password}
+            setPassword={setPassword}
+            isSubmitting={isSubmitting}
+          />
           <div>
             <Button text="送信" />
           </div>

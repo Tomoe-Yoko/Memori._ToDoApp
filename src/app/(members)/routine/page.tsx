@@ -53,9 +53,9 @@ const Page: React.FC = () => {
           throw new Error(`Fetched data is not an array:${data}`);
         }
       } catch (error) {
+        console.error("曜日データを取得できませんでした。:", error);
         alert("曜日データを取得できませんでした。");
         setRoutineList([]); // デフォルトで空の配列を設定
-        throw error;
       } finally {
         setLoading(false);
       }

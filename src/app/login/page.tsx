@@ -6,15 +6,13 @@ import Button from "../_components/Button";
 import Footer from "../_components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート
 import memo from "@/app/public/img/memo.png";
-import openPw from "@/app/public/img/openPw.png";
-import closePw from "@/app/public/img/closePw.png";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import PasswordInput from "../_components/PasswordInput";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
@@ -85,41 +83,10 @@ const Page = () => {
               className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
-          <div className="relative w-full">
-            <input
-              type={showPassword ? "text" : "password"} // パスワードの表示/非表示を切り替え
-              name="password"
-              placeholder="パスワード"
-              className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
-            <div
-              className="absolute right-12 top-3 transform-translate-y-1/2 cursor-pointer"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <Image
-                  src={closePw}
-                  alt="closePw"
-                  width={32}
-                  height={32}
-                  className="w-5 h-5 text-[#cccccc]"
-                />
-              ) : (
-                <Image
-                  src={openPw}
-                  alt="openPw"
-                  width={32}
-                  height={32}
-                  className="w-5 h-5 text-[#cccccc]"
-                />
-              )}
-            </div>
-          </div>
+          <PasswordInput password={password} setPassword={setPassword} />
+
           <p className="text-center text-[#729EF0] text-base">
-            <Link href="/resetPassword/sendEmail">
+            <Link href="/reset_password/send_email">
               ※パスワードを忘れた方はこちら
             </Link>
           </p>
