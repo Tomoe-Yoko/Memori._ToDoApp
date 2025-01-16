@@ -30,19 +30,18 @@ const useControlGalleryTab = (
 
       const data = await response.json(); // APIがオブジェクトでデータを返している
       if (response.ok) {
-        setGalleryGroups(data.galleryGroups);
+        setGalleryGroups(() => data.galleryGroups);
       } else {
-        setGalleryGroups(galleryGroups);
         throw new Error(`Fetched data is not an array:${data}`);
       }
     } catch (error) {
-      setGalleryGroups([]); // デフォルトで空の配列を設定
+      setGalleryGroups(() => []); // デフォルトで空の配列を設定
       console.error("タブデータの取得に失敗しました。:", error);
       alert("タブデータの取得に失敗しました。");
     } finally {
       setLoading(false);
     }
-  }, [token, galleryGroups]);
+  }, [token]);
 
   // 初回レンダリングおよび曜日が変更された際にデータを取得
   //不必要な再レンダリング（無限ループなど）や処理の実行を防ぐためuseEffectを分ける
