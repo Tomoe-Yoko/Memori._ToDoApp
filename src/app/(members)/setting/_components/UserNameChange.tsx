@@ -1,16 +1,16 @@
 "use client";
 import Button from "@/app/_components/Button";
 import Input from "@/app/_components/Input";
+import { useUser } from "@/app/_hooks/useUser";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
   token: string | null;
-  getUserName: string | null | undefined;
-  mutate: () => void;
 }
 
-const UserNameChange: React.FC<Props> = ({ token, getUserName, mutate }) => {
+const UserNameChange: React.FC<Props> = ({ token }) => {
+  const { mutate, userName: getUserName } = useUser();
   const [userName, setUserName] = useState<string | null | undefined>("");
   const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {

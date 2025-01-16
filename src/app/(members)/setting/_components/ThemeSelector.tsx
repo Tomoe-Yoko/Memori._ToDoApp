@@ -1,23 +1,20 @@
 "use client";
+import { useUser } from "@/app/_hooks/useUser";
 import { ThemeColor, themeColors } from "@/app/_type/login";
-import { $Enums } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 
 interface Props {
   token: string | null;
-  mutate: () => void;
-  themeColor: $Enums.ThemeColorId | undefined;
   currentTheme: ThemeColor;
   setCurrentTheme: React.Dispatch<React.SetStateAction<ThemeColor>>;
 }
 
 const ThemeSelector: React.FC<Props> = ({
   token,
-  mutate,
-  themeColor,
   currentTheme,
   setCurrentTheme,
 }) => {
+  const { mutate, themeColor } = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   // 初期テーマカラーを設定
   useEffect(() => {
