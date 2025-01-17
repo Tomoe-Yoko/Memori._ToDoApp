@@ -42,18 +42,6 @@ export const PUT = async (
   const { scheduleDate, content, scheduleColor } = body;
 
   try {
-    // const existingCalendar = await prisma.calendar.findUnique({
-    //   where: { id: calendarId },
-    // });
-
-    // if (!existingCalendar) {
-    //   console.error("Calendar entry not found for ID:", calendarId);
-    //   return NextResponse.json(
-    //     { message: "更新するレコードが見つかりません" },
-    //     { status: 404 }
-    //   );
-    // }
-
     const calendar = await prisma.calendar.update({
       where: {
         userId: user.id, //userIdがuser.idであることを条件追加
@@ -121,13 +109,11 @@ export const DELETE = async (
         id: calendarId,
       },
     });
-    console.log("Calendar entry deleted for ID:", calendarId);
     return NextResponse.json({ status: "OK" }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error deleting calendar entry:", error.message);
       return NextResponse.json({ status: error.message }, { status: 400 });
-      // console.log(error.message);
     }
   }
 };

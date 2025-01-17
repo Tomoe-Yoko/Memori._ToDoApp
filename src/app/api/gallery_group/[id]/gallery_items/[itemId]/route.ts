@@ -78,7 +78,7 @@ export const PUT = async (
   const { thumbnailImageKey } = body;
 
   try {
-    const editingTodoItem = await prisma.galleryItems.update({
+    const editingGalleryItem = await prisma.galleryItems.update({
       where: {
         id: putGalleryItemId,
         galleryGroup: { user: { supabaseUserId } },
@@ -86,7 +86,7 @@ export const PUT = async (
       data: { thumbnailImageKey },
     });
     return NextResponse.json(
-      { status: "OK", editingTodoItem },
+      { status: "OK", editingGalleryItem },
       { status: 200 }
     );
   } catch (error) {

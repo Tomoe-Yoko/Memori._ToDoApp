@@ -6,26 +6,27 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-
 model Users {
-  id             Int      @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   userName       String
-  supabaseUserId String  @unique
-  themeColorId   ThemeColorId 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  supabaseUserId String         @unique
+  themeColorId   ThemeColorId
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   calendars      Calendar[]
-  routineWorks    RoutineWork[]
+  routineWorks   RoutineWork[]
   todoGroups     TodoGroup[]
   galleryGroups  GalleryGroup[]
+  contacts       Contact[]
 
   @@map("Users")
 }
+
 enum ThemeColorId {
   Theme01
   Theme02
@@ -44,20 +45,20 @@ enum ThemeColorId {
   Theme15
 }
 
-
 model Calendar {
-  id            Int      @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   userId        Int
   scheduleDate  DateTime
   content       String
   scheduleColor ScheduleColor
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
-  user          Users    @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
 
   @@map("Calendar")
 }
+
 enum ScheduleColor {
   Pink
   Blue
@@ -69,47 +70,43 @@ enum ScheduleColor {
   Purple
 }
 
-
-
 model TodoGroup {
-  id              Int      @id @default(autoincrement())
-  userId          Int
-  toDoGroupTitle  String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  toDoGroupTitle String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  user            Users    @relation(fields: [userId], references: [id])
-  toDoItems       TodoItems[]
+  user      Users       @relation(fields: [userId], references: [id])
+  toDoItems TodoItems[]
 
   @@map("TodoGroup")
 }
 
 model TodoItems {
-  id            Int      @id @default(autoincrement())
-  todoGroupId   Int
-  toDoItem      String
-  isChecked     Boolean
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  todoGroupId Int
+  toDoItem    String
+  isChecked   Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  todoGroup     TodoGroup @relation(fields: [todoGroupId], references: [id])
+  todoGroup TodoGroup @relation(fields: [todoGroupId], references: [id])
 
   @@map("TodoItems")
 }
 
-
-
 model RoutineWork {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  weekly    Weekly
-  routineContent  String
-  isChecked       Boolean
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user      Users    @relation(fields: [userId], references: [id])
-
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  weekly         Weekly
+  routineContent String
+  isChecked      Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           Users    @relation(fields: [userId], references: [id])
 }
+
 enum Weekly {
   mon
   tue
@@ -120,16 +117,15 @@ enum Weekly {
   sun
 }
 
-
 model GalleryGroup {
   id                Int      @id @default(autoincrement())
   userId            Int
   galleryGroupTitle String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  user              Users    @relation(fields: [userId], references: [id])
-  galleryItems      GalleryItems[]
+  user         Users          @relation(fields: [userId], references: [id])
+  galleryItems GalleryItems[]
 
   @@map("GalleryGroup")
 }
@@ -138,21 +134,23 @@ model GalleryItems {
   id                Int      @id @default(autoincrement())
   galleryGroupId    Int
   thumbnailImageKey String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  galleryGroup      GalleryGroup @relation(fields: [galleryGroupId], references: [id])
+  galleryGroup GalleryGroup @relation(fields: [galleryGroupId], references: [id])
 
   @@map("GalleryItems")
 }
 
 model Contact {
-  id         Int      @id @default(autoincrement())
-  userName   String
-  text       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  userName  String
+  email     String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      Users    @relation(fields: [userId], references: [id])
 
   @@map("Contact")
 }
-

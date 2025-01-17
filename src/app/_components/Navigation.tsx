@@ -1,10 +1,10 @@
 import React from "react";
 import Image from "next/image";
-import calendar_icon from "../../img/nav/calender_icon.svg";
-import list_icon from "../../img/nav/list_icon.svg";
-import routine_icon from "../../img/nav/routine_icon.svg";
-import gallery_icon from "../../img/nav/gallery_icon.svg";
-import setting_icon from "../../img/nav/setting_icon.svg";
+import calendar_icon from "@/app/public/img/nav/calender_icon.svg";
+import list_icon from "@/app/public/img/nav/list_icon.svg";
+import routine_icon from "@/app/public/img/nav/routine_icon.svg";
+import gallery_icon from "@/app/public/img/nav/gallery_icon.svg";
+import setting_icon from "@/app/public/img/nav/setting_icon.svg";
 import Link from "next/link";
 
 const Navigation = () => {
