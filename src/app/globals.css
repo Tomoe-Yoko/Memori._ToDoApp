@@ -32,10 +32,7 @@ body div.react-calendar__month-view__days > button {
 .react-calendar__month-view__days__day {
   @apply flex flex-col justify-start;
 }
-/* 当日の色を変更 */
-.react-calendar .react-calendar__tile--now {
-  @apply bg-[#ffffe3];
-}
+
 /* 日付内スケジュール */
 .react-calendar .react-calendar__month-view__days > button > div > p {
   @apply text-[10.5px] leading-tight p-0 whitespace-nowrap;
@@ -46,6 +43,9 @@ body div.react-calendar__month-view__days > button {
 .react-calendar .react-calendar__tile:enabled:hover,
 .react-calendar .react-calendar__tile:enabled:focus {
   @apply bg-transparent text-inherit;
+} /* 当日の色を変更 */
+.react-calendar .react-calendar__tile--now {
+  @apply bg-[#ffffe3];
 }
 /* 土曜日だけ青色にする */
 .react-calendar
