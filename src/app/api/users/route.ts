@@ -42,11 +42,26 @@ export const POST = async (request: NextRequest) => {
         themeColorId: body.themeColorId,
       },
     });
-
+    const defaultTodoGroupTitle = "タブ名変更：ダブルクリック";
+    // Todoグループを作成
+    const firstTodoTab = await prisma.todoGroup.create({
+      data: {
+        userId: userPostResponse.id, // ここで正しいユーザーIDを使用
+        toDoGroupTitle: defaultTodoGroupTitle, // デフォルトのタブタイトルを使用
+      },
+    });
+    const firstGalleryTab = await prisma.galleryGroup.create({
+      data: {
+        userId: userPostResponse.id,
+        galleryGroupTitle: defaultTodoGroupTitle,
+      },
+    });
     return NextResponse.json({
       status: 201,
       message: "success",
       user: userPostResponse,
+      firstTodoTab,
+      firstGalleryTab,
     });
   } catch (error) {
     if (error instanceof Error) {
