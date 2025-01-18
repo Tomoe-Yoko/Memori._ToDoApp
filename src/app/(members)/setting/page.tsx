@@ -17,7 +17,7 @@ const SettingsPage: React.FC = () => {
   );
 
   return (
-    <div>
+    <div className="h-svh">
       <h2 className="text-white text-2xl text-center">Setting.</h2>
       <div className="w-[80%] mx-auto my-8 bg-white p-4">
         <ThemeSelector

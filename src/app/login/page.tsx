@@ -80,12 +80,12 @@ const Page = () => {
               required
               onChange={(e) => setEmail(e.target.value)}
               value={email}
-              className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
+              className="mx-auto mb-4 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
           <PasswordInput password={password} setPassword={setPassword} />
 
-          <p className="text-center text-[#729EF0] text-base">
+          <p className="text-center text-[#4a72ba] text-base">
             <Link href="/reset_password/send_email">
               ※パスワードを忘れた方はこちら
             </Link>

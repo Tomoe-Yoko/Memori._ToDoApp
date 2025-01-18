@@ -46,7 +46,7 @@ export default function Page() {
         className="mx-auto my-8"
       />
       <h2 className="text-center text-xl my-4 text-text_button">
-        サインアップ
+        ユーザー登録
       </h2>
       <div className="flex justify-center py-8 mx-8 bg-[#fff6]">
         <form
@@ -61,7 +61,7 @@ export default function Page() {
               required
               onChange={(e) => setUserName(e.target.value)}
               value={userName}
-              className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
+              className="mx-auto mb-4 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
           <div>
@@ -72,14 +72,18 @@ export default function Page() {
               required
               onChange={(e) => setEmail(e.target.value)}
               value={email}
-              className="mx-auto mb-8 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
+              className="mx-auto bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
             />
           </div>
+
           <PasswordInput password={password} setPassword={setPassword} />
 
           <div>
-            <Button text="登録" />
+            <Button text="登録！" />
           </div>
+          <p className="mx-auto mb-4 text-sm  block w-[80%] p-3 text-text_button">
+            ※「登録！」を押すとメールが送信されます。迷惑メールとして判定される場合がありますので、その際は迷惑メールフォルダをご確認ください。
+          </p>
         </form>
         <Toaster position="top-center" />
       </div>
