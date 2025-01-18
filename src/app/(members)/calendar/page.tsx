@@ -12,7 +12,7 @@ import { scheduleColorMap } from "./_components/modals/NewPost";
 import Navigation from "../../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
-import "../../../app/globals.css";
+import "../../globals.css";
 import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
 
