@@ -33,22 +33,30 @@ body div.react-calendar__month-view__days > button {
   @apply flex flex-col justify-start;
 }
 /* 当日の色を変更 */
-.react-calendar__tile--now {
+.react-calendar .react-calendar__tile--now {
   @apply bg-[#ffffe3];
 }
 /* 日付内スケジュール */
-.react-calendar__month-view__days > button > div > p {
+.react-calendar .react-calendar__month-view__days > button > div > p {
   @apply text-[10.5px] leading-tight p-0 whitespace-nowrap;
 }
 /* カレンダータイルの背景色をなしに */
-.react-calendar__tile,
-.react-calendar__month-view__days:active,
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
+.react-calendar .react-calendar__tile,
+.react-calendar .react-calendar__month-view__days:active,
+.react-calendar .react-calendar__tile:enabled:hover,
+.react-calendar .react-calendar__tile:enabled:focus {
   @apply bg-transparent text-inherit;
 }
+/* 土曜日だけ青色にする */
+.react-calendar
+  .react-calendar__month-view__days__day--weekend:nth-child(7n-1) {
+  @apply text-blue-700;
+}
+.react-calendar .react-calendar__month-view__days__day--weekend:nth-child(7n) {
+  @apply text-red-600;
+}
 
-/* todoスクロールバーを非表示 */
+/*・・・・・・ todoスクロールバーを非表示 ・・・・・・*/
 .scrollbar-hide {
   overflow-x: scroll; /* 横方向のスクロールを有効*/
   -ms-overflow-style: none; /* IE and Edge */

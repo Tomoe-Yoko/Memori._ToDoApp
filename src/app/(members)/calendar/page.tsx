@@ -135,7 +135,7 @@ const Page: React.FC = () => {
       if (calendarEntries.length > 2) {
         return (
           <div className="flex flex-col items-start">
-            {calendarEntries.slice(0, 2).map((entry) => {
+            {calendarEntries.slice(0, 3).map((entry) => {
               const colorCode = Object.keys(scheduleColorMap).find(
                 (key) => scheduleColorMap[key] === entry.scheduleColor
               );
@@ -150,7 +150,7 @@ const Page: React.FC = () => {
               );
             })}
             <p className="text-[10px] text-gray-500">
-              ほか{calendarEntries.length - 2}件
+              ほか{calendarEntries.length - 3}件
             </p>
           </div>
         );
