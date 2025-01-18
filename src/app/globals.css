@@ -4,12 +4,12 @@
 
 /*・・・・・・ react-calendar・・・・・・ */
 /* カレンダー全体 */
-.react-calendar {
-  @apply mx-auto border-none bg-transparent w-[400px];
+.react-calendar.react-calendar {
+  @apply mx-auto border-none bg-transparent w-[90%];
 }
 /*2024.10のテキスト */
 .react-calendar__navigation {
-  @apply text-white text-2xl mx-auto;
+  @apply text-white text-2xl mx-auto  bg-transparent;
 }
 /* 曜日以下（白背景部分） */
 .react-calendar__viewContainer {
