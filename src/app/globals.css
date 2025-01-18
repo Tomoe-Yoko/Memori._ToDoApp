@@ -38,7 +38,7 @@ body div.react-calendar__month-view__days > button {
 }
 /* 日付内スケジュール */
 .react-calendar__month-view__days > button > div > p {
-  @apply text-[10px] leading-tight p-0;
+  @apply text-[10.5px] leading-tight p-0 whitespace-nowrap;
 }
 /* カレンダータイルの背景色をなしに */
 .react-calendar__tile,
