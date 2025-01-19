@@ -5,6 +5,7 @@ import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { GalleryItem } from "@/app/_type/Gallery";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/utils/supabase";
+import imageCompression from "browser-image-compression";
 
 const useControlGalleryImage = (selectedTabId: number) => {
   const { token } = useSupabaseSession();
@@ -82,6 +83,27 @@ const useControlGalleryImage = (selectedTabId: number) => {
     fetchGalleryItems();
   }, [fetchGalleryItems, selectedTabId]); // useCallbackでメモ化されたfetchGalleryItemsを依存関係に追加
 
+  // 圧縮処理関数
+  const compressImage = async (file: File): Promise<File> => {
+    const options = {
+      maxSizeMB: 0.7, // 最大サイズ (700KB 以下に圧縮)
+      useWebWorker: true, // 圧縮を Web Worker で実行してパフォーマンス向上
+      maxWidthOrHeight: undefined, // 元の幅と高さを維持
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      console.log(
+        "圧縮後のファイルサイズ:",
+        compressedFile.size / 1024 / 1024,
+        "MB"
+      );
+      return compressedFile;
+    } catch (error) {
+      console.error("画像圧縮に失敗しました:", error);
+      throw new Error("画像圧縮に失敗しました");
+    }
+  };
   //画像を追加
   const handleAddImage = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -91,12 +113,16 @@ const useControlGalleryImage = (selectedTabId: number) => {
       }
 
       const file = event.target.files[0];
+
+      // 圧縮処理を実行
+      const compressedFile = await compressImage(file);
+
       const filePath = `private/${uuidv4()}`;
 
       // Supabase ストレージに画像をアップロード
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("gallery_item")
-        .upload(filePath, file, {
+        .upload(filePath, compressedFile, {
           cacheControl: "3600",
           upsert: false,
         });
@@ -204,12 +230,15 @@ const useControlGalleryImage = (selectedTabId: number) => {
       if (!file) {
         throw new Error("No image file selected");
       }
+      // 画像圧縮を実行
+      const compressedFile = await compressImage(file);
+
       // 既存の画像キーを使用して更新
       const existingImageKey = thumbnailImageKey; // 既存のキーを使う
 
       const { error: uploadError } = await supabase.storage
         .from("gallery_item")
-        .update(existingImageKey, file, {
+        .update(existingImageKey, compressedFile, {
           cacheControl: "3600",
           upsert: true,
         });
@@ -293,7 +322,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
         setThumbnailImageKey(""); // キーをリセット
         closeImgModal();
         toast.success("画像を一つ削除しました。", {
-          duration: 7000, //ポップアップ表示時間
+          duration: 2100, //ポップアップ表示時間
         });
       } else {
         throw new Error("Failed to delete image from database.");
