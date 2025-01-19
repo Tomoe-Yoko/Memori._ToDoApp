@@ -44,7 +44,7 @@ const UserNameChange: React.FC<Props> = ({ token }) => {
   };
   return (
     <div>
-      <div className="mt-8 mx-auto w-56 text-lg text-text_button">
+      <div className="mt-6 mx-auto w-56 text-lg text-text_button">
         <Input
           value={userName || ""}
           onChange={(e) => setUserName(e.target.value)}

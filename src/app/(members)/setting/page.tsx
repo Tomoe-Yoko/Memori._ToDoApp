@@ -17,20 +17,20 @@ const SettingsPage: React.FC = () => {
   );
 
   return (
-    <div className="h-svh">
+    <div className="h-svh mb-2">
       <h2 className="text-white text-2xl text-center">Setting.</h2>
-      <div className="w-[80%] mx-auto my-8 bg-white p-4">
+      <div className="w-[80%] mx-auto my-6 bg-white p-4">
         <ThemeSelector
           token={token}
           currentTheme={currentTheme}
           setCurrentTheme={setCurrentTheme}
         />
         <UserNameChange token={token} />
-        <Link href="/contact" className="block mt-8">
+        <Link href="/contact" className="block mt-6 w-[85%] mx-auto">
           <Button text="お問合せ" />
         </Link>
 
-        <div className="mt-8" onClick={logout}>
+        <div className="mt-6" onClick={logout}>
           <Button text="ログアウト" />
         </div>
       </div>

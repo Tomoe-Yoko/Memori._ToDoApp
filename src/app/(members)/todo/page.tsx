@@ -62,7 +62,7 @@ const Page: React.FC = () => {
                 <span className="text-white ">✓</span>
               </button>
               <input
-                placeholder="入力(フォーカスを外すと登録できます。)"
+                placeholder="入力(フォーカスを外すと登録)"
                 ref={inputRef} // useRefで作成したrefをここに設定
                 type="text"
                 value={postTodoTitle}

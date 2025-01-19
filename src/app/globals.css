@@ -43,7 +43,8 @@ body div.react-calendar__month-view__days > button {
 .react-calendar .react-calendar__tile:enabled:hover,
 .react-calendar .react-calendar__tile:enabled:focus {
   @apply bg-transparent text-inherit;
-} /* 当日の色を変更 */
+}
+/* 当日の色を変更 */
 .react-calendar .react-calendar__tile--now {
   @apply bg-[#ffffe3];
 }
