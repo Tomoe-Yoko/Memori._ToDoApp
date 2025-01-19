@@ -60,7 +60,7 @@ const GalleryImage: React.FC<Props> = ({
                     width={600}
                     height={848}
                     priority
-                    className="max-w-[50%] min-w-[150px] min-h-[212px] object-contain bg-0[#eee]"
+                    className="max-w-[48%] min-w-[110px] object-contain bg-0[#eee] m-[2px]"
                     onClick={() =>
                       handleImgClick(
                         item.signedUrl!,
