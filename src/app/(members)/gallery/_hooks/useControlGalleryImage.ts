@@ -86,7 +86,7 @@ const useControlGalleryImage = (selectedTabId: number) => {
   // 圧縮処理関数
   const compressImage = async (file: File): Promise<File> => {
     const options = {
-      maxSizeMB: 0.7, // 最大サイズ (700KB 以下に圧縮)
+      maxSizeMB: 0.5, // 最大サイズ (600KB 以下に圧縮)
       useWebWorker: true, // 圧縮を Web Worker で実行してパフォーマンス向上
       maxWidthOrHeight: undefined, // 元の幅と高さを維持
     };

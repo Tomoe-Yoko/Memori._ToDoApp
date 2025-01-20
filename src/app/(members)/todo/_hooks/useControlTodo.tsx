@@ -253,7 +253,7 @@ export const useTodo = () => {
         }
       );
       if (response.ok) {
-        toast.success("タスクが追加（更新）されました。");
+        toast.success("タスクが更新されました。");
         fetcher();
       } else {
         console.error("Failed to save item.");

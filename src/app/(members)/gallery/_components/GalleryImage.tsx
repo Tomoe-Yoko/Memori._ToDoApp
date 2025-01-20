@@ -111,7 +111,7 @@ const GalleryImage: React.FC<Props> = ({
                 />
                 <Button text="更新" size="small" />
               </div>
-              ;
+
               <div
                 onClick={() =>
                   selectedImageId !== undefined && deleteImg(selectedImageId)
