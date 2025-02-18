@@ -44,16 +44,20 @@ const UserNameChange: React.FC<Props> = ({ token }) => {
   };
   return (
     <div>
-      <div className="mt-6 mx-auto w-56 text-lg text-text_button">
-        <Input
-          value={userName || ""}
-          onChange={(e) => setUserName(e.target.value)}
-          placeholder="新しいユーザーネームを入力"
-          disabled={loading}
-        />
-      </div>
-      <div onClick={handleUserNameChange}>
-        <Button text="ユーザーネーム変更" />
+      <div className="flex justify-between items-center mt-6  w-[300px] mx-auto text-lg text-text_button">
+        <label className=" text-sm">名前:</label>
+        <div className="mt-4">
+          <Input
+            value={userName || ""}
+            onChange={(e) => setUserName(e.target.value)}
+            placeholder="新しいユーザーネームを入力"
+            disabled={loading}
+          />
+        </div>
+
+        <div onClick={handleUserNameChange}>
+          <Button text="変更" size="tiny" />
+        </div>
       </div>
     </div>
   );

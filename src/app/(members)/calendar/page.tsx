@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
+
 import { ScheduleColor } from "@prisma/client";
 import { CalendarData } from "../../_type/Calendar";
 import Modal from "react-modal";
@@ -15,6 +16,7 @@ import "react-calendar/dist/Calendar.css";
 import "../../globals.css";
 import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
+// import ToggleStartOfWeek from "@/app/_components/ToggleStartOfWeek";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -23,6 +25,9 @@ const Page: React.FC = () => {
   const [addScheduleModal, setAddScheduleModal] = useState<boolean>(false);
   const [showAllScheduleModal, setShowAllScheduleModal] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [startOfWeek, setStartOfWeek] = useState<"gregory" | "iso8601">(
+    "iso8601"
+  ); // 追加
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -43,6 +48,18 @@ const Page: React.FC = () => {
     if (!token) return;
     setLoading(false);
     fetcher();
+    // 週の始まりを取得
+    const fetchStartOfWeek = async () => {
+      const res = await fetch("/api/users", {
+        headers: { Authorization: token! },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStartOfWeek(data.userData.startOfWeek || "iso8601");
+      }
+    };
+
+    fetchStartOfWeek();
   }, [fetcher, token]);
 
   //DELETE
@@ -192,15 +209,18 @@ const Page: React.FC = () => {
     //GET(リロード)
     fetcher(); //useCallbackで書いた内容（token情報は不要）
   };
+
   if (loading) {
     return <Loading />;
   }
   return (
     <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
+
       <div className="pb-[70px]">
         <Calendar
           locale="ja-JP"
+          calendarType={startOfWeek} // ここで変更
           prev2Label={null}
           next2Label={null}
           formatDay={(_, date) => date.getDate().toString()}
@@ -228,9 +248,6 @@ const Page: React.FC = () => {
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
         <NewPost onSuccess={handleSuccess} initialDate={new Date()} />
-        {/* <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
-          <Button text="キャンセル" />
-        </div> */}
       </Modal>
       <Modal
         isOpen={showAllScheduleModal}

@@ -79,7 +79,7 @@ export default function Home() {
         <section className="py-28 bg-[#fffa]">
           <p className="w-72 mx-auto text-text_button py-4 text-lg">
             忙しいあなたへ <br /> 毎日おつかれさま。 <br />
-            効率良くタスクをこなして ゆっくりできる時間を 確保してくださいね。
+            効率良くタスクをこなしてゆっくりできる時間を確保してくださいね。
           </p>
           <div className="mt-12">
             <Link href="/signup">

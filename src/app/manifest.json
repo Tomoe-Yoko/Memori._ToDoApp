@@ -1,6 +1,6 @@
 {
   "name": "Memori_TodoApp",
-  "short_name": "Memori_TodoApp",
+  "short_name": "Memori",
   "description": "Memori_TodoApp",
   "start_url": "/",
   "display": "standalone",

@@ -40,6 +40,7 @@ export const POST = async (request: NextRequest) => {
         supabaseUserId: data.user.id,
         userName: body.userName,
         themeColorId: body.themeColorId,
+        startOfWeek: "iso8601",
       },
     });
     const defaultTodoGroupTitle = "タブ名変更：ダブルクリック";
@@ -94,6 +95,7 @@ export const GET = async (request: NextRequest) => {
     const userData = {
       userName: user.userName,
       themeColor: `bg-${user.themeColorId}`,
+      startOfWeek: user.startOfWeek,
     };
 
     return NextResponse.json({ status: "OK", userData });
@@ -138,10 +140,17 @@ export const PUT = async (request: NextRequest) => {
     //  POST更新データを作成（nullまたはundefinedのフィールドは無視）
     // 分割代入とスプレッド構文の合わせ技
     //`userName`が`undefined`でない場合にのみ`{ userName }`を`updateData`に追加する.カラーも同様
-    const updateData: { userName?: string; themeColorId?: ThemeColorId } = {
+    const updateData: {
+      userName?: string;
+      themeColorId?: ThemeColorId;
+      startOfWeek?: "iso8601" | "gregory";
+    } = {
       ...(body.userName !== undefined && { userName: body.userName }),
       ...(body.themeColorId !== undefined && {
         themeColorId: body.themeColorId,
+      }),
+      ...(body.startOfWeek !== undefined && {
+        startOfWeek: body.startOfWeek,
       }),
     };
     // データベースの更新

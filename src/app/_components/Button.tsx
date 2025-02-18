@@ -2,7 +2,7 @@ import React from "react";
 interface ButtonProps {
   text: string;
   // size?: "large" | "middle" | "small";
-  size?: "middle" | "small";
+  size?: "middle" | "small" | "tiny";
   bgColor?: "normal" | "delete";
 }
 const Button: React.FC<ButtonProps> = ({
@@ -15,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
     // large: "w-64 py-4 text-lg", // 大きいサイズ
     middle: "w-56 py-3 text-base", // （デフォルト）
     small: "w-32 py-3 text-sm", // 小さいサイズ
+    tiny: "w-18 px-4 py-2 text-sm",
   };
 
   const bgColors = {
@@ -34,4 +35,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-//mt-16

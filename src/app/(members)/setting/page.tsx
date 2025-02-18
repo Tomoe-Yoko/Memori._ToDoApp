@@ -9,6 +9,8 @@ import { Toaster } from "react-hot-toast";
 import useLogout from "../../_hooks/useLogout";
 import ThemeSelector from "./_components/ThemeSelector";
 import UserNameChange from "./_components/UserNameChange";
+import ToggleStartOfWeek from "@/app/_components/ToggleStartOfWeek";
+// import ToggleStartOfWeek from "@/app/_components/toggleStartOfWeek";
 const SettingsPage: React.FC = () => {
   const { token } = useSupabaseSession();
   const logout = useLogout(); // ログアウト関数を取得
@@ -26,6 +28,7 @@ const SettingsPage: React.FC = () => {
           setCurrentTheme={setCurrentTheme}
         />
         <UserNameChange token={token} />
+        <ToggleStartOfWeek />
         <Link href="/contact" className="block mt-6 w-[85%] mx-auto">
           <Button text="お問合せ" />
         </Link>
