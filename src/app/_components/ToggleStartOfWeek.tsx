@@ -72,8 +72,8 @@ const ToggleStartOfWeek: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-3 w-[350px] ml-[2rem]">
-      <div className="flex items-center gap-1 w-[350px]">
+    <div className="flex flex-col items-center space-y-3  ">
+      <div className="flex items-center gap-1 min-w-[270px]">
         <label className="w-[70px] text-sm font-medium text-text_button">
           週始まり:
         </label>
@@ -85,7 +85,7 @@ const ToggleStartOfWeek: React.FC = () => {
               options={options}
               value={field.value}
               onChange={(newValue) => field.onChange(newValue)}
-              className="w-[160px]"
+              className="w-[150px]"
               classNames={{
                 control: () =>
                   "!border-gray-300 !outline-none !text-text_button",
