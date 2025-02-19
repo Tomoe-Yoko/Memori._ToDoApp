@@ -213,10 +213,16 @@ const Page: React.FC = () => {
   if (loading) {
     return <Loading />;
   }
+  // 土曜と日曜の日付の色変更
+  const tileClassName = ({ date }: { date: Date }) => {
+    const day = date.getDay(); // 0: 日曜日, 1: 月曜日, ..., 6: 土曜日
+    if (day === 0) return "react-calendar__month-view__days__day--sunday"; // 日曜日
+    if (day === 6) return "react-calendar__month-view__days__day--saturday"; // 土曜日
+    return null; // その他の日はクラスを追加しない
+  };
   return (
     <div className="relative">
       <h2 className="text-white text-2xl text-center">Calendar.</h2>
-
       <div className="pb-[70px]">
         <Calendar
           locale="ja-JP"
@@ -230,6 +236,7 @@ const Page: React.FC = () => {
           formatShortWeekday={(_, date) =>
             ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]
           }
+          tileClassName={tileClassName}
           tileContent={tileContent}
           onClickDay={onCalendarClick}
           className={"react-calendar"}

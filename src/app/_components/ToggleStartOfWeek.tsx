@@ -14,8 +14,8 @@ const options = [
 
 const ToggleStartOfWeek: React.FC = () => {
   const { token } = useSupabaseSession();
-  const { control, handleSubmit, setValue, watch } = useForm<{
-    startOfWeek: { value: string; label: string } | null;
+  const { control, handleSubmit, watch, reset } = useForm<{
+    startOfWeek: "iso8601" | "gregory" | null;
   }>({
     defaultValues: { startOfWeek: null },
   });
@@ -23,25 +23,33 @@ const ToggleStartOfWeek: React.FC = () => {
 
   const fetcher = useCallback(async () => {
     try {
+      if (!token) return;
       const res = await fetch("api/users");
       if (!res.ok) throw new Error("Failed to fetch startOfWeek");
 
       const data: CreateLoginPostRequestBody = await res.json();
       const { startOfWeek } = data;
       if (startOfWeek) {
-        setValue(
-          "startOfWeek",
-          options.find((opt) => opt.value === data.startOfWeek) || null
-        );
+        const selectedOption =
+          options.find((opt) => opt.value === startOfWeek) || null;
+        reset({
+          startOfWeek: selectedOption
+            ? (selectedOption.value as "gregory" | "iso8601")
+            : null,
+        });
       }
+      // setValue(
+      //   "startOfWeek",
+      //   options.find((opt) => opt.value === data.startOfWeek) || null
+      // );}
     } catch (error) {
       console.error("Error fetching startOfWeek:", error);
+      toast.error("設定の取得に失敗しました。");
     }
-  }, [setValue]);
+  }, [token, reset]);
   useEffect(() => {
-    if (!token) return;
     fetcher();
-  }, [token, fetcher]);
+  }, [fetcher]);
 
   const onSubmit = async () => {
     if (!startOfWeek) return;
@@ -49,7 +57,7 @@ const ToggleStartOfWeek: React.FC = () => {
       const res = await fetch("api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/JSON", Authorization: token! },
-        body: JSON.stringify({ startOfWeek: startOfWeek.value }),
+        body: JSON.stringify({ startOfWeek: startOfWeek }),
       });
       if (!res.ok) {
         return toast.error("エラー：変更できませんでした。");
@@ -83,8 +91,8 @@ const ToggleStartOfWeek: React.FC = () => {
           render={({ field }) => (
             <Select
               options={options}
-              value={field.value}
-              onChange={(newValue) => field.onChange(newValue)}
+              value={options.find((option) => option.value === field.value)}
+              onChange={(newValue) => field.onChange(newValue?.value)}
               className="w-[150px]"
               classNames={{
                 control: () =>

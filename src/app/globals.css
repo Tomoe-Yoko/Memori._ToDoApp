@@ -48,12 +48,13 @@ body div.react-calendar__month-view__days > button {
 .react-calendar .react-calendar__tile--now {
   @apply bg-[#ffffe3];
 }
-/* 土曜日だけ青色にする */
-.react-calendar
-  .react-calendar__month-view__days__day--weekend:nth-child(7n-1) {
+
+/* 土曜日の色 */
+.react-calendar .react-calendar__month-view__days__day--saturday {
   @apply text-blue-700;
 }
-.react-calendar .react-calendar__month-view__days__day--weekend:nth-child(7n) {
+/* 日曜日の色 */
+.react-calendar .react-calendar__month-view__days__day--sunday {
   @apply text-red-600;
 }
 
