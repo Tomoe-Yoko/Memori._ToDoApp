@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "next/navigation";
 import Button from "../_components/Button";
@@ -15,6 +15,16 @@ const Page = () => {
   const [password, setPassword] = useState("");
 
   const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data) {
+        router.replace("/login/welcome");
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
