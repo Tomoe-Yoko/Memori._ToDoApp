@@ -9,6 +9,7 @@ import memo from "@/app/public/img/memo.png";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import PasswordInput from "../_components/PasswordInput";
+import Loading from "../loading";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -43,10 +44,18 @@ const Page = () => {
     const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
-        router.replace(data.session ? "/login/welcome" : "/login");
+        if (data === undefined) {
+          return <Loading />;
+        }
+
+        if (data) {
+          router.replace(data.session ? "/login/welcome" : "/login");
+          return <Loading />;
+        }
       } catch (error) {
         console.error("セッション情報取得失敗:", error);
         router.replace("/login");
+        return <Loading />;
       }
     };
     checkSession();
@@ -75,14 +84,16 @@ const Page = () => {
           body: JSON.stringify({
             email,
             //optionsはuser_metadataの中に入る
-            userName: data.user.user_metadata.userName,
-            themeColorId: "Theme01",
+            userName: data.user.user_metadata.userName || "Guest",
+            // themeColorId: "Theme01",
+            themeColorId: data.user.user_metadata.themeColorId || "Theme01",
           }),
         });
 
         const result = await response.json();
         if (response.ok) {
           router.replace("/login/welcome");
+          return <Loading />;
         } else {
           toast.error(`APIリクエストに失敗しました: ${result.message} `);
         }
