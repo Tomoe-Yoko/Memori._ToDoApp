@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { useUser } from "@/app/_hooks/useUser";
@@ -8,6 +8,7 @@ import { useUser } from "@/app/_hooks/useUser";
 const WelcomePage: React.FC = () => {
   const { token } = useSupabaseSession();
   const { userName, isLoading } = useUser();
+  const [greetingMessage, setGreetingMessage] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -20,13 +21,25 @@ const WelcomePage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [router, token, isLoading]);
 
+  useEffect(() => {
+    const hour = new Date().getHours();
+    console.log(hour);
+    if (hour >= 3 && hour <= 11) {
+      setGreetingMessage("おはようございます");
+    } else if (hour >= 12 && hour <= 16) {
+      setGreetingMessage("こんにちわ");
+    } else {
+      setGreetingMessage("今日もおつかれさま");
+    }
+  }, []);
+
   return (
     <div className="">
       <div className="text-white text-2xl">
         <p className="leading-relaxed text-white pt-[12rem] text-center text-2xl">
           <span className="text-[28px]">{userName}さん</span>
           <br />
-          今日もおつかれさま
+          {greetingMessage}
         </p>
       </div>
       <svg
@@ -42,6 +55,11 @@ const WelcomePage: React.FC = () => {
           stroke="white"
           strokeWidth="6"
           strokeLinecap="round"
+          style={{
+            strokeDasharray: 400, // 線の長さに応じて調整
+            strokeDashoffset: 400,
+            animation: "dash 1.5s ease forwards",
+          }}
         />
         <circle
           cx="142.877"
@@ -49,7 +67,14 @@ const WelcomePage: React.FC = () => {
           r="4.21685"
           transform="rotate(4.75489 142.877 15.318)"
           fill="white"
+          style={{
+            opacity: 0,
+            animation: "dot 0.2s ease 0.8s forwards",
+          }}
         />
+        <style>
+          {`@keyframes dash {to {stroke-dashoffset: 0;}}@keyframes dot {to {opacity:1;}}`}
+        </style>
       </svg>
     </div>
   );
