@@ -8,7 +8,7 @@ import { useUser } from "@/app/_hooks/useUser";
 const WelcomePage: React.FC = () => {
   const { token } = useSupabaseSession();
   const { userName, isLoading } = useUser();
-  const [greetingMessage, setGreetingMessage] = useState<string>("");
+  const [greetingMessage, setGreetingMessage] = useState<React.ReactNode>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -26,10 +26,20 @@ const WelcomePage: React.FC = () => {
     console.log(hour);
     if (hour >= 3 && hour <= 11) {
       setGreetingMessage("おはようございます");
-    } else if (hour >= 12 && hour <= 16) {
+    } else if (hour >= 12 && hour <= 14) {
       setGreetingMessage("こんにちわ");
-    } else {
+    } else if (hour >= 15 && hour <= 16) {
+      setGreetingMessage("おやつ食べた？");
+    } else if (hour >= 17 && hour <= 21) {
       setGreetingMessage("今日もおつかれさま");
+    } else {
+      setGreetingMessage(
+        <>
+          そろそろ
+          <br />
+          おやすみなさい
+        </>
+      );
     }
   }, []);
 

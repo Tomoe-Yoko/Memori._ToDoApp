@@ -127,7 +127,7 @@ const Page = () => {
               required
               onChange={(e) => setEmail(e.target.value)}
               value={email}
-              className="mx-auto mb-4 bg-gray-50  text-gray-900 text-sm  block w-[80%] p-3"
+              className="mx-auto mb-4 bg-gray-50  text-gray-900 text-[1rem] block w-[80%] p-3"
             />
           </div>
           <PasswordInput password={password} setPassword={setPassword} />

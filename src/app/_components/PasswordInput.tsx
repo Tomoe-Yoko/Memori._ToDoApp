@@ -24,7 +24,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         type={showPassword ? "text" : "password"} // パスワードの表示/非表示を切り替え
         name="password"
         placeholder="パスワード"
-        className="mx-auto mb-8 bg-gray-50 text-gray-900 text-sm block w-[80%] p-3"
+        className="mx-auto mb-8 bg-gray-50 text-gray-900 text-[1rem] block w-[80%] p-3"
         required
         onChange={(e) => setPassword(e.target.value)}
         value={password}
