@@ -22,6 +22,7 @@ const Page: React.FC = () => {
     todoItems,
     postItem,
     newItem,
+    setNewItem,
     postTodoTitle,
     setPostTodoTitle,
     addPostNewItem,
@@ -67,7 +68,12 @@ const Page: React.FC = () => {
                 type="text"
                 value={postTodoTitle}
                 onChange={(e) => setPostTodoTitle(e.target.value)}
-                onBlur={addPostNewItem}
+                // onBlur={addPostNewItem}
+                onBlur={() =>
+                  postTodoTitle.trim() === ""
+                    ? (setNewItem(false), setPostTodoTitle(""))
+                    : addPostNewItem()
+                }
                 className="px-2 py-1 border-b-2 w-[85%] focus:outline-none "
               />
             </div>

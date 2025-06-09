@@ -313,6 +313,7 @@ export const useTodo = () => {
     todoItems,
     postItem,
     newItem,
+    setNewItem,
     addPostNewItem,
     setPostTodoTitle,
     postTodoTitle,
