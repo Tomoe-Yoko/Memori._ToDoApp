@@ -14,31 +14,7 @@ import Loading from "../loading";
 const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const router = useRouter();
-
-  // useEffect(() => {
-  //   const checkSession = async () => {
-  //     try {
-  //       const { data, error } = await supabase.auth.getSession();
-  //       if (error) {
-  //         console.error("セッション取得エラー:", error.message);
-  //         router.replace("/login");
-  //         return;
-  //       }
-  //       if (!data.session) {
-  //         console.error("セッション情報がありませんでした");
-  //         router.replace("/login");
-  //         return;
-  //       }
-  //       router.replace("/login/welcome");
-  //     } catch (error) {
-  //       console.error("セッション情報取得失敗:", error);
-  //       router.replace("/login");
-  //     }
-  //   };
-  //   checkSession();
-  // }, [router]);
 
   useEffect(() => {
     const checkSession = async () => {
