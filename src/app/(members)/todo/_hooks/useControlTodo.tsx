@@ -299,6 +299,42 @@ export const useTodo = () => {
     }
   };
 
+  //////dndkit
+  // useControlTodo.tsx の中にこんな感じの関数を追加
+  // const updateTodoOrder = async(sortedItem: CreateTodoItemRequestBody[]) => {
+  //   const token = (await supabase.auth.getSession()).data?.session?.access_token;
+
+  //   // 仮のidを付与する（本来はサーバーから取得するidを使うべき）
+  //   const convertedOrder = sortedItem.map((item, idx) => ({
+  //     ...item,
+  //     id: todoItems[idx]?.id ?? idx + 1, // 既存のidがあれば使い、なければ仮id
+  //   }));
+  //   setTodoItems(convertedOrder);
+  //   // ここでサーバーに順番更新リクエストを投げる処理も入れてOK
+  // };
+
+  const updateTodoOrder = async (sortedItems: TodoItem[]) => {
+    const token = (await supabase.auth.getSession()).data?.session
+      ?.access_token;
+
+    const reordered = sortedItems.map((item, index) => ({
+      id: item.id,
+      sortOrder: index, // 0から順番に
+    }));
+
+    await fetch(`/api/todoItems/${activeTabId}/reorder`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+      body: JSON.stringify({ items: reordered }),
+    });
+
+    // stateも更新（必要なら）
+    setTodoItems(sortedItems);
+  };
+
   return {
     deleteItem,
     saveItem,
@@ -317,5 +353,6 @@ export const useTodo = () => {
     addPostNewItem,
     setPostTodoTitle,
     postTodoTitle,
+    updateTodoOrder, // dndkit用の関数を返す
   };
 };
