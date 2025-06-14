@@ -3,6 +3,7 @@ export interface TodoItem {
   id: number;
   toDoItem: string;
   isChecked: boolean;
+  sortOrder?: number;
 }
 
 export interface CreatePostRequestBody {
@@ -25,4 +26,9 @@ export type UpdateTodoItemRequestBody = TodoItem;
 export interface CreateResponse extends TodoItem {
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SortedItem {
+  id: number;
+  sortOrder: number;
 }

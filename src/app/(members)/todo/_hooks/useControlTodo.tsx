@@ -6,10 +6,12 @@ import {
   UpdateTodoItemRequestBody,
   CreateResponse,
   TodoItem,
+  SortedItem,
 } from "@/app/_type/Todo";
 import { supabase } from "@/utils/supabase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { TbHandGrab } from "react-icons/tb";
 
 export const useTodo = () => {
   const { token } = useSupabaseSession();
@@ -21,7 +23,8 @@ export const useTodo = () => {
   const inputRef = useRef<HTMLInputElement | null>(null); // // 新規追加時の入力欄にフォーカスするためのRef
   const [newItem, setNewItem] = useState(false);
   const [postTodoTitle, setPostTodoTitle] = useState("");
-
+  const [isSortMode, setIsSortMode] = useState(false);
+  const [tempSortedItems, setTempSortedItems] = useState<SortedItem[]>([]); // 一時的にソートされたアイテムを保持するための状態
   //signUp後、初めてtodoページを開くときの表示
 
   const fetcher = useCallback(async () => {
@@ -313,26 +316,77 @@ export const useTodo = () => {
   //   // ここでサーバーに順番更新リクエストを投げる処理も入れてOK
   // };
 
-  const updateTodoOrder = async (sortedItems: TodoItem[]) => {
-    const token = (await supabase.auth.getSession()).data?.session
-      ?.access_token;
+  // const updateTodoOrder = async (sortedItems: SortedItem[]) => {
+  //   setTempSortedItems(sortedItems);
+  //   console.log(sortedItems);
+  // };
+  const updateTodoOrder = async (
+    sortedOrderOnly: { id: number; sortOrder: number }[]
+  ) => {
+    const updated = sortedOrderOnly
+      .map((sorted) => {
+        const fullItem = todoItems.find((item) => item.id === sorted.id);
+        if (!fullItem) return null;
+        return {
+          ...fullItem,
+          sortOrder: sorted.sortOrder,
+        };
+      })
+      .filter(Boolean) as TodoItem[];
 
-    const reordered = sortedItems.map((item, index) => ({
+    setTodoItems(updated);
+  };
+
+  const clickSortMode = async () => {
+    const isNowSortMode = isSortMode;
+    setIsSortMode(!isNowSortMode);
+    if (!isNowSortMode)
+      return toast(
+        <div>
+          <p className="pb-2">🏷️並べ替えモード</p>
+          <div className="flex items-center">
+            <p className="w-[1.5rem] text-3xl pt-2 pb-0">
+              <TbHandGrab />
+            </p>
+            <p>ドラッグして変更</p>
+          </div>
+        </div>
+      );
+    if (!token) return toast.error("ログインしてください。");
+
+    const reordered = todoItems.map((item, index) => ({
       id: item.id,
       sortOrder: index, // 0から順番に
     }));
 
-    await fetch(`/api/todoItems/${activeTabId}/reorder`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token || "",
-      },
-      body: JSON.stringify({ items: reordered }),
-    });
+    toast("🏷️並べ替えモードを終了");
+    try {
+      const response = await fetch(
+        `/api/todo_group/${activeTabId}/todo_items/${activeTabId}/reorder`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({ items: reordered }),
+        }
+      );
+      console.log(response);
+      if (response.ok) {
+        setTempSortedItems(reordered);
+        fetcher();
+      } else {
+        console.error("Failed to save item.");
+      }
+    } catch (e) {
+      console.error("Error updating item:", e);
+      toast.error(`${e}:順番を更新できませんでした。`, {
+        duration: 2100,
+      });
 
-    // stateも更新（必要なら）
-    setTodoItems(sortedItems);
+      console.log(tempSortedItems);
+    }
   };
 
   return {
@@ -354,5 +408,9 @@ export const useTodo = () => {
     setPostTodoTitle,
     postTodoTitle,
     updateTodoOrder, // dndkit用の関数を返す
+    clickSortMode,
+    isSortMode,
+    setTempSortedItems,
+    tempSortedItems,
   };
 };

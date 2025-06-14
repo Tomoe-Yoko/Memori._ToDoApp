@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Tabs from "./_components/Tabs";
 import Navigation from "../../_components/Navigation";
 import Items from "./_components/Items";
@@ -44,8 +44,12 @@ const Page: React.FC = () => {
     setPostTodoTitle,
     addPostNewItem,
     updateTodoOrder,
+    clickSortMode,
+    isSortMode,
+
+    // setTempSortedItems,
   } = useTodo();
-  const [isSortMode, setIsSortMode] = useState(false);
+
   return (
     <>
       <div>
@@ -70,7 +74,12 @@ const Page: React.FC = () => {
             );
             const newIndex = todoItems.findIndex((item) => item.id === over.id);
             const sorted = arrayMove(todoItems, oldIndex, newIndex);
-            updateTodoOrder(sorted); // useTodo から取得済み
+            updateTodoOrder(
+              sorted.map((item, index) => ({
+                id: item.id,
+                sortOrder: index,
+              }))
+            ); // useTodo から取得済み
           }}
         >
           <SortableContext
@@ -80,6 +89,7 @@ const Page: React.FC = () => {
             <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
               {todoItems
                 .filter((item) => item.todoGroupId === activeTabId)
+                .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
                 .map((item) =>
                   isSortMode ? (
                     <SortableItem
@@ -136,7 +146,8 @@ const Page: React.FC = () => {
             className={` w-[55px] aspect-square fixed bottom-[145px] mr-3 rounded-full text-white text-[11px] ${
               isSortMode ? "bg-trash_bg" : "bg-[#787878]"
             }`}
-            onClick={() => setIsSortMode(!isSortMode)}
+            // onClick={() => setIsSortMode(!isSortMode)}
+            onClick={() => clickSortMode()}
           >
             {isSortMode ? "完了" : "並べ替え"}
           </button>

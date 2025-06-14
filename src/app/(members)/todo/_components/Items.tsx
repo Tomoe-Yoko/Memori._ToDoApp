@@ -1,6 +1,6 @@
 import { CreateTodoItemRequestBody } from "@/app/_type/Todo";
 import React, { RefObject } from "react";
-import { BsTrash3Fill } from "react-icons/bs"; // アイコンをインポート
+import { BsTrash3Fill } from "react-icons/bs";
 
 interface Props {
   id: number;
