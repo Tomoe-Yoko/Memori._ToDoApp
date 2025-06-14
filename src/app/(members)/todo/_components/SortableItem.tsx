@@ -31,7 +31,7 @@ export const SortableItem: React.FC<Props> = ({ id, toDoItem, isChecked }) => {
         <TbHandGrab />
       </span>
       <button
-        className={`block w-7 h-7 rounded-full border-2 flex justify-center items-center  ${
+        className={`w-7 h-7 rounded-full border-2 flex justify-center items-center  ${
           isChecked
             ? "bg-text_button border-text_button "
             : "border-text_button"

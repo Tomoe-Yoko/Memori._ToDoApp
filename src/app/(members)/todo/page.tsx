@@ -6,7 +6,6 @@ import Items from "./_components/Items";
 import PlusButton from "../../_components/PlusButton";
 import { Toaster } from "react-hot-toast";
 import { useTodo } from "./_hooks/useControlTodo";
-// import { TbHandGrab } from "react-icons/tb";
 import {
   DndContext,
   closestCenter,
@@ -22,7 +21,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-// import SortableItem from "./_components/SortableItem";
 import { SortableItem } from "./_components/SortableItem";
 
 const Page: React.FC = () => {
@@ -47,8 +45,6 @@ const Page: React.FC = () => {
     updateTodoOrder,
     clickSortMode,
     isSortMode,
-
-    // setTempSortedItems,
   } = useTodo();
 
   return (
@@ -69,8 +65,8 @@ const Page: React.FC = () => {
             // useSensorでスマホを使いやすく。
             useSensor(TouchSensor, {
               activationConstraint: {
-                delay: 150,
-                tolerance: 5,
+                delay: 1,
+                tolerance: 1,
               },
             })
           )}
