@@ -17,6 +17,7 @@ export interface CreateTodoItemRequestBody {
   todoGroupId: number | null;
   toDoItem: string;
   isChecked: boolean;
+  sortOrder?: number;
 }
 
 export type UpdateTodoItemRequestBody = TodoItem;
