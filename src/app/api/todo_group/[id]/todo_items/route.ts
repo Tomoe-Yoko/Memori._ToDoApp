@@ -82,7 +82,7 @@ export const POST = async (
   }
   try {
     const body: CreateTodoItemRequestBody = await request.json();
-    const { toDoItem, isChecked } = body;
+    const { toDoItem, isChecked, sortOrder } = body;
 
     const todoGroup = await prisma.todoGroup.findUnique({
       where: {
@@ -102,6 +102,7 @@ export const POST = async (
         todoGroupId,
         toDoItem,
         isChecked,
+        sortOrder,
       },
     });
 

@@ -137,6 +137,7 @@ export const useTodo = () => {
       todoGroupId: activeTabId,
       toDoItem: postTodoTitle,
       isChecked: false,
+      sortOrder: todoItems.length + 1,
     };
 
     try {
@@ -344,11 +345,11 @@ export const useTodo = () => {
       return toast(
         <div>
           <p className="pb-2">🏷️並べ替えモード</p>
-          <div className="flex items-center">
-            <p className="w-[1.5rem] text-3xl pt-2 pb-0">
+          <div className="flex items-center gap-1">
+            <p className="w-[1.5rem] text-3xl pb-0">
               <TbHandGrab />
             </p>
-            <p>ドラッグして変更</p>
+            <p>をドラッグして変更</p>
           </div>
         </div>
       );
@@ -356,7 +357,7 @@ export const useTodo = () => {
 
     const reordered = todoItems.map((item, index) => ({
       id: item.id,
-      sortOrder: index, // 0から順番に
+      sortOrder: index + 1, // 0から順番に
     }));
 
     toast("🏷️並べ替えモードを終了");
