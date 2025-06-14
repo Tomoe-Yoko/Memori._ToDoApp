@@ -96,6 +96,7 @@ const Page: React.FC = () => {
                       key={item.id}
                       id={item.id}
                       toDoItem={item.toDoItem}
+                      isChecked={item.isChecked}
                     />
                   ) : (
                     <Items
