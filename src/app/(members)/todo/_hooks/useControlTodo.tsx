@@ -11,7 +11,7 @@ import {
 import { supabase } from "@/utils/supabase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { TbHandGrab } from "react-icons/tb";
+// import { TbHandGrab } from "react-icons/tb";
 
 export const useTodo = () => {
   const { token } = useSupabaseSession();
@@ -303,24 +303,7 @@ export const useTodo = () => {
     }
   };
 
-  //////dndkit
-  // useControlTodo.tsx の中にこんな感じの関数を追加
-  // const updateTodoOrder = async(sortedItem: CreateTodoItemRequestBody[]) => {
-  //   const token = (await supabase.auth.getSession()).data?.session?.access_token;
-
-  //   // 仮のidを付与する（本来はサーバーから取得するidを使うべき）
-  //   const convertedOrder = sortedItem.map((item, idx) => ({
-  //     ...item,
-  //     id: todoItems[idx]?.id ?? idx + 1, // 既存のidがあれば使い、なければ仮id
-  //   }));
-  //   setTodoItems(convertedOrder);
-  //   // ここでサーバーに順番更新リクエストを投げる処理も入れてOK
-  // };
-
-  // const updateTodoOrder = async (sortedItems: SortedItem[]) => {
-  //   setTempSortedItems(sortedItems);
-  //   console.log(sortedItems);
-  // };
+  //////dndkit 並べ替え
   const updateTodoOrder = async (
     sortedOrderOnly: { id: number; sortOrder: number }[]
   ) => {
@@ -345,13 +328,13 @@ export const useTodo = () => {
       return toast(
         <div>
           <p className="pb-2">🏷️並べ替えモード</p>
-          <div className="flex items-center gap-1">
-            <p className="w-[1.5rem] text-3xl pb-0">
+          {/* <div className="flex items-center gap-1"> */}
+          {/* <p className="w-[1.5rem] text-3xl pb-0">
               <TbHandGrab />
-            </p>
-            <p>をドラッグして変更</p>
-          </div>
+            </p> */}
+          <p>長押し → ドラッグで変更</p>
         </div>
+        // </div>
       );
     if (!token) return toast.error("ログインしてください。");
 
