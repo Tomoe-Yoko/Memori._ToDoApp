@@ -11,7 +11,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
-  TouchSensor,
+  // TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -61,14 +61,14 @@ const Page: React.FC = () => {
             useSensor(PointerSensor),
             useSensor(KeyboardSensor, {
               coordinateGetter: sortableKeyboardCoordinates,
-            }),
-            // useSensorでスマホを使いやすく。
-            useSensor(TouchSensor, {
-              activationConstraint: {
-                delay: 1,
-                tolerance: 1,
-              },
             })
+            // useSensorでスマホを使いやすく。
+            // useSensor(TouchSensor, {
+            //   activationConstraint: {
+            //     delay: 1,
+            //     tolerance: 1,
+            //   },
+            // })
           )}
           collisionDetection={closestCenter}
           onDragEnd={({ active, over }) => {
