@@ -27,7 +27,8 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [startOfWeek, setStartOfWeek] = useState<"gregory" | "iso8601">(
     "iso8601"
-  ); // 追加
+  );
+  const [holidays, setHolidays] = useState<Record<string, string>>({}); // 祝日データ
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -61,6 +62,18 @@ const Page: React.FC = () => {
 
     fetchStartOfWeek();
   }, [fetcher, token]);
+
+  // 祝日データの取得
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      const res = await fetch("https://holidays-jp.github.io/api/v1/date.json");
+      if (res.ok) {
+        const holidayData = await res.json();
+        setHolidays(holidayData);
+      }
+    };
+    fetchHolidays();
+  }, []);
 
   //DELETE
   const handleDeleteSchedule = async (id: number) => {
@@ -139,60 +152,119 @@ const Page: React.FC = () => {
     }
   };
 
+  // const tileContent = ({ date, view }: { date: Date; view: string }) => {
+  //   if (view === "month") {
+  //     const dateString = date.toLocaleDateString("ja-JP");
+  //     const calendarEntries = calendars.filter((entry) => {
+  //       const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
+  //         "ja-JP"
+  //       );
+  //       return entryDateString === dateString;
+  //     });
+
+  //     if (calendarEntries.length > 2) {
+  //       return (
+  //         <div className="flex flex-col items-start">
+  //           {calendarEntries.slice(0, 3).map((entry) => {
+  //             const colorCode = Object.keys(scheduleColorMap).find(
+  //               (key) => scheduleColorMap[key] === entry.scheduleColor
+  //             );
+  //             return (
+  //               <p
+  //                 key={entry.id}
+  //                 style={{ color: colorCode }}
+  //                 className="text-[10px]"
+  //               >
+  //                 ・{entry.content}
+  //               </p>
+  //             );
+  //           })}
+  //           <p className="text-[10px] text-gray-500">
+  //             ほか{calendarEntries.length - 3}件
+  //           </p>
+  //         </div>
+  //       );
+  //     } else if (calendarEntries.length > 0) {
+  //       return (
+  //         <div className="flex flex-col items-start">
+  //           {calendarEntries.map((entry) => {
+  //             const colorCode = Object.keys(scheduleColorMap).find(
+  //               (key) => scheduleColorMap[key] === entry.scheduleColor
+  //             );
+  //             return (
+  //               <p
+  //                 key={entry.id}
+  //                 style={{ color: colorCode }}
+  //                 className="text-[10px]"
+  //               >
+  //                 ・{entry.content}
+  //               </p>
+  //             );
+  //           })}
+  //         </div>
+  //       );
+  //     } else {
+  //       return null;
+  //     }
+  //   }
+  // };
+
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
-      const dateString = date.toLocaleDateString("ja-JP");
+      const isoDate = date.toISOString().split("T")[0]; // "2025-01-01"
+      const holidayName = holidays[isoDate];
+
       const calendarEntries = calendars.filter((entry) => {
         const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
           "ja-JP"
         );
-        return entryDateString === dateString;
+        return entryDateString === date.toLocaleDateString("ja-JP");
       });
 
-      if (calendarEntries.length > 2) {
-        return (
-          <div className="flex flex-col items-start">
-            {calendarEntries.slice(0, 3).map((entry) => {
-              const colorCode = Object.keys(scheduleColorMap).find(
-                (key) => scheduleColorMap[key] === entry.scheduleColor
-              );
-              return (
-                <p
-                  key={entry.id}
-                  style={{ color: colorCode }}
-                  className="text-[10px]"
-                >
-                  ・{entry.content}
-                </p>
-              );
-            })}
-            <p className="text-[10px] text-gray-500">
-              ほか{calendarEntries.length - 3}件
-            </p>
-          </div>
+      // 予定の表示部分を構成
+      const scheduleElements = (
+        calendarEntries.length > 2
+          ? calendarEntries.slice(0, 3)
+          : calendarEntries
+      ).map((entry) => {
+        const colorCode = Object.keys(scheduleColorMap).find(
+          (key) => scheduleColorMap[key] === entry.scheduleColor
         );
-      } else if (calendarEntries.length > 0) {
         return (
-          <div className="flex flex-col items-start">
-            {calendarEntries.map((entry) => {
-              const colorCode = Object.keys(scheduleColorMap).find(
-                (key) => scheduleColorMap[key] === entry.scheduleColor
-              );
-              return (
-                <p
-                  key={entry.id}
-                  style={{ color: colorCode }}
-                  className="text-[10px]"
-                >
-                  ・{entry.content}
-                </p>
-              );
-            })}
-          </div>
+          <p
+            key={entry.id}
+            style={{ color: colorCode }}
+            className="text-[10px]"
+          >
+            ・{entry.content}
+          </p>
         );
-      } else {
-        return null;
+      });
+
+      // 祝日がある場合は先頭に追加
+      if (holidayName) {
+        scheduleElements.unshift(
+          <p key="holiday" className="text-red-500 text-[10px] font-bold">
+            ※ {holidayName}
+          </p>
+        );
       }
+
+      // 表示内容があれば返す
+      if (scheduleElements.length > 0) {
+        return (
+          <div className="flex flex-col items-start">
+            {scheduleElements}
+            {calendarEntries.length > 3 && (
+              <p className="text-[10px] text-gray-500">
+                ほか{calendarEntries.length - 3}件
+              </p>
+            )}
+          </div>
+        );
+      }
+
+      return null;
     }
   };
 
