@@ -93,11 +93,11 @@ const useControlGalleryImage = (selectedTabId: number) => {
 
     try {
       const compressedFile = await imageCompression(file, options);
-      console.log(
-        "圧縮後のファイルサイズ:",
-        compressedFile.size / 1024 / 1024,
-        "MB"
-      );
+      // console.log(
+      //   "圧縮後のファイルサイズ:",
+      //   compressedFile.size / 1024 / 1024,
+      //   "MB"
+      // );
       return compressedFile;
     } catch (error) {
       console.error("画像圧縮に失敗しました:", error);

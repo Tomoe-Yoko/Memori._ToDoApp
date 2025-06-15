@@ -154,13 +154,12 @@ export const PUT = async (request: NextRequest) => {
       }),
     };
     // データベースの更新
-    const updatedUser = await prisma.users.update({
+    await prisma.users.update({
       where: {
         supabaseUserId: data.user.id,
       },
       data: updateData,
     });
-    console.log(`140:${updatedUser}`);
 
     return NextResponse.json({
       status: 200,

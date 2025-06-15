@@ -23,7 +23,6 @@ const WelcomePage: React.FC = () => {
 
   useEffect(() => {
     const hour = new Date().getHours();
-    console.log(hour);
     if (hour >= 3 && hour <= 11) {
       setGreetingMessage("おはようございます");
     } else if (hour >= 12 && hour <= 14) {

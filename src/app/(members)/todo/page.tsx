@@ -11,7 +11,6 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
-  // TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -62,13 +61,6 @@ const Page: React.FC = () => {
             useSensor(KeyboardSensor, {
               coordinateGetter: sortableKeyboardCoordinates,
             })
-            // useSensorでスマホを使いやすく。
-            // useSensor(TouchSensor, {
-            //   activationConstraint: {
-            //     delay: 1,
-            //     tolerance: 1,
-            //   },
-            // })
           )}
           collisionDetection={closestCenter}
           onDragEnd={({ active, over }) => {
@@ -88,7 +80,7 @@ const Page: React.FC = () => {
         >
           <SortableContext
             items={todoItems.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
+            strategy={verticalListSortingStrategy} //縦方向リスト
           >
             <ul className="bg-white m-auto max-w-md w-[95%] pt-6 pb-16 min-h-svh">
               {todoItems
@@ -96,6 +88,7 @@ const Page: React.FC = () => {
                 .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
                 .map((item) =>
                   isSortMode ? (
+                    //↓この中で useSortable() を使い、実際に動かせるように
                     <SortableItem
                       key={item.id}
                       id={item.id}
@@ -132,7 +125,6 @@ const Page: React.FC = () => {
                       type="text"
                       value={postTodoTitle}
                       onChange={(e) => setPostTodoTitle(e.target.value)}
-                      // onBlur={addPostNewItem}
                       onBlur={() =>
                         postTodoTitle.trim() === ""
                           ? (setNewItem(false), setPostTodoTitle(""))
@@ -151,7 +143,6 @@ const Page: React.FC = () => {
             className={` w-[55px] aspect-square fixed bottom-[145px] mr-3 rounded-full text-white text-[11px] ${
               isSortMode ? "bg-trash_bg" : "bg-[#787878]"
             }`}
-            // onClick={() => setIsSortMode(!isSortMode)}
             onClick={() => clickSortMode()}
           >
             {isSortMode ? "完了" : "並べ替え"}

@@ -303,7 +303,7 @@ export const useTodo = () => {
     }
   };
 
-  //////dndkit 並べ替え
+  //////TODOアイテム_dndkit 並べ替え
   const updateTodoOrder = async (
     sortedOrderOnly: { id: number; sortOrder: number }[]
   ) => {
@@ -328,19 +328,15 @@ export const useTodo = () => {
       return toast(
         <div>
           <p className="pb-2">🏷️並べ替えモード</p>
-          {/* <div className="flex items-center gap-1"> */}
-          {/* <p className="w-[1.5rem] text-3xl pb-0">
-              <TbHandGrab />
-            </p> */}
-          <p>長押し → ドラッグで変更</p>
+
+          <p>ドラッグで並び替えられます</p>
         </div>
-        // </div>
       );
     if (!token) return toast.error("ログインしてください。");
 
     const reordered = todoItems.map((item, index) => ({
       id: item.id,
-      sortOrder: index + 1, // 0から順番に
+      sortOrder: index + 1, // 1から順番に
     }));
 
     toast("🏷️並べ替えモードを終了");
@@ -356,7 +352,6 @@ export const useTodo = () => {
           body: JSON.stringify({ items: reordered }),
         }
       );
-      console.log(response);
       if (response.ok) {
         setTempSortedItems(reordered);
         fetcher();
@@ -368,8 +363,6 @@ export const useTodo = () => {
       toast.error(`${e}:順番を更新できませんでした。`, {
         duration: 2100,
       });
-
-      console.log(tempSortedItems);
     }
   };
 
