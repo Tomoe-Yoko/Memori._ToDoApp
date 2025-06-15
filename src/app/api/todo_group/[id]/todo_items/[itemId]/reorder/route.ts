@@ -1,3 +1,4 @@
+//todoアイテムの並び替え更新
 import { PrismaClient } from "@prisma/client";
 import { supabase } from "@/utils/supabase";
 import { NextResponse, NextRequest } from "next/server";
@@ -40,13 +41,13 @@ export const PUT = async (
         id: { in: items.map((item) => item.id) },
         todoGroup: {
           id: todoGroupId,
-          userId: user.id, // ここでユーザー所有を確認
+          userId: user.id,
         },
       },
     });
     const validIds = new Set(validTodoItems.map((item) => item.id));
 
-    // ② 有効なitemのみ更新
+    // 有効なitemのみ更新
     const updatePromises = items
       .filter((item) => validIds.has(item.id))
       .map((item) =>
@@ -59,22 +60,6 @@ export const PUT = async (
     await Promise.all(updatePromises);
 
     return NextResponse.json({ status: "OK" });
-    // const updatePromises = items.map((item) =>
-    //   prisma.todoItems.update({
-    //     where: {
-    //       id: item.id,
-    //       todoGroup: {
-    //         id: todoGroupId,
-    //         user: { supabaseUserId },
-    //       },
-    //     },
-    //     data: { sortOrder: item.sortOrder },
-    //   })
-    // );
-
-    // await Promise.all(updatePromises);
-
-    // return NextResponse.json({ status: "OK" });
   } catch (error) {
     return NextResponse.json(
       { message: "更新に失敗しました", error },

@@ -12,8 +12,6 @@ async function main() {
   });
 
   for (const group of todoGroups) {
-    console.log(`Updating todoGroupId: ${group.id}`);
-
     for (let i = 0; i < group.toDoItems.length; i++) {
       const item = group.toDoItems[i];
       await prisma.todoItems.update({
@@ -22,8 +20,6 @@ async function main() {
       });
     }
   }
-
-  console.log("✅ All sortOrders have been updated.");
 }
 
 main()
