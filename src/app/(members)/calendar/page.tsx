@@ -244,8 +244,8 @@ const Page: React.FC = () => {
       // 祝日がある場合は先頭に追加
       if (holidayName) {
         scheduleElements.unshift(
-          <p key="holiday" className="text-red-500 text-[10px] font-bold">
-            ※ {holidayName}
+          <p key="holiday" className="text-gray-500">
+            * {holidayName}
           </p>
         );
       }
