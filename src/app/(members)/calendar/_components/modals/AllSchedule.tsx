@@ -23,6 +23,7 @@ interface Props {
     createdAt: string,
     updatedAt: string
   ) => void;
+  holidays: Record<string, string>;
 }
 
 const AllSchedule: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const AllSchedule: React.FC<Props> = ({
   handleDeleteSchedule,
   handleUpdateSchedule,
   handleSuccess,
+  holidays,
 }) => {
   const [schedules, setSchedules] = useState<CalendarData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -72,6 +74,9 @@ const AllSchedule: React.FC<Props> = ({
     );
     setEditingId(null);
   };
+  const holidayName = selectedDate
+    ? holidays[selectedDate.toISOString().split("T")[0]]
+    : "";
   return (
     <div className="relative ">
       <div className="absolute top-[-40px] right-[-30px]">
@@ -85,7 +90,11 @@ const AllSchedule: React.FC<Props> = ({
           weekday: "short",
         })}
       </h2>
+
       <div className="space-y-2 bg-[#ccca] rounded-xl p-4 leading-normal">
+        {holidayName && (
+          <p className="text-red-600 pb-2">* {holidayName}</p> // ← 祝日名の表示
+        )}
         {schedules.length > 0 ? (
           schedules.map((entry) => {
             const colorCode = Object.keys(scheduleColorMap).find(
@@ -146,7 +155,6 @@ const AllSchedule: React.FC<Props> = ({
         className="bg-white p-16 max-w-lg mx-auto mt-24 rounded shadow-lg"
         overlayClassName="absolute top-0 w-full bg-black bg-opacity-50 flex justify-center items-center"
       >
-        {/* <NewPost onSuccess={() => setAddModalOpen(false)} /> */}
         {selectedDate && (
           <NewPost
             onSuccess={() => {
@@ -156,10 +164,7 @@ const AllSchedule: React.FC<Props> = ({
             }}
             initialDate={selectedDate} // 選択された日付を渡す
           />
-        )}{" "}
-        {/* <div onClick={() => setShowAllScheduleModal(true)} className="mt-8">
-          <Button text="キャンセル" />
-        </div> */}
+        )}
       </Modal>
     </div>
   );
