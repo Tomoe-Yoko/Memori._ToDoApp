@@ -218,8 +218,10 @@ const Page: React.FC = () => {
         const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
           "ja-JP"
         );
+
         return entryDateString === date.toLocaleDateString("ja-JP");
       });
+      console.log(calendarEntries);
 
       // 予定の表示部分を構成
       const scheduleElements = (
@@ -341,6 +343,7 @@ const Page: React.FC = () => {
           handleDeleteSchedule={handleDeleteSchedule}
           handleUpdateSchedule={handleUpdateSchedule}
           handleSuccess={handleSuccess}
+          holidays={holidays}
         />
         <Toaster position="top-center" />
       </Modal>
