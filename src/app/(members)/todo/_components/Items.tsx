@@ -44,6 +44,7 @@ const Items: React.FC<Props> = ({
             >
               {isChecked && <span className="text-white ">✓</span>}
             </button>
+
             <input
               ref={toDoItem === "" ? inputRef : null} // 空のタスクの場合のみフォーカス
               type="text"
@@ -60,7 +61,9 @@ const Items: React.FC<Props> = ({
                   : toDoItem.length >= 14
                   ? "text-[13px]"
                   : "text-[1rem]"
-              }`}
+              } ${
+                isChecked && "line-through decoration-[text_button] opacity-80"
+              } `}
             />
           </div>
 

@@ -62,6 +62,19 @@ const Page: React.FC = () => {
     },
     [token]
   );
+  useEffect(() => {
+    const today = new Date().getDay();
+    const weekMap: Record<number, Weekly> = {
+      0: Weekly.sun,
+      1: Weekly.mon,
+      2: Weekly.tue,
+      3: Weekly.wed,
+      4: Weekly.thu,
+      5: Weekly.fri,
+      6: Weekly.sat,
+    };
+    setCurrentDay(weekMap[today]);
+  }, []);
 
   // 初回レンダリングおよび曜日が変更された際にデータを取得
   useEffect(() => {
