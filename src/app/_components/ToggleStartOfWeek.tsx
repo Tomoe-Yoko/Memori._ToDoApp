@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Select from "react-select";
 import { Controller, useForm } from "react-hook-form";
 import { useSupabaseSession } from "../_hooks/useSupabaseSession";
-import { CreateLoginPostRequestBody } from "../_type/login";
+import { CreateLoginPostResponse } from "../_type/login";
 import Button from "./Button";
 
 const options = [
@@ -17,31 +17,29 @@ const ToggleStartOfWeek: React.FC = () => {
   const { control, handleSubmit, watch, reset } = useForm<{
     startOfWeek: "iso8601" | "gregory" | null;
   }>({
-    defaultValues: { startOfWeek: null },
+    defaultValues: { startOfWeek: "iso8601" },
   });
-  const startOfWeek = watch("startOfWeek");
+  const startOfWeekValue = watch("startOfWeek");
 
   const fetcher = useCallback(async () => {
     try {
       if (!token) return;
-      const res = await fetch("api/users");
+      const res = await fetch("api/users", {
+        // method: "GET",
+        headers: { "Content-Type": "application/JSON", Authorization: token! },
+      });
       if (!res.ok) throw new Error("Failed to fetch startOfWeek");
 
-      const data: CreateLoginPostRequestBody = await res.json();
-      const { startOfWeek } = data;
-      if (startOfWeek) {
-        const selectedOption =
-          options.find((opt) => opt.value === startOfWeek) || null;
+      const data: CreateLoginPostResponse = await res.json();
+
+      if (
+        data.userData.startOfWeek === "gregory" ||
+        data.userData.startOfWeek === "iso8601"
+      ) {
         reset({
-          startOfWeek: selectedOption
-            ? (selectedOption.value as "gregory" | "iso8601")
-            : null,
+          startOfWeek: data.userData.startOfWeek,
         });
       }
-      // setValue(
-      //   "startOfWeek",
-      //   options.find((opt) => opt.value === data.startOfWeek) || null
-      // );}
     } catch (error) {
       console.error("Error fetching startOfWeek:", error);
       toast.error("設定の取得に失敗しました。");
@@ -52,12 +50,12 @@ const ToggleStartOfWeek: React.FC = () => {
   }, [fetcher]);
 
   const onSubmit = async () => {
-    if (!startOfWeek) return;
+    if (!startOfWeekValue) return;
     try {
       const res = await fetch("api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/JSON", Authorization: token! },
-        body: JSON.stringify({ startOfWeek: startOfWeek }),
+        body: JSON.stringify({ startOfWeek: startOfWeekValue }),
       });
       if (!res.ok) {
         return toast.error("エラー：変更できませんでした。");

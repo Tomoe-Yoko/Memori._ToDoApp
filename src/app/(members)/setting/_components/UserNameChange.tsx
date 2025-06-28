@@ -44,9 +44,10 @@ const UserNameChange: React.FC<Props> = ({ token }) => {
   };
   return (
     <div>
-      <div className="flex justify-between items-center mt-6  w-[250px] mx-auto text-lg text-text_button">
+      {/* <div className="flex justify-between items-center mt-6  w-[250px] mx-auto text-lg text-text_button"> */}
+      <div className="flex gap-4 justify-center items-center text-lg text-text_button">
         <label className=" text-sm">名前:</label>
-        <div className="mt-4 w-[150px]">
+        <div className="w-[150px] mt-4">
           <Input
             value={userName || ""}
             onChange={(e) => setUserName(e.target.value)}

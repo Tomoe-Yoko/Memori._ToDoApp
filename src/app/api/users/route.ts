@@ -77,11 +77,9 @@ export const GET = async (request: NextRequest) => {
   const token = request.headers.get("Authorization") || "";
 
   const { error, data } = await supabase.auth.getUser(token);
+
   if (error)
-    return NextResponse.json({
-      status: "OK",
-      userData: { userName: null, themeColor: `bg-Theme01` },
-    });
+    return NextResponse.json({ status: error.message }, { status: 400 });
 
   const supabaseUserId = data.user.id;
   const user = await prisma.users.findUnique({ where: { supabaseUserId } });
