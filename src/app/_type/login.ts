@@ -10,6 +10,14 @@ export interface CreateLoginPostRequestBody {
   themeColorId: ThemeColorId;
   startOfWeek: "iso8601" | "gregory";
 }
+export interface CreateLoginPostResponse {
+  status: string;
+  userData: {
+    startOfWeek: "gregory" | "iso8601";
+    userName: string;
+    themeColor: string;
+  };
+}
 export enum ThemeColor {
   Theme01 = "Theme01",
   Theme02 = "Theme02",
