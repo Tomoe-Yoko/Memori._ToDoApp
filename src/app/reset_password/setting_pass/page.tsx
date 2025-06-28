@@ -4,7 +4,7 @@ import { supabase } from "@/utils/supabase";
 import { useRouter } from "next/navigation";
 import Button from "@/app/_components/Button";
 import Footer from "@/app/_components/Footer";
-import Image from "next/image"; // Imageコンポーネントをインポート
+import Image from "next/image";
 import memo from "@/app/public/img/memo.png";
 import toast, { Toaster } from "react-hot-toast";
 import PasswordInput from "@/app/_components/PasswordInput";

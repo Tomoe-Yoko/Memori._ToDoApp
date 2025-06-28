@@ -40,8 +40,6 @@ const ToggleStartOfWeek: React.FC = () => {
           startOfWeek: data.userData.startOfWeek,
         });
       }
-
-      console.log(data);
     } catch (error) {
       console.error("Error fetching startOfWeek:", error);
       toast.error("設定の取得に失敗しました。");

@@ -152,63 +152,6 @@ const Page: React.FC = () => {
     }
   };
 
-  // const tileContent = ({ date, view }: { date: Date; view: string }) => {
-  //   if (view === "month") {
-  //     const dateString = date.toLocaleDateString("ja-JP");
-  //     const calendarEntries = calendars.filter((entry) => {
-  //       const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
-  //         "ja-JP"
-  //       );
-  //       return entryDateString === dateString;
-  //     });
-
-  //     if (calendarEntries.length > 2) {
-  //       return (
-  //         <div className="flex flex-col items-start">
-  //           {calendarEntries.slice(0, 3).map((entry) => {
-  //             const colorCode = Object.keys(scheduleColorMap).find(
-  //               (key) => scheduleColorMap[key] === entry.scheduleColor
-  //             );
-  //             return (
-  //               <p
-  //                 key={entry.id}
-  //                 style={{ color: colorCode }}
-  //                 className="text-[10px]"
-  //               >
-  //                 ・{entry.content}
-  //               </p>
-  //             );
-  //           })}
-  //           <p className="text-[10px] text-gray-500">
-  //             ほか{calendarEntries.length - 3}件
-  //           </p>
-  //         </div>
-  //       );
-  //     } else if (calendarEntries.length > 0) {
-  //       return (
-  //         <div className="flex flex-col items-start">
-  //           {calendarEntries.map((entry) => {
-  //             const colorCode = Object.keys(scheduleColorMap).find(
-  //               (key) => scheduleColorMap[key] === entry.scheduleColor
-  //             );
-  //             return (
-  //               <p
-  //                 key={entry.id}
-  //                 style={{ color: colorCode }}
-  //                 className="text-[10px]"
-  //               >
-  //                 ・{entry.content}
-  //               </p>
-  //             );
-  //           })}
-  //         </div>
-  //       );
-  //     } else {
-  //       return null;
-  //     }
-  //   }
-  // };
-
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
       const isoDate = date.toISOString().split("T")[0]; // "2025-01-01"
@@ -221,7 +164,6 @@ const Page: React.FC = () => {
 
         return entryDateString === date.toLocaleDateString("ja-JP");
       });
-      console.log(calendarEntries);
 
       // 予定の表示部分を構成
       const scheduleElements = (
