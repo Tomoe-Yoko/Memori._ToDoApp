@@ -27,8 +27,11 @@ const SettingsPage: React.FC = () => {
           currentTheme={currentTheme}
           setCurrentTheme={setCurrentTheme}
         />
-        <UserNameChange token={token} />
-        <ToggleStartOfWeek />
+        <div className="flex-col items-start justify-start">
+          <UserNameChange token={token} />
+          <ToggleStartOfWeek />
+        </div>
+
         <Link href="/contact" className="block mt-6 w-[85%] mx-auto">
           <Button text="お問合せ" />
         </Link>
