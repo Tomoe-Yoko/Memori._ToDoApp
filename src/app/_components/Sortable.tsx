@@ -38,17 +38,17 @@ export const Sortable: React.FC<Props> = ({
 
   return (
     <>
-      {isSortMode && (isDragging ? <FaRegHandRock /> : <FaRegHand />)}{" "}
       <div
         ref={setNodeRef}
         style={style}
         {...attributes}
         // 並べ替えモードのときだけリスナーを適用
         {...(isSortMode ? listeners : {})}
-        className={`flex items-center gap-1 cursor-default ${
+        className={`touch-none flex items-center gap-1 cursor-default ${
           isSortMode ? "cursor-grab active:cursor-grabbing" : ""
         } ${className}`}
       >
+        {isSortMode && (isDragging ? <FaRegHandRock /> : <FaRegHand />)}
         {children}
       </div>
     </>
