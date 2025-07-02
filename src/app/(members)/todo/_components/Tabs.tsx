@@ -221,11 +221,12 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
                       className="w-full"
                     >
                       <button
-                        className={`w-full px-4 py-2 rounded-md text-left text-sm ${
-                          activeTabId === tab.id
-                            ? "bg-gray-800 text-white border-l-4 border-gray-600"
-                            : "bg-gray-700 text-gray-300"
-                        }`}
+                        // className={`w-full px-4 py-2 rounded-md text-left text-sm ${
+                        //   activeTabId === tab.id
+                        //     ? "bg-gray-800 text-white border-l-4 border-gray-600"
+                        //     : "bg-gray-700 text-gray-300"
+                        // }`}
+                        className="w-full px-4 py-2 rounded-md text-white text-left text-sm bg-text_button"
                         onClick={() => handleTabClick(tab.id)}
                       >
                         {tab.toDoGroupTitle}

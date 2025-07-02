@@ -48,7 +48,9 @@ export const Sortable: React.FC<Props> = ({
           isSortMode ? "cursor-grab active:cursor-grabbing" : ""
         } ${className}`}
       >
-        {isSortMode && (isDragging ? <FaRegHandRock /> : <FaRegHand />)}
+        <div className="text-indigo-500">
+          {isSortMode && (isDragging ? <FaRegHandRock /> : <FaRegHand />)}
+        </div>
         {children}
       </div>
     </>
