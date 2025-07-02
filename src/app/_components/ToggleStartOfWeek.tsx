@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import React, { useCallback, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Select from "react-select";
