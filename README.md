@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Memori. - TODOアプリ
 
-## Getting Started
+> **Memori.** は、忙しい人でもタスクの漏れを防ぎ、効率的に、かつ楽しみながら自分の時間も大切にできるようにと開発したTODOアプリです。
+---
 
-First, run the development server:
+## URL
+https://memori-todoapp.vercel.app/
+
+---
+
+## 開発の目的
+
+このアプリは、次々に浮かぶアイデアやタスクを整理するための「自分専用の場所」が欲しいと感じたことが、開発の原点です。
+私自身、日々のタスクを効率よくこなしつつ、ゆったりとした“自分の時間”も大切にしたいと考えてきました。
+同じように忙しい毎日を送っている方のタスク整理ツールになればと思い、「Memori.」を開発しました。
+世の中には多機能なTODOアプリが数多くありますが、タスクをこなすためだけのツールが多い印象でした。
+そこでMemori.では、気分に合わせて変更できる豊富な背景色を設定できるようにし、「自分らしい空間」を感じられるよう工夫しています。
+また、ルーティンページでは「ごみの日」などの定期的な予定を登録でき、達成した際にはちょっとした“幸せ”を感じられるような仕様にいたしました。
+日々のタスクも楽しくなるような、そんなアプリを目指しています。
+
+---
+
+## 主な機能一覧
+
+- **タスクの整理と効率化**  
+  あれもこれもと、やりたいことがたくさんあるユーザーでもタスクを漏らさず、優先順位を明確に保ちながら進められます。
+
+- **パーソナルなカスタマイズ**  
+  背景色の変更が15色から選べるなど、「自分らしい」空間を設定可能。
+
+- **ページ構成**
+  - ログインページ
+  - カレンダーページ
+  - TODOリストページ
+  - ルーティンページ
+  - ギャラリーページ
+
+---
+
+## 使用技術
+
+- **フレームワーク**: Next.js (create-next-appベース)
+- **言語**: TypeScript
+- **スタイリング**: Tailwind CSS
+- **デプロイ**: Vercel
+- **フォント最適化**: `next/font` によるGeistの自動最適化
+- **ORM**: Prisma
+- **その他**
+  - supabase
+  - tailwindCSS
+  - ChatGPTを開発補助ツールとして活用（ロジック理解を重視）
+
+---
+
+##  開発者向け情報
+
+### 📦 パッケージインストール
+
+以下のいずれかのコマンドで依存関係をインストール：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+npm install
+# または
+yarn install
+# または
+pnpm install
+# または
+bun install
