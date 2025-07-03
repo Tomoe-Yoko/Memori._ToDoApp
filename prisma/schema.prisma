@@ -94,7 +94,7 @@ model TodoItems {
   todoGroupId Int
   toDoItem    String
   isChecked   Boolean
-  sortOrder   Int?
+  sortOrder   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
