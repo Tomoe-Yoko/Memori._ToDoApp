@@ -199,6 +199,7 @@ export const useTodo = () => {
       todoGroupId: activeTabId,
       toDoItem: "",
       isChecked: false,
+      sortOrder: todoItems.length + 1, // 新しいアイテムのsortOrderを設定
     };
     try {
       // サーバーに新しいアイテムを送信

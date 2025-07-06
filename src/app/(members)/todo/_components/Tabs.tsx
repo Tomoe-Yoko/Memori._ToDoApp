@@ -16,13 +16,11 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  // DragEndEvent,
 } from "@dnd-kit/core";
 
 import {
   SortableContext,
   horizontalListSortingStrategy,
-  // arrayMove,
 } from "@dnd-kit/sortable";
 
 interface Props {
@@ -43,11 +41,11 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
     useMouseDrag(tabContainerRef);
   const {
-    updateTabOrder,
-    ToggleSortTabMode,
+    // updateTabOrder,
+    clickSortTabMode,
     sortTabs,
     isSortMode,
-    handleDragEnd,
+    handleTabDragEnd,
     setSortTabs,
   } = useControlTodoTab();
   // DnD sensors setup
@@ -199,7 +197,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+          onDragEnd={handleTabDragEnd}
         >
           <div
             className={`fixed inset-0 bg-[#787878aa] bg-opacity-40 flex items-center justify-center z-50 ${
@@ -221,11 +219,6 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
                       className="w-full"
                     >
                       <button
-                        // className={`w-full px-4 py-2 rounded-md text-left text-sm ${
-                        //   activeTabId === tab.id
-                        //     ? "bg-gray-800 text-white border-l-4 border-gray-600"
-                        //     : "bg-gray-700 text-gray-300"
-                        // }`}
                         className="w-full px-4 py-2 rounded-md text-white text-left text-sm bg-text_button"
                         onClick={() => handleTabClick(tab.id)}
                       >
@@ -238,10 +231,11 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
                   <button
                     onClick={() => {
                       if (isSortMode) {
-                        const sortedIds = sortTabs.map((tab) => tab.id);
-                        updateTabOrder(sortedIds);
+                        // const sortedIds =
+                        sortTabs.map((tab) => tab.id);
+                        clickSortTabMode();
                       }
-                      ToggleSortTabMode();
+                      clickSortTabMode();
                     }}
                     className="p-3 text-xs text-white bg-text_button rounded-md"
                   >
@@ -253,54 +247,6 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
           </div>
         </DndContext>
       ) : (
-        // <DndContext
-        //   sensors={sensors}
-        //   collisionDetection={closestCenter}
-        //   onDragEnd={handleDragEnd}
-        // >
-        //   <div className="">
-        //     <SortableContext
-        //       items={sortTabs.map((tab) => tab.id)}
-        //       strategy={horizontalListSortingStrategy}
-        //     >
-        //       <div className="flex">
-        //         {sortTabs.map((tab) => (
-        //           <Sortable
-        //             key={tab.id}
-        //             id={tab.id}
-        //             isSortMode={true}
-        //             className="min-w-fit"
-        //           >
-        //             <button
-        //               // className={`min-w-fit px-4 py-2 rounded-custom-rounded ${
-        //               //   activeTabId === tab.id
-        //               //     ? "bg-gray-800 text-white border-t border-l border-r"
-        //               //     : "bg-gray-900"
-
-        //               // }`}
-        //               className="min-w-fit p-2 rounded-custom-rounded bg-gray-800 text-white border-t border-l border-r text-[13px]"
-        //               onClick={() => handleTabClick(tab.id)}
-        //             >
-        //               {tab.toDoGroupTitle}
-        //             </button>
-        //           </Sortable>
-        //         ))}
-        //       </div>
-        //     </SortableContext>
-        //     <button
-        //       onClick={() => {
-        //         if (isSortMode) {
-        //           const sortedIds = sortTabs.map((tab) => tab.id);
-        //           updateTabOrder(sortedIds);
-        //         }
-        //         ToggleSortTabMode();
-        //       }}
-        //       className="block p-2 min-w-fit text-white rounded-custom-rounded bg-text_button text-[11px]"
-        //     >
-        //       {isSortMode ? "並べ替え完了" : "並べ替え"}
-        //     </button>
-        //   </div>
-        // </DndContext>
         <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
           <div
             className="flex overflow-x-auto scrollbar-hide"
@@ -337,10 +283,11 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
             <button
               onClick={() => {
                 if (isSortMode) {
-                  const sortedIds = sortTabs.map((tab) => tab.id);
-                  updateTabOrder(sortedIds);
+                  // const sortedIds =
+                  sortTabs.map((tab) => tab.id);
+                  clickSortTabMode();
                 }
-                ToggleSortTabMode();
+                clickSortTabMode();
               }}
               className="block p-2 min-w-fit text-white rounded-custom-rounded bg-text_button text-[11px]"
             >
