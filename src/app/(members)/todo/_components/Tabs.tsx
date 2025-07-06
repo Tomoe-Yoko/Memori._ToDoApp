@@ -7,7 +7,22 @@ import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
 import Input from "@/app/_components/Input";
+import Loading from "@/app/loading";
 import { useMouseDrag } from "@/app/_hooks/useMouseDrag";
+import { useControlTodoTab } from "../_hooks/useControlTodoTab";
+import { Sortable } from "@/app/_components/Sortable";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface Props {
   todoGroups: CreatePostRequestBody[];
@@ -22,12 +37,38 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
-
+  const [loading, setLoading] = useState<boolean>(true);
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
   const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
     useMouseDrag(tabContainerRef);
+  // const {
+  //   // updateTabOrder,
+  //   clickSortTabMode,
+  //   sortTabs,
+  //   isSortMode,
+  //   handleTabDragEnd,
+  //   setSortTabs,
+  // } = useControlTodoTab(fetchTabs);
+  // DnD sensors setup
+  const sensors = useSensors(useSensor(PointerSensor));
 
-  const fetcher = useCallback(async () => {
+  // const fetchTabs = useCallback(async () => {
+  //   const response = await fetch("/api/todo_group", {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: token!,
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   if (response.ok) {
+  //     setTabs(data.todoGroups);
+  //     if (isSortMode) setSortTabs(data.todoGroups);
+  //   } else {
+  //     console.error("Failed to fetch tabs:", data);
+  //   }
+  // }, [token, isSortMode, setSortTabs]);
+  const fetchTabs = useCallback(async () => {
+    setLoading(true);
     const response = await fetch("/api/todo_group", {
       headers: {
         "Content-Type": "application/json",
@@ -37,15 +78,49 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
     const data = await response.json();
     if (response.ok) {
       setTabs(data.todoGroups);
+      if (data.todoGroups.length > 0) {
+        setActiveTabId(data.todoGroups[0].id); // ✅ 明示的に更新
+      }
     } else {
       console.error("Failed to fetch tabs:", data);
     }
-  }, [token]);
+    setLoading(false);
+  }, [token, setActiveTabId]);
 
+  const {
+    clickSortTabMode,
+    sortTabs,
+    isSortMode,
+    handleTabDragEnd,
+    setSortTabs,
+  } = useControlTodoTab(fetchTabs); // ← OK、ここでやっと使える！
+  // const {} = useControlTodoTab(fetchTabs); // タブの取得と更新をuseControlTodoTabフックに反映
   useEffect(() => {
     if (!token) return;
-    fetcher();
-  }, [fetcher, token]);
+    fetchTabs();
+  }, [fetchTabs, token]);
+
+  //   if (isSortMode) {
+  //     setSortTabs(
+  //       todoGroups.map((tab, idx) => ({
+  //         ...tab,
+  //         sortTabOrder:
+  //           typeof tab.sortTabOrder === "number" ? tab.sortTabOrder : idx,
+  //       }))
+  //     );
+  //   }
+  // }, [fetchTabs, token, todoGroups, isSortMode, setSortTabs]);
+  useEffect(() => {
+    if (isSortMode) {
+      setSortTabs(
+        tabs.map((tab, idx) => ({
+          ...tab,
+          sortTabOrder:
+            typeof tab.sortTabOrder === "number" ? tab.sortTabOrder : idx,
+        }))
+      );
+    }
+  }, [isSortMode, tabs, setSortTabs]);
 
   // モーダルを開く
   const openModal = () => {
@@ -92,7 +167,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
           )
         );
         setEditTab(null);
-        fetcher();
+        fetchTabs();
         setActiveTabId(editTab.id);
       } else {
         console.error("Failed to update tab");
@@ -163,91 +238,162 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
     } catch (error) {
       console.error("Error adding tab:", error);
     }
-    fetcher();
+    fetchTabs();
     setActiveTabId(newTab.id);
   };
+  if (loading) {
+    return <Loading />;
+  }
   return (
-    <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
-      <div
-        className="flex overflow-x-auto scrollbar-hide"
-        ref={tabContainerRef}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeaveOrUp}
-        onMouseUp={handleMouseLeaveOrUp}
-        onMouseMove={handleMouseMove}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`min-w-fit px-4 py-2 rounded-custom-rounded ${
-              activeTabId === tab.id
-                ? "bg-white border-t border-l border-r"
-                : "bg-gray-200"
+    <>
+      {isSortMode ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleTabDragEnd}
+        >
+          <div
+            className={`fixed inset-0 bg-[#787878aa] bg-opacity-40 flex items-center justify-center z-50 ${
+              isSortMode ? "" : "hidden"
             }`}
-            onClick={() => handleTabClick(tab.id)}
-            onDoubleClick={() => handleTabDoubleClick(tab.id)}
           >
-            {tab.toDoGroupTitle}
-          </button>
-        ))}
-
-        {/* タブのプラスボタン */}
-        <button
-          onClick={openModal}
-          className="px-4 py-2 text-text_button rounded-custom-rounded bg-gray-200"
-        >
-          <AiOutlinePlus size={20} />
-        </button>
-
-        {/* 編集モーダル表示 */}
-        <Modal
-          isOpen={!!editTab}
-          onRequestClose={() => setEditTab(null)}
-          className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-        >
-          <h2 className="text-lg font-semibold mb-4 text-text_button">
-            タブ編集
-          </h2>
-          <Input
-            value={editTabName}
-            onChange={(e) => setEditTabName(e.target.value)}
-            placeholder="タブ名を編集"
-          />
-
-          <div className="mt-4 flex gap-4">
-            <div onClick={updateTab}>
-              <Button text="更新" size="small" />
-            </div>
-            <div onClick={deleteTab}>
-              <Button text="削除" size="small" bgColor="delete" />
+            <div className="bg-gray-100 p-4 rounded-lg shadow-lg w-full max-w-xs">
+              <h3>タブの並び替え</h3>
+              <SortableContext
+                items={sortTabs.map((tab) => tab.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                <div className="flex flex-col gap-2 p-2 border-b border-gray-700">
+                  {sortTabs.map((tab) => (
+                    <Sortable
+                      key={tab.id}
+                      id={tab.id}
+                      isSortMode={true}
+                      className="w-full"
+                    >
+                      <button
+                        className="w-full px-4 py-2 rounded-md text-white text-left text-sm bg-text_button"
+                        onClick={() => handleTabClick(tab.id)}
+                      >
+                        {tab.toDoGroupTitle}
+                      </button>
+                    </Sortable>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={() => {
+                      if (isSortMode) {
+                        sortTabs.map((tab) => tab.id);
+                      }
+                      clickSortTabMode();
+                    }}
+                    className="p-3 text-xs text-white bg-text_button rounded-md"
+                  >
+                    並べ替え完了
+                  </button>
+                </div>
+              </SortableContext>
             </div>
           </div>
-          <Toaster position="top-center" />
-        </Modal>
+        </DndContext>
+      ) : (
+        <div className="p-4 pb-0 max-w-md m-auto   rounded text-text_button">
+          <div
+            className="flex overflow-x-auto scrollbar-hide"
+            ref={tabContainerRef}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeaveOrUp}
+            onMouseUp={handleMouseLeaveOrUp}
+            onMouseMove={handleMouseMove}
+          >
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`min-w-fit px-4 py-2 rounded-custom-rounded ${
+                  activeTabId === tab.id
+                    ? "bg-white border-t border-l border-r"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => handleTabClick(tab.id)}
+                onDoubleClick={() => handleTabDoubleClick(tab.id)}
+              >
+                {tab.toDoGroupTitle}
+              </button>
+            ))}
 
-        {/* 新規追加モーダル表示 */}
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={closeModal}
-          className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-        >
-          <h2 className="text-lg font-semibold mb-4 text-text_button">
-            ToDoタブ追加
-          </h2>
-          <Input
-            value={newTabName}
-            onChange={(e) => setNewTabName(e.target.value)}
-            placeholder="タブ名を入力"
-          />
+            {/* タブ追加 */}
+            <button
+              onClick={openModal}
+              className="px-4 py-2 text-white rounded-custom-rounded bg-text_button "
+            >
+              <AiOutlinePlus size={20} />
+            </button>
 
-          <div onClick={addTab}>
-            <Button text="追加" />
+            {/* タブの並べ替えボタン */}
+            <button
+              onClick={() => {
+                if (isSortMode) {
+                  sortTabs.map((tab) => tab.id);
+                }
+                clickSortTabMode();
+              }}
+              className="block p-2 min-w-fit text-white rounded-custom-rounded bg-text_button text-[11px]"
+            >
+              {isSortMode ? "並べ替え完了" : "並べ替え"}
+            </button>
+
+            {/* 編集モーダル表示 */}
+            <Modal
+              isOpen={!!editTab}
+              onRequestClose={() => setEditTab(null)}
+              className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+              overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            >
+              <h2 className="text-lg font-semibold mb-4 text-text_button">
+                タブ編集
+              </h2>
+              <Input
+                value={editTabName}
+                onChange={(e) => setEditTabName(e.target.value)}
+                placeholder="タブ名を編集"
+              />
+
+              <div className="mt-4 flex gap-4">
+                <div onClick={updateTab}>
+                  <Button text="更新" size="small" />
+                </div>
+                <div onClick={deleteTab}>
+                  <Button text="削除" size="small" bgColor="delete" />
+                </div>
+              </div>
+              <Toaster position="top-center" />
+            </Modal>
+
+            {/* 新規追加モーダル表示 */}
+            <Modal
+              isOpen={isModalOpen}
+              onRequestClose={closeModal}
+              className="bg-white p-6 rounded shadow-md max-w-sm mx-auto mt-20 text-center"
+              overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            >
+              <h2 className="text-lg font-semibold mb-4 text-text_button">
+                ToDoタブ追加
+              </h2>
+              <Input
+                value={newTabName}
+                onChange={(e) => setNewTabName(e.target.value)}
+                placeholder="タブ名を入力"
+              />
+
+              <div onClick={addTab}>
+                <Button text="追加" />
+              </div>
+            </Modal>
           </div>
-        </Modal>
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

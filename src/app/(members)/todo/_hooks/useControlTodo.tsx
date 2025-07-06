@@ -86,36 +86,40 @@ export const useTodo = () => {
   }, [fetcher, token]);
 
   //アクティブなタブの切り替え、情報を取得
-  useEffect(() => {
-    if (!token || activeTabId === null) return;
-    const fetchTodoItems = async () => {
-      try {
-        const response = await fetch(
-          `/api/todo_group/${activeTabId}/todo_items`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token!,
-            },
-          }
-        );
+  // useEffect(() => {
+  //   if (!token || activeTabId === null) return;
+  //   const fetchTodoItems = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `/api/todo_group/${activeTabId}/todo_items`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: token!,
+  //           },
+  //         }
+  //       );
 
-        const data = await response.json();
-        if (response.ok) {
-          setTodoItems(data.todoItems);
-        } else {
-          console.error("Failed to fetch todo items:", data);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       const data = await response.json();
+  //       if (response.ok) {
+  //         setTodoItems(data.todoItems);
+  //       } else {
+  //         console.error("Failed to fetch todo items:", data);
+  //       }
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         console.error(error.message);
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchTodoItems();
+  // }, [token, activeTabId]); // activeTabIdが変更されたときに実行
+  useEffect(() => {
+    if (!token || !activeTabId) return;
     fetchTodoItems();
-  }, [token, activeTabId]); // activeTabIdが変更されたときに実行
+  }, [token, activeTabId, fetchTodoItems]);
 
   //新しいアイテムが追加されたときにフォーカスを当てる
   useEffect(() => {
@@ -199,6 +203,7 @@ export const useTodo = () => {
       todoGroupId: activeTabId,
       toDoItem: "",
       isChecked: false,
+      sortOrder: todoItems.length + 1, // 新しいアイテムのsortOrderを設定
     };
     try {
       // サーバーに新しいアイテムを送信
