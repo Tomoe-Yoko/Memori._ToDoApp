@@ -7,6 +7,7 @@ import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "@/utils/supabase";
 import Input from "@/app/_components/Input";
+import Loading from "@/app/loading";
 import { useMouseDrag } from "@/app/_hooks/useMouseDrag";
 import { useControlTodoTab } from "../_hooks/useControlTodoTab";
 import { Sortable } from "@/app/_components/Sortable";
@@ -36,22 +37,38 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
   const [newTabName, setNewTabName] = useState(""); //新しいタブの名前を入力するための状態
   const [editTab, setEditTab] = useState<CreatePostRequestBody | null>(null); //現在編集対象のタブを管理
   const [editTabName, setEditTabName] = useState(""); //編集用のタブ名を管理
-
+  const [loading, setLoading] = useState<boolean>(true);
   const tabContainerRef = useRef<HTMLDivElement | null>(null); //タブscroll参照
   const { handleMouseDown, handleMouseLeaveOrUp, handleMouseMove } =
     useMouseDrag(tabContainerRef);
-  const {
-    // updateTabOrder,
-    clickSortTabMode,
-    sortTabs,
-    isSortMode,
-    handleTabDragEnd,
-    setSortTabs,
-  } = useControlTodoTab();
+  // const {
+  //   // updateTabOrder,
+  //   clickSortTabMode,
+  //   sortTabs,
+  //   isSortMode,
+  //   handleTabDragEnd,
+  //   setSortTabs,
+  // } = useControlTodoTab(fetchTabs);
   // DnD sensors setup
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const fetcher = useCallback(async () => {
+  // const fetchTabs = useCallback(async () => {
+  //   const response = await fetch("/api/todo_group", {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: token!,
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   if (response.ok) {
+  //     setTabs(data.todoGroups);
+  //     if (isSortMode) setSortTabs(data.todoGroups);
+  //   } else {
+  //     console.error("Failed to fetch tabs:", data);
+  //   }
+  // }, [token, isSortMode, setSortTabs]);
+  const fetchTabs = useCallback(async () => {
+    setLoading(true);
     const response = await fetch("/api/todo_group", {
       headers: {
         "Content-Type": "application/json",
@@ -61,16 +78,49 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
     const data = await response.json();
     if (response.ok) {
       setTabs(data.todoGroups);
-      setSortTabs(data.todoGroups);
+      if (data.todoGroups.length > 0) {
+        setActiveTabId(data.todoGroups[0].id); // ✅ 明示的に更新
+      }
     } else {
       console.error("Failed to fetch tabs:", data);
     }
-  }, [token, setSortTabs]);
+    setLoading(false);
+  }, [token, setActiveTabId]);
 
+  const {
+    clickSortTabMode,
+    sortTabs,
+    isSortMode,
+    handleTabDragEnd,
+    setSortTabs,
+  } = useControlTodoTab(fetchTabs); // ← OK、ここでやっと使える！
+  // const {} = useControlTodoTab(fetchTabs); // タブの取得と更新をuseControlTodoTabフックに反映
   useEffect(() => {
     if (!token) return;
-    fetcher();
-  }, [fetcher, token]);
+    fetchTabs();
+  }, [fetchTabs, token]);
+
+  //   if (isSortMode) {
+  //     setSortTabs(
+  //       todoGroups.map((tab, idx) => ({
+  //         ...tab,
+  //         sortTabOrder:
+  //           typeof tab.sortTabOrder === "number" ? tab.sortTabOrder : idx,
+  //       }))
+  //     );
+  //   }
+  // }, [fetchTabs, token, todoGroups, isSortMode, setSortTabs]);
+  useEffect(() => {
+    if (isSortMode) {
+      setSortTabs(
+        tabs.map((tab, idx) => ({
+          ...tab,
+          sortTabOrder:
+            typeof tab.sortTabOrder === "number" ? tab.sortTabOrder : idx,
+        }))
+      );
+    }
+  }, [isSortMode, tabs, setSortTabs]);
 
   // モーダルを開く
   const openModal = () => {
@@ -117,7 +167,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
           )
         );
         setEditTab(null);
-        fetcher();
+        fetchTabs();
         setActiveTabId(editTab.id);
       } else {
         console.error("Failed to update tab");
@@ -188,9 +238,12 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
     } catch (error) {
       console.error("Error adding tab:", error);
     }
-    fetcher();
+    fetchTabs();
     setActiveTabId(newTab.id);
   };
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <>
       {isSortMode ? (

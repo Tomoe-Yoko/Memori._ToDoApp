@@ -33,7 +33,7 @@ export const PUT = async (
   }
 
   const body = await request.json();
-  const { items }: { items: { id: number; sortTabOrder: number }[] } = body;
+  const { items }: { items: { id: number; sortOrder: number }[] } = body;
 
   try {
     const validTodoItems = await prisma.todoItems.findMany({
@@ -53,7 +53,7 @@ export const PUT = async (
       .map((item) =>
         prisma.todoItems.update({
           where: { id: item.id },
-          data: { sortOrder: item.sortTabOrder },
+          data: { sortOrder: item.sortOrder },
         })
       );
 

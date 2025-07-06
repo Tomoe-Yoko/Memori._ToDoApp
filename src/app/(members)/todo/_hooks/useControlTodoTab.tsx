@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { SortedTab } from "@/app/_type/Todo";
 
-export const useControlTodoTab = () => {
+export const useControlTodoTab = (fetchTabs?: () => void) => {
   const { token } = useSupabaseSession();
   const [isSortMode, setIsSortMode] = useState(false);
   const [sortTabs, setSortTabs] = useState<SortedTab[]>([]);
@@ -37,7 +37,7 @@ export const useControlTodoTab = () => {
       id: tab.id,
       sortTabOrder: index + 1,
     }));
-    toast("🏷️ 並び替えモードを終了");
+    //  toast("🏷️ 並び替えモードを終了");
     try {
       const response = await fetch(`/api/todo_group/reorder`, {
         method: "PUT",
@@ -57,6 +57,7 @@ export const useControlTodoTab = () => {
           })
         );
         toast.success("✅ 並び順を保存しました");
+        if (fetchTabs) fetchTabs();
       } else {
         console.error("Failed to save tab order.");
         // toast.error("❌ タブ並び順保存に失敗しました");
