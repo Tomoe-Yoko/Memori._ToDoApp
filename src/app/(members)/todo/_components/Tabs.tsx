@@ -231,9 +231,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
                   <button
                     onClick={() => {
                       if (isSortMode) {
-                        // const sortedIds =
                         sortTabs.map((tab) => tab.id);
-                        clickSortTabMode();
                       }
                       clickSortTabMode();
                     }}
@@ -283,9 +281,7 @@ const Tabs: React.FC<Props> = ({ todoGroups, activeTabId, setActiveTabId }) => {
             <button
               onClick={() => {
                 if (isSortMode) {
-                  // const sortedIds =
                   sortTabs.map((tab) => tab.id);
-                  clickSortTabMode();
                 }
                 clickSortTabMode();
               }}
