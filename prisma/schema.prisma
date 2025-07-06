@@ -80,6 +80,7 @@ model TodoGroup {
   id             Int      @id @default(autoincrement())
   userId         Int
   toDoGroupTitle String
+  sortTabOrder   Int?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
