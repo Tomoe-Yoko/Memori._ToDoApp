@@ -33,9 +33,13 @@ export default function Home() {
               <Button text="ログイン" />
             </Link>
           </div>
-
-          <Link href="/signup">
-            <Button text="新規登録" />
+          <div className="my-12">
+            <Link href="/signup">
+              <Button text="新規登録" />
+            </Link>
+          </div>
+          <Link href="">
+            <Button text="ゲストログイン" />
           </Link>
         </section>
         <section className="py-28">
