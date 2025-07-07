@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreateContactRequestBody } from "@/app/_type/Contact";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import fetch from "node-fetch";
 const prisma = new PrismaClient();
 

@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { RoutineWorkRequestBody } from "@/app/_type/WeeklyRoutine";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 const prisma = new PrismaClient();
 
 export const POST = async (request: NextRequest) => {

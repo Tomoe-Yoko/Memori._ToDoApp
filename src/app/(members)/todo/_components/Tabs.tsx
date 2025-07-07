@@ -5,7 +5,7 @@ import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { CreatePostRequestBody } from "@/app/_type/Todo";
 import Button from "@/app/_components/Button";
 import toast, { Toaster } from "react-hot-toast";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import Input from "@/app/_components/Input";
 import Loading from "@/app/loading";
 import { useMouseDrag } from "@/app/_hooks/useMouseDrag";

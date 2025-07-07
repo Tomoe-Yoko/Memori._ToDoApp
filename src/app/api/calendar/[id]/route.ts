@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { PrismaClient, ScheduleColor } from "@prisma/client";
 
 const prisma = new PrismaClient();

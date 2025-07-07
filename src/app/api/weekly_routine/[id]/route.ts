@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { Weekly } from "@prisma/client";
 import { RoutineWorkRequestBody } from "@/app/_type/WeeklyRoutine";
 
