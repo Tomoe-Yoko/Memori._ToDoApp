@@ -86,7 +86,8 @@ https://memori-todoapp.vercel.app/
 </table></markdown-accessiblity-table>
 ---
 
-## 使用技術
+## 機能・使用技術
+![機能の表](https://github.com/user-attachments/assets/db0d6961-6d16-41d9-a251-4a1194f69721)
 
 - **フレームワーク**: Next.js (create-next-appベース)
 - **言語**: TypeScript
