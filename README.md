@@ -93,7 +93,6 @@ https://memori-todoapp.vercel.app/
 - **言語**: TypeScript
 - **スタイリング**: Tailwind CSS
 - **デプロイ**: Vercel
-- **フォント最適化**: `next/font` によるGeistの自動最適化
 - **ORM**: Prisma
 - **その他**
   - supabase
