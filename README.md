@@ -101,6 +101,10 @@ https://memori-todoapp.vercel.app/
 
 ---
 
+## ER図
+![機能の表](https://github.com/user-attachments/assets/0c5a174b-db52-4310-9cf1-77e4af66dd4a)
+
+---
 ##  開発者向け情報
 
 ### パッケージインストール
