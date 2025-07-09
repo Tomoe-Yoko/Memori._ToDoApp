@@ -38,8 +38,8 @@ https://memori-todoapp.vercel.app/
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" alt="image" style="max-width: 300px;"></td>
-<td><img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" alt="image" style="max-width: 300px;"></td>
+<td><img src="https://github.com/user-attachments/assets/7878a6b7-38db-458d-a8cb-33ab7c447150" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/aa35909a-3b6d-4ed9-98f2-6968447fc444" alt="image" style="max-width: 100%;"></td>
 </tr>
 <tr>
 <td>簡単なカレンダー。予定ごとに色分けでき、複数人の予定も一目で把握できます。</td>
@@ -57,8 +57,8 @@ https://memori-todoapp.vercel.app/
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7" alt="image" style="max-width: 300px;"></td>
-<td><img src="https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f" alt="image" style="max-width: 300px;"></td>
+<td><img src="https://github.com/user-attachments/assets/1c3cc392-dee1-452d-8722-6881ec32653e" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/f2d8cbe4-3f33-46ab-9047-d761ccafc6c4" alt="image" style="max-width: 100%;"></td>
 </tr>
 <tr>
 <td>毎週の定期タスクを一括管理し、達成感を得られる仕組みを取り入れています。</td>
@@ -77,7 +77,7 @@ https://memori-todoapp.vercel.app/
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343" alt="image" style="max-width: 300px;"></td>
+<td><img src="https://github.com/user-attachments/assets/5ee2532a-e051-4e9c-8312-749dedfbfd42" alt="image" style="max-width: 100%;"></td>
 </tr>
 <tr>
 <td>背景色のカラーバリエーションが豊富で、お問い合わせも可能です。</td>
