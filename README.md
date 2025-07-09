@@ -38,7 +38,7 @@ https://memori-todoapp.vercel.app/
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/f2d8cbe4-3f33-46ab-9047-d761ccafc6c4" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/5ee2532a-e051-4e9c-8312-749dedfbfd42" alt="image" style="max-width: 100%;"></td>
 <td><img src="https://github.com/user-attachments/assets/1c3cc392-dee1-452d-8722-6881ec32653e" alt="image" style="max-width: 100%;"></td>
 </tr>
 <tr>
@@ -57,7 +57,7 @@ https://memori-todoapp.vercel.app/
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/5ee2532a-e051-4e9c-8312-749dedfbfd42" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/f2d8cbe4-3f33-46ab-9047-d761ccafc6c4" alt="image" style="max-width: 100%;"></td>
 <td><img src="https://github.com/user-attachments/assets/aa35909a-3b6d-4ed9-98f2-6968447fc444" alt="image" style="max-width: 100%;"></td>
 </tr>
 <tr>
