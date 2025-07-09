@@ -28,32 +28,18 @@ https://memori-todoapp.vercel.app/
 - **パーソナルなカスタマイズ**  
   背景色の変更が15色から選べるなど、「自分らしい」空間を設定可能。
 
-- **ページ構成**
-  - ログインページ
-  - カレンダーページ
-  - TODOリストページ
-  - ルーティンページ
-  - ギャラリーページ
-| ページ構成 | 画像 | 説明 |
-|------------|------|------|
-| カレンダー | <img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" width="200"/> | 簡単なカレンダー。予定ごとに色分けでき、複数人の予定も一目で把握できます。 |
-| TODOリスト | <img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" width="200"/> | タスクをカテゴリー別に整理でき、視認性を高めました。 |
-| ルーティン | <img src="https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7" width="200"/> | 毎週の定期タスクを一括管理し、達成感を得られる仕組みを取り入れています。 |
-| ギャラリー | <img src="https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f" width="200"/> | 画像をカテゴリー別に保存でき、プリント類の整理にも活用できます。 |
-| セッティング | <img src="https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343" width="200"/> | 背景色のカラーバリエーションが豊富で、お問い合わせも可能です。 |
-
-
-<markdown-accessiblity-table data-catalyst=""><table>
+- **ページ構成と機能**
+ <markdown-accessiblity-table data-catalyst=""><table>
 <thead>
 <tr>
-<th> カレンダー</th>
+<th>カレンダー</th>
 <th>TODOリスト</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" alt="image" style="max-width: 100%;"></td>
-<td><img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" alt="image" style="max-width: 300px;"></td>
+<td><img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" alt="image" style="max-width: 300px;"></td>
 </tr>
 <tr>
 <td>簡単なカレンダー。予定ごとに色分けでき、複数人の予定も一目で把握できます。</td>
@@ -62,7 +48,42 @@ https://memori-todoapp.vercel.app/
 </tbody>
 </table></markdown-accessiblity-table>
 
+<markdown-accessiblity-table data-catalyst=""><table>
+<thead>
+<tr>
+<th>ルーティン</th>
+<th>ギャラリー</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7" alt="image" style="max-width: 300px;"></td>
+<td><img src="https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f" alt="image" style="max-width: 300px;"></td>
+</tr>
+<tr>
+<td>毎週の定期タスクを一括管理し、達成感を得られる仕組みを取り入れています。</td>
+<td>画像をカテゴリー別に保存でき、プリント類の整理にも活用できます。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
 
+
+<markdown-accessiblity-table data-catalyst=""><table>
+<thead>
+<tr>
+<th>セッティング</th>
+
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343" alt="image" style="max-width: 300px;"></td>
+</tr>
+<tr>
+<td>背景色のカラーバリエーションが豊富で、お問い合わせも可能です。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
 ---
 
 ## 使用技術
