@@ -34,13 +34,13 @@ https://memori-todoapp.vercel.app/
   - TODOリストページ
   - ルーティンページ
   - ギャラリーページ
-|ページ構成 | 画像 | 説明 |
-|------------------|------|------|
-| カレンダー | ![カレンダー画面](https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad) | 簡単なカレンダー。予定ごとに色分けできるようにし、複数人の予定も一目で把握できるように工夫しています。 |
-| TODOリスト | ![TODOリスト画面](https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560) | タスクをカテゴリー別に分けて、見やすく整理できるようにしました。 |
-| ルーティン | ![ルーティン画面](https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7) | TODOの中でも毎週決まっているタスクは、こちらで一括管理できるようにしました。達成感を味わえるような仕組みも取り入れています。 |
-| ギャラリー | ![ギャラリー画面](https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f) | 画像で残しておきたいものを保存できるスペースです。カテゴリー分けができるため、プリント類などの整理にも役立ちます。 |
-| セッティング| ![セッティング画面](https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343) | 背景色のカラーバリエーションも豊富で、お問い合わせもこちらから行っていただけます。 |
+| ページ構成 | 画像 | 説明 |
+|------------|------|------|
+| カレンダー | <img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" width="200"/> | 簡単なカレンダー。予定ごとに色分けでき、複数人の予定も一目で把握できます。 |
+| TODOリスト | <img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" width="200"/> | タスクをカテゴリー別に整理でき、視認性を高めました。 |
+| ルーティン | <img src="https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7" width="200"/> | 毎週の定期タスクを一括管理し、達成感を得られる仕組みを取り入れています。 |
+| ギャラリー | <img src="https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f" width="200"/> | 画像をカテゴリー別に保存でき、プリント類の整理にも活用できます。 |
+| セッティング | <img src="https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343" width="200"/> | 背景色のカラーバリエーションが豊富で、お問い合わせも可能です。 |
 ---
 
 ## 使用技術
