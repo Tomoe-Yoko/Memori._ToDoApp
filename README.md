@@ -41,6 +41,28 @@ https://memori-todoapp.vercel.app/
 | ルーティン | <img src="https://github.com/user-attachments/assets/add78158-999a-416f-a1f9-18415298fec7" width="200"/> | 毎週の定期タスクを一括管理し、達成感を得られる仕組みを取り入れています。 |
 | ギャラリー | <img src="https://github.com/user-attachments/assets/a0c6c8fd-e6ba-4b45-9f07-21c05ef2c11f" width="200"/> | 画像をカテゴリー別に保存でき、プリント類の整理にも活用できます。 |
 | セッティング | <img src="https://github.com/user-attachments/assets/77bdae20-9c77-4c3a-89c7-afc5e70e8343" width="200"/> | 背景色のカラーバリエーションが豊富で、お問い合わせも可能です。 |
+
+
+<markdown-accessiblity-table data-catalyst=""><table>
+<thead>
+<tr>
+<th> カレンダー</th>
+<th>TODOリスト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="https://github.com/user-attachments/assets/ec9dbaa3-645d-46ba-98e6-f3ee50024dad" alt="image" style="max-width: 100%;"></td>
+<td><img src="https://github.com/user-attachments/assets/d89d0199-418e-48f9-96c6-6267a81a4560" alt="image" style="max-width: 100%;"></td>
+</tr>
+<tr>
+<td>簡単なカレンダー。予定ごとに色分けでき、複数人の予定も一目で把握できます。</td>
+<td>タスクをカテゴリー別に整理でき、視認性を高めました。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+
 ---
 
 ## 使用技術
