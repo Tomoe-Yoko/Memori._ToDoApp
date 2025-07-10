@@ -14,7 +14,8 @@ import "react-calendar/dist/Calendar.css";
 import "../../globals.css";
 import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
-import { mutate } from "swr";
+import { useUser } from "@/app/_hooks/useUser";
+// import { mutate } from "swr";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -27,6 +28,7 @@ const Page: React.FC = () => {
     "iso8601"
   );
   const [holidays, setHolidays] = useState<Record<string, string>>({}); // 祝日データ
+  const { mutate } = useUser();
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -47,7 +49,8 @@ const Page: React.FC = () => {
     if (!token) return;
     setLoading(false);
     fetcher();
-    mutate("api/users");
+    mutate();
+    // mutate("api/users");
     // 週の始まりを取得
     const fetchStartOfWeek = async () => {
       const res = await fetch("/api/users", {
