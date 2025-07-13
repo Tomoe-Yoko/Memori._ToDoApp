@@ -63,7 +63,7 @@ const Page: React.FC = () => {
     };
 
     fetchStartOfWeek();
-  }, [fetcher, token]);
+  }, [fetcher, token, mutate]);
 
   // 祝日データの取得
   useEffect(() => {
