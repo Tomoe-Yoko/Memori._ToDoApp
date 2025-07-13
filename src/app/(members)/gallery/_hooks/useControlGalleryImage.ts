@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { GalleryItem } from "@/app/_type/Gallery";
 import { v4 as uuidv4 } from "uuid";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import imageCompression from "browser-image-compression";
 
 const useControlGalleryImage = (selectedTabId: number) => {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, ThemeColorId } from "@prisma/client";
 import { CreateLoginPostRequestBody } from "@/app/_type/login";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 
 const prisma = new PrismaClient();
 

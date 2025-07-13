@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreatePostRequestBody } from "@/app/_type/Calendar";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 
 const prisma = new PrismaClient();
 

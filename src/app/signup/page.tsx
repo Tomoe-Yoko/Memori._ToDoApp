@@ -1,6 +1,6 @@
 //ユーザー登録！
 "use client";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import React, { useState } from "react";
 import Button from "../_components/Button";
 import Footer from "../_components/Footer";

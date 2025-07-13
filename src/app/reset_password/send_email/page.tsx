@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import Button from "@/app/_components/Button";
 import Footer from "@/app/_components/Footer";
 import Image from "next/image"; // Imageコンポーネントをインポート

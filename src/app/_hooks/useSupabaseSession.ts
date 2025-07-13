@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
 export const useSupabaseSession = () => {

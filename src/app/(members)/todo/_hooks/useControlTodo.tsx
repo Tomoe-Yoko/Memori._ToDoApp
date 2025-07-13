@@ -8,7 +8,7 @@ import {
   TodoItem,
   SortedItem,
 } from "@/app/_type/Todo";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 // import { TbHandGrab } from "react-icons/tb";

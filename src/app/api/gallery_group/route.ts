@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { CreateGalleryGroupRequestBody } from "@/app/_type/Gallery";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 
 const prisma = new PrismaClient();
 

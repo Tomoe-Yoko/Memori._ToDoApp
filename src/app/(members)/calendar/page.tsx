@@ -2,21 +2,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseSession } from "../../_hooks/useSupabaseSession";
 import Calendar from "react-calendar";
-
 import { ScheduleColor } from "@prisma/client";
 import { CalendarData } from "../../_type/Calendar";
 import Modal from "react-modal";
 import NewPost from "./_components/modals/NewPost";
 import AllSchedule from "./_components/modals/AllSchedule";
 import { scheduleColorMap } from "./_components/modals/NewPost";
-// import Button from "../_components/Button";
 import Navigation from "../../_components/Navigation";
 import toast, { Toaster } from "react-hot-toast";
 import "react-calendar/dist/Calendar.css";
 import "../../globals.css";
 import PlusButton from "../../_components/PlusButton";
 import Loading from "@/app/loading";
-// import ToggleStartOfWeek from "@/app/_components/ToggleStartOfWeek";
+import { useUser } from "@/app/_hooks/useUser";
+// import { mutate } from "swr";
 
 const Page: React.FC = () => {
   const { token } = useSupabaseSession();
@@ -29,6 +28,7 @@ const Page: React.FC = () => {
     "iso8601"
   );
   const [holidays, setHolidays] = useState<Record<string, string>>({}); // 祝日データ
+  const { mutate } = useUser();
   const fetcher = useCallback(async () => {
     const res = await fetch("/api/calendar", {
       headers: {
@@ -49,6 +49,8 @@ const Page: React.FC = () => {
     if (!token) return;
     setLoading(false);
     fetcher();
+    mutate();
+    // mutate("api/users");
     // 週の始まりを取得
     const fetchStartOfWeek = async () => {
       const res = await fetch("/api/users", {
@@ -61,7 +63,7 @@ const Page: React.FC = () => {
     };
 
     fetchStartOfWeek();
-  }, [fetcher, token]);
+  }, [fetcher, token, mutate]);
 
   // 祝日データの取得
   useEffect(() => {
@@ -154,15 +156,27 @@ const Page: React.FC = () => {
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
-      const isoDate = date.toISOString().split("T")[0]; // "2025-01-01"
-      const holidayName = holidays[isoDate];
+      const jstDateString = date
+        .toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replace(/\//g, "-"); // "2025/01/01" → "2025-01-01"
+
+      const holidayName = holidays[jstDateString];
 
       const calendarEntries = calendars.filter((entry) => {
-        const entryDateString = new Date(entry.scheduleDate).toLocaleDateString(
-          "ja-JP"
-        );
+        const entryDate = new Date(entry.scheduleDate);
+        const entryDateString = entryDate
+          .toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })
+          .replace(/\//g, "-");
 
-        return entryDateString === date.toLocaleDateString("ja-JP");
+        return entryDateString === jstDateString;
       });
 
       // 予定の表示部分を構成

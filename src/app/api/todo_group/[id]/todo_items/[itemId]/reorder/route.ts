@@ -1,6 +1,6 @@
 //todoアイテムの並び替え更新
 import { PrismaClient } from "@prisma/client";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { NextResponse, NextRequest } from "next/server";
 
 const prisma = new PrismaClient();

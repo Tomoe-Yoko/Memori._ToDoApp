@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { useRouter } from "next/navigation";
 import Button from "../_components/Button";
 import Footer from "../_components/Footer";
@@ -20,14 +20,22 @@ const Page = () => {
     const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
+        const guestEmail = process.env.NEXT_PUBLIC_GUEST_EMAIL;
         if (data === undefined) {
           return <Loading />;
         }
-
-        if (data) {
-          router.replace(data.session ? "/login/welcome" : "/login");
-          return <Loading />;
+        if (!data || !data.session || !data.session.user?.email) {
+          router.replace("/login");
+          return;
         }
+        // console.log("Session data:", data);
+        const currentEmail = data.session.user.email;
+        if (currentEmail === guestEmail) {
+          // console.log("ゲストアカウントなので stay");
+          return;
+        }
+
+        router.replace(data.session ? "/login/welcome" : "/login");
       } catch (error) {
         console.error("セッション情報取得失敗:", error);
         router.replace("/login");

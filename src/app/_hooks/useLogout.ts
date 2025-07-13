@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/_utils/supabase";
 import { useUser } from "./useUser";
 
 const useLogout = () => {
