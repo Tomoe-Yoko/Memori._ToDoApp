@@ -1,35 +1,34 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { supabase } from "../_utils/supabase";
 import { mutate } from "swr";
+import { supabase } from "../_utils/supabase";
 
 export const GuestLoginButton = () => {
   const router = useRouter();
-
   const handleGuestLogin = async () => {
     const email = process.env.NEXT_PUBLIC_GUEST_EMAIL;
     const password = process.env.NEXT_PUBLIC_GUEST_PASSWORD;
     if (!email || !password) {
-      throw new Error(
-        "ゲストログインできませんでした。環境変数を確認してください。"
-      );
+      toast.error("環境変数が設定されていません");
+      return;
     }
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
 
       if (error) {
-        throw new Error("ゲストログインできませんでした。" + error.message);
+        toast.error("ログインに失敗しました。");
+        console.error(error.message);
+        return;
       }
 
-      router.replace("/calendar");
-      toast.success("ゲストログインしました", {
-        duration: 2100,
-      });
-      mutate("/api/users");
+      mutate("api/users"); // ユーザーデータを更新
+      router.replace(data.session ? "/login/welcome" : "/login");
+      toast.success("ゲストログインしました");
+      console.log("ゲストログイン成功:", data);
     } catch (error) {
       toast.error("ゲストログインに失敗しました。");
       console.error("Guest login error:", error);

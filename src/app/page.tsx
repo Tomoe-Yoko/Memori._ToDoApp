@@ -8,6 +8,7 @@ import top04 from "@/app/public/img/top04.png";
 import Button from "./_components/Button";
 import Footer from "./_components/Footer";
 import Link from "next/link";
+import { GuestLoginButton } from "./_components/GuestLoginButton";
 
 export default function Home() {
   return (
@@ -38,9 +39,9 @@ export default function Home() {
               <Button text="新規登録" />
             </Link>
           </div>
-          <Link href="">
-            <Button text="ゲストログイン" />
-          </Link>
+          <div>
+            <GuestLoginButton />
+          </div>
         </section>
         <section className="py-28">
           <h2 className="text-white text-4xl text-center py-8">
